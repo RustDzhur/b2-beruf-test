@@ -1,18 +1,18 @@
-0|Bu sayfanın Claude'u kullanmasına izin vermediniz. Otomatik cevap kontrolü bunsuz da çalışır.
-1|Claude bu hesap için kullanılamıyor.
+0|Bu sayfanın yapay zekâ kullanmasına izin vermediniz. Otomatik cevap kontrolü bunsuz da çalışır.
+1|yapay zekâ bu hesap için kullanılamıyor.
 2|Art arda çok fazla istek gönderildi veya limit doldu. Biraz sonra tekrar deneyin.
 3|Oturumun süresi doldu. claude.ai'de yeniden giriş yapın ve sayfayı yenileyin.
 4|Cevap beklenmedik bir biçimde geldi. Düğmeye tekrar basın.
-5|Claude bu isteğe cevap vermedi. Metni değiştirin.
+5|yapay zekâ bu isteğe cevap vermedi. Metni değiştirin.
 6|Metin çok uzun. Kısaltın.
 7|İstek durduruldu.
 8|Yerel sunucuyla bağlantı yok. npm start çalışıyor mu?
-9|API anahtarı kabul edilmiyor. ANTHROPIC_API_KEY değerini kontrol edin.
-10|Claude bir hata bildirdi. Tekrar deneyin.
-11|Claude'a ulaşılamadı. Tekrar deneyin.
-12|Claude düşünüyor…
-13|Claude kontrolü kapalı: API anahtarı ayarlanmamış. Sunucuyu durdurun ve şöyle başlatın: ANTHROPIC_API_KEY=sk-ant-... npm start (anahtarı console.anthropic.com adresinde oluşturabilirsiniz). Veya mektupları claude.ai üzerindeki çevrimiçi sürümde yazın; orada kontrol anahtarsız çalışır.
-14|Claude ile kontrol bu görünümde kullanılamıyor. Sayfayı claude.ai üzerinde açın ve sorulduğunda Claude erişimine izin verin.
+9|API anahtarı kabul edilmiyor. OPENAI_API_KEY değerini kontrol edin.
+10|yapay zekâ bir hata bildirdi. Tekrar deneyin.
+11|yapay zekâ ulaşılamadı. Tekrar deneyin.
+12|yapay zekâ düşünüyor…
+13|yapay zekâ kontrolü kapalı: API anahtarı ayarlanmamış. Sunucuyu durdurun ve şöyle başlatın: OPENAI_API_KEY=sk-ant-... npm start (anahtarı platform.openai.com adresinde oluşturabilirsiniz). Veya mektupları claude.ai üzerindeki çevrimiçi sürümde yazın; orada kontrol anahtarsız çalışır.
+14|yapay zekâ ile kontrol bu görünümde kullanılamıyor. Sayfayı claude.ai üzerinde açın ve sorulduğunda yapay zekâ erişimine izin verin.
 15|▶ Oynat
 16|konuşmacı: Microsoft nöral ses
 17|Bu tarayıcı metni sesli okuyamıyor. Sayfayı Chrome veya Edge'de açın ya da transkripti okuyun.
@@ -38,7 +38,7 @@
 38|Cevap:
 39|Yanlış · doğru:
 40|Cevap yok · doğru:
-41|Claude soruyu analiz ediyor…
+41|yapay zekâ soruyu analiz ediyor…
 43|Bu, geçme seviyesidir (%60 ve üzeri).
 44|Hâlâ %60'ın altında. Hatalara bakın ve "Neden?" düğmesine basın.
 45|↻ Baştan başla
@@ -58,10 +58,10 @@
 60|Yöneticinin notu ve müşterinin mektubu
 62|Yöneticinin notunu ve müşterinin mektubunu okuyun ve 19. ve 20. soruları cevaplayın.
 63|Müşteriye mektup (Beschwerde)
-64|Kendiniz yazarsınız, Claude kontrol eder
-65|Yöneticinin notunu ve müşterinin mektubunu okuyun ve müşteriye cevabı kendiniz yazın. Claude dilbilgisini, cümle yapısını ve B2 seviyesini kontrol eder.
+64|Kendiniz yazarsınız, yapay zekâ kontrol eder
+65|Yöneticinin notunu ve müşterinin mektubunu okuyun ve müşteriye cevabı kendiniz yazın. yapay zekâ dilbilgisini, cümle yapısını ve B2 seviyesini kontrol eder.
 66|Forumda görüş: Kendiniz yazarsınız
-67|Şirket içi foruma bir mesaj yazın: ne oldu, artıları, eksileri, görüşünüz. Claude metni kontrol eder.
+67|Şirket içi foruma bir mesaj yazın: ne oldu, artıları, eksileri, görüşünüz. yapay zekâ metni kontrol eder.
 68|Boşluklar: a–j kelimeleri
 69|Hangi kelime (a–j) boşluğa uyuyor? Her kelime yalnızca bir kez kullanılır, bazıları fazladır.
 70|Boşluklar: a, b veya c
@@ -77,11 +77,11 @@
 81|Telefon mesajından not
 82|Mesajı dinleyin ve notu doldurun: ad, telefon, önemli bilgi, yapılması gereken.
 83|Sunum + sorular (2+2 dk.)
-84|Konu hakkında kısa bir sunum hazırlayın ve yapın (yaklaşık 2 dakika), sonra sınav görevlisinin sorularını cevaplayın. Claude metninizi kontrol eder ve sınav görevlisini canlandırır.
+84|Konu hakkında kısa bir sunum hazırlayın ve yapın (yaklaşık 2 dakika), sonra sınav görevlisinin sorularını cevaplayın. yapay zekâ metninizi kontrol eder ve sınav görevlisini canlandırır.
 85|Smalltalk (3 dk.)
-86|Bir iş arkadaşıyla günlük bir konuda rahat bir sohbet. Örnek konuşmaya bakın, sonra Claude ile konuşun.
+86|Bir iş arkadaşıyla günlük bir konuda rahat bir sohbet. Örnek konuşmaya bakın, sonra yapay zekâ ile konuşun.
 87|Birlikte çözüm bulma (4 dk.)
-88|Partnerinizle iş yerindeki bir sorunu tartışır ve birlikte çözüm ararsınız. Örnek diyaloğa bakın, sonra Claude ile konuşun.
+88|Partnerinizle iş yerindeki bir sorunu tartışır ve birlikte çözüm ararsınız. Örnek diyaloğa bakın, sonra yapay zekâ ile konuşun.
 89|Metinler a–h
 90|Cevaplar a–f
 91|Yöneticinin notu
@@ -110,19 +110,19 @@
 117|Dur
 118|Mektubu kontrol et
 119|En az 40 kelime yazın, o zaman kontrol işe yarar.
-120|Claude mektubu sınav kriterlerine göre kontrol ediyor… genellikle 30–90 saniye
+120|yapay zekâ mektubu sınav kriterlerine göre kontrol ediyor… genellikle 30–90 saniye
 121|Örneği göster
 122|Örneği gizle
-123|Claude'dan örnek
-124|Claude bir örnek yazıyor…
+123|yapay zekâ örnek
+124|yapay zekâ bir örnek yazıyor…
 125|Mektubu atla
-126|Claude ile mektup kontrolü bu görünümde kullanılamıyor. Metninizi örnekle karşılaştırın ve Redemittel'i gözden geçirin.
+126|yapay zekâ ile mektup kontrolü bu görünümde kullanılamıyor. Metninizi örnekle karşılaştırın ve Redemittel'i gözden geçirin.
 127|yapıldı
 128|kısmen
 129|hayır
 130|Düzeltilmiş metni göster
 131|Düzeltilmiş metni gizle
-132|Claude'un değerlendirmesi
+132|yapay zekâ değerlendirmesi
 133|yaklaşık
 134|geçme seviyesinde
 135|hâlâ %60'ın altında
@@ -134,7 +134,7 @@
 142|B2 seviyesinde bunu böyle söylersiniz
 143|İpuçları
 144|Forumda iş arkadaşlarınıza bir mesaj yazın: ne planlanıyor, artıları, eksileri, gerekçeli görüşünüz. Bir üslup seçin: ihr/euch veya Sie, ve ikisini karıştırmayın.
-145|Dosyadaki örnek (konu "fitness odası") yapıyı gösterir. Kendi konunuz için "Claude'dan örnek" düğmesine basın.
+145|Dosyadaki örnek (konu "fitness odası") yapıyı gösterir. Kendi konunuz için "yapay zekâ örnek" düğmesine basın.
 146|Anahtar kelimeler ve sayılar kontrol edilir. İfade size ait olabilir; anlam ve sayılar önemlidir.
 147|↻ Yeni
 148|Doğru not ·
@@ -155,40 +155,40 @@
 163|Gönder
 164|Konuşmamı değerlendir
 165|Önce en az 2–3 kez cevap verin.
-166|Claude konuşmayı değerlendiriyor…
+166|yapay zekâ konuşmayı değerlendiriyor…
 167|Seviye:
 168|İyi giden noktalar
 169|Faydalı ifadeler
 170|cevapları sesli oku
-171|Claude ile konuşma burada kullanılamıyor. Maddelere ve Redemittel'e göre yüksek sesle alıştırma yapın ve örnekle karşılaştırın.
+171|yapay zekâ ile konuşma burada kullanılamıyor. Maddelere ve Redemittel'e göre yüksek sesle alıştırma yapın ve örnekle karşılaştırın.
 172|Göndermek için Ctrl+Enter
 173|Örnek diyalog
 174|A siz, B partnerinizdir. Bu olası bir versiyondur: Yapıyı ve ifadeleri alın, ama kendi sözlerinizle konuşun.
-175|Partnerle konuşma (Claude)
-176|Partner (Claude)
+175|Partnerle konuşma (yapay zekâ)
+176|Partner (yapay zekâ)
 177|Konuşmayı başlat
 178|Örnek konuşma
 179|A siz, B karşınızdaki kişidir. İfadeleri ve yapıyı alın, kendiniz hakkında cevap verin.
-180|Karşınızdaki kişiyle konuşma (Claude)
-181|Konuşma partneri (Claude)
+180|Karşınızdaki kişiyle konuşma (yapay zekâ)
+181|Konuşma partneri (yapay zekâ)
 182|Örnek sunum
 183|Örnek yapı: selamlama ve ana hatlar, örneklerle ana bölüm, görüş, sonuç. Metniniz sizinle ilgili olmalı.
-184|Konu ve bu maddeler hakkında yaklaşık 2 dakikalık (150–260 kelime) bir konuşma hazırlayın. Sonra yüksek sesle okuyun; sınavda serbest konuşursunuz. Claude metni kontrol eder, sonra bir sınav görevlisi gibi sorular sorar.
+184|Konu ve bu maddeler hakkında yaklaşık 2 dakikalık (150–260 kelime) bir konuşma hazırlayın. Sonra yüksek sesle okuyun; sınavda serbest konuşursunuz. yapay zekâ metni kontrol eder, sonra bir sınav görevlisi gibi sorular sorar.
 185|Olası bir versiyon. Aşağıdan dinleyebilirsiniz de.
 186|Sınav görevlisinin soruları (2 dakika)
-187|Sınav görevlisi (Claude)
+187|Sınav görevlisi (yapay zekâ)
 188|Sunumumla ilgili soru sor
 189|dosyanızdan
-190|Claude'dan örnek, dosyadan değil
+190|yapay zekâ örnek, dosyadan değil
 191|Kopyala
 192|Kopyalandı
 193|Başarısız
 194|Bir şikayete cevap (Beschwerde, No. 21)
-195|Dosyanızdan örnek mektuplar. Dosyanın kendisi uyarıyor: Kelimesi kelimesine ezberlenmiş bir metin kopyala-yapıştır sayılabilir. Yapıyı ve ifadeleri öğrenin, mektupta kendi sözlerinizle ve yalnızca yöneticinin istediğini yazın.
+195|Öğrenmek için örnek mektuplar. Kelimesi kelimesine ezberlenmiş metin kopya sayılabilir. Yapıyı ve kalıpları öğrenin, ama kendi sözcüklerinizle ve yalnızca patronun istediğini yazın.
 197|Yöneticinin görevi
 198|Örnek mektup
 200|Forum (Forumsbeitrag, No. 58)
-201|Dosyadaki sıra: hitap, giriş, lehte argümanlar, aleyhte argümanlar, görüşünüz, ad. Tek paragraf, tek üslup (Sie veya du), karıştırmayın.
+201|Sıra: selamlama, giriş, lehteki argümanlar, aleyhteki argümanlar, kendi görüşünüz, ad. Tek paragraf, tek hitap biçimi (Sie veya du), karıştırmayın.
 202|Şablonlu örnek (konu "fitness odası")
 203|Forum örneği
 205|Dosya yalnızca özü öğrenmenizi öneriyor: ad, telefon, 2–4 madde ve yapılması gereken. Ayrıntılar (adlar, renkler, sayılar) sınavda değişebilir, bu yüzden dikkatle dinleyin.
@@ -202,10 +202,10 @@
 213|Sprechen Teil 1 · sunum
 214|Sprechen Teil 3 · çözüm
 215|Sprechen Teil 1: örnek sunumlar
-216|Önemli: Dosyanızda bu konular için metin yok, yalnızca Telegram bağlantıları var. Bu 8 konuyu ve örnekleri yapıya örnek olarak kendim yazdım. Gerçek 8 konuyu ve "Tipps" bölümünü gönderirseniz, onları değiştiririm.
-217|Burada da aynı: 77 konu ve diyalog yalnızca bir Telegram bağlantısı olarak var. Bu 10 durumu ve diyalogları örnek olarak ben yazdım.
+216|Konular ve örnek sunumlar yapıya örnek olarak verilmiştir. Kurguyu öğrenin ve kendi konularınızı yerleştirin.
+217|Durumlar ve diyaloglar, bir konuşmanın yapısına örnek olarak verilmiştir.
 218|Sprechen Teil 3: bir sorunu çözme
-219|Durumlar dosyanızdan alındı (s. 168–172); A ve B diyaloglarını örnek olarak ben yazdım. Birçok olası versiyondan biri.
+219|A ve B diyalogları örnek olarak verilmiştir. Pek çok olası biçimden biridir.
 221|dosyadaki durum
 222|Durum
 223|Ana sayfa
@@ -217,7 +217,7 @@
 231|Daha fazla →
 232|🎲 Rastgele görev
 233|Sınav biletleri için antrenör
-234|Dosyanızdaki tüm güncel varyantlar: Lesen, sesli Hören, Sprachbausteine, Telefonnotiz, Claude tarafından kontrol edilen mektuplar ve partnerle Sprechen. Değiştirildi olarak işaretlenen biletler kaldırıldı.
+234|Sınav bölümlerine göre tüm varyantlar: Lesen, sesli Hören, Sprachbausteine, Telefonnotiz, yapay zekâ tarafından kontrol edilen mektuplar ve partnerle Sprechen.
 235|✍ Mektup yaz
 236|📖 Ezberle
 237|Deneme sınavı
@@ -273,7 +273,7 @@
 292|Mektup 21
 293|Forum 58
 294|: değerlendirilmedi
-295|Gerçek sınavdaki gibi her bölümden rastgele bir varyant: Cevaplar bölümün sonunda kontrol edilir, her ses bir kez oynatılır, transkript gizlidir. Mektupları Claude kontrol eder; vaktiniz yoksa bir mektubu atlayabilirsiniz.
+295|Gerçek sınavdaki gibi her bölümden rastgele bir varyant: Cevaplar bölümün sonunda kontrol edilir, her ses bir kez oynatılır, transkript gizlidir. Mektupları yapay zekâ kontrol eder; vaktiniz yoksa bir mektubu atlayabilirsiniz.
 296|Sınav süresi
 297|Lesen + Lesen und Schreiben: 65 dakika · Hören + Hören und Schreiben: 25 dakika · Sprachbausteine + Schreiben: 35 dakika. Toplam 125 dakika. Her bloğun sayacı ilk bölümüyle başlar; bloklar arasında ara verebilirsiniz.
 298|Sınavı başlat
@@ -286,7 +286,7 @@
 307|Sonuç
 308|Deneme sınavı sonucu
 311|. Değerlendirilmeyen mektuplar 0 sayılır.
-312|Sprechen (60 puan daha) burada sayılmaz: Bunu Sprechen bölümünde Claude ile alıştırın.
+312|Sprechen (60 puan daha) burada sayılmaz: Bunu Sprechen bölümünde yapay zekâ ile alıştırın.
 313|Yeni deneme sınavı
 314|Hatalarım
 315|Sınavdaki gibi: başlamadan önce cevap kâğıdındaki bilgilerinizi doldurun. Bunlar cevap kâğıdının her sayfasının başında görünecek.
@@ -306,7 +306,7 @@ r7|⏱ {1} dk.
 r8|Metniniz · hatalar: {1}
 r9|Varyant {1}
 r10|Örnek {1}
-r11|Dosyadaki tüm forum konuları ({1})
+r11|Tüm forum konuları ({1})
 r12|Durum {1}
 r13|No. {1}: doğru {2} / {3}
 r14|No. {1}: henüz denenmedi

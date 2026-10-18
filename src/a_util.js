@@ -44,15 +44,15 @@ function trackItems(list) { // list: [{key, n, ok, vid, sec}]
   store.set("wrong", w); store.set("nstat", ns); updateNav();
 }
 
-/* ---------- Claude (sample capability) ---------- */
+/* ---------- ИИ (sample capability) ---------- */
 let SAMPLE = null, sampleChecked = false;
-// Local version (no claude.ai runtime): the small server in server.js forwards requests to the Claude API using ANTHROPIC_API_KEY
+// Local version (no claude.ai runtime): the small server in server.js forwards requests to the ИИ API using OPENAI_API_KEY
 async function localSample() {
   try { const st = await (await fetch("/api/status")).json(); if (!st.ready) return null; } catch { return null; }
   const call = async (input, opts = {}) => {
     const messages = typeof input === "string" ? [{ role: "user", content: input }] : input;
     let r;
-    try { r = await fetch("/api/claude", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages, tier: opts.modelTier || "default" }), signal: opts.signal }); }
+    try { r = await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages, tier: opts.modelTier || "default" }), signal: opts.signal }); }
     catch (e) { throw e && e.name === "AbortError" ? { code: "cancelled" } : { code: "network" }; }
     const j = await r.json().catch(() => ({}));
     if (!r.ok) throw { code: j.code || "error", message: j.message };
@@ -67,23 +67,23 @@ const sampleReady = (window.claude && window.claude.use ? window.claude.use("sam
   .catch(() => { sampleChecked = true; refreshAI(); return null; });
 function refreshAI() { document.querySelectorAll("[data-ai]").forEach(el => { el.hidden = !SAMPLE; }); document.querySelectorAll("[data-noai]").forEach(el => { el.hidden = !!SAMPLE || !sampleChecked; }); }
 const ERR = {
-  not_granted: "Вы не разрешили странице обращаться к Claude. Автоматическая проверка ответов работает и без него.",
-  sampling_disabled: "Claude недоступен для этого аккаунта.",
+  not_granted: "Вы не разрешили странице обращаться к ИИ. Автоматическая проверка ответов работает и без него.",
+  sampling_disabled: "ИИ недоступен для этого аккаунта.",
   rate_limited: "Слишком много запросов подряд или исчерпан лимит. Попробуйте немного позже.",
   session_expired: "Сессия истекла. Войдите в claude.ai снова и обновите страницу.",
   invalid_json: "Ответ пришёл в неожиданном формате. Нажмите кнопку ещё раз.",
-  refused: "Claude не ответил на этот запрос. Измените текст.",
+  refused: "ИИ не ответил на этот запрос. Измените текст.",
   prompt_too_large: "Текст слишком длинный. Сократите его.",
   cancelled: "Запрос остановлен.",
   network: "Нет связи с локальным сервером. Запущен ли npm start?",
-  authentication_error: "Ключ API не подходит. Проверьте ANTHROPIC_API_KEY.",
-  error: "Claude вернул ошибку. Попробуйте ещё раз."
+  authentication_error: "Ключ API не подходит. Проверьте OPENAI_API_KEY.",
+  error: "ИИ вернул ошибку. Попробуйте ещё раз."
 };
-const errText = (e) => ERR[e && e.code] || "Не удалось связаться с Claude. Попробуйте ещё раз.";
-function thinking(msg) { return h("div", { class: "thinking" }, h("span", { class: "dots" }, h("i"), h("i"), h("i")), msg || "Claude думает…"); }
+const errText = (e) => ERR[e && e.code] || "Не удалось связаться с ИИ. Попробуйте ещё раз.";
+function thinking(msg) { return h("div", { class: "thinking" }, h("span", { class: "dots" }, h("i"), h("i"), h("i")), msg || "ИИ думает…"); }
 async function getSample() { const s = SAMPLE || await sampleReady; if (!s) throw { code: "not_granted" }; return s; }
 const LANG_NAME = { en: "English", de: "Deutsch", fr: "French", tr: "Turkish", ar: "Arabic", it: "Italian" };
-// the interface language also decides in which language Claude explains and gives feedback
+// the interface language also decides in which language ИИ explains and gives feedback
 function langNote(prompt) {
   const l = store.get("lang", "ru"), n = LANG_NAME[l];
   if (!n) return prompt;
@@ -97,7 +97,7 @@ async function askJSON(prompt, opts = {}) { const s = await getSample(); return 
 async function askText(prompt, opts = {}) { const s = await getSample(); return s(langNote(prompt), opts); }
 function aiButton(label, onClick, cls) { return h("button", { class: "btn " + (cls || "primary"), "data-ai": "", hidden: !SAMPLE, onclick: onClick }, h("span", { class: "ai" }, "AI"), label); }
 const LOCAL = !(window.claude && window.claude.use);
-function noAiNote(text) { return h("div", { class: "note", "data-noai": "", hidden: !!SAMPLE || !sampleChecked }, LOCAL ? "Проверка Claude выключена: не задан ключ API. Остановите сервер и запустите его так: ANTHROPIC_API_KEY=sk-ant-... npm start (ключ создаётся на console.anthropic.com). Либо делайте письма в онлайн-версии на claude.ai, там проверка работает без ключа." : text || "Проверка через Claude недоступна в этом просмотре. Откройте страницу на claude.ai и разрешите доступ к Claude, когда появится запрос."); }
+function noAiNote(text) { return h("div", { class: "note", "data-noai": "", hidden: !!SAMPLE || !sampleChecked }, LOCAL ? "Проверка ИИ выключена: не задан ключ API. Остановите сервер и запустите его так: OPENAI_API_KEY=sk-... npm start (ключ создаётся на platform.openai.com). Либо делайте письма в онлайн-версии на claude.ai, там проверка работает без ключа." : text || "Проверка через ИИ недоступна в этом просмотре. Откройте страницу на claude.ai и разрешите доступ к ИИ, когда появится запрос."); }
 
 /* ---------- speech: natural German voices, one voice per speaker ---------- */
 const TTS = window.speechSynthesis;

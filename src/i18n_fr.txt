@@ -1,18 +1,18 @@
-0|Vous n’avez pas autorisé cette page à utiliser Claude. La vérification automatique des réponses fonctionne aussi sans lui.
-1|Claude n’est pas disponible pour ce compte.
+0|Vous n’avez pas autorisé cette page à utiliser IA. La vérification automatique des réponses fonctionne aussi sans lui.
+1|IA n’est pas disponible pour ce compte.
 2|Trop de requêtes à la suite ou limite atteinte. Réessayez un peu plus tard.
 3|La session a expiré. Reconnectez-vous à claude.ai et rechargez la page.
 4|La réponse a un format inattendu. Cliquez de nouveau sur le bouton.
-5|Claude n’a pas répondu à cette requête. Modifiez le texte.
+5|IA n’a pas répondu à cette requête. Modifiez le texte.
 6|Le texte est trop long. Raccourcissez-le.
 7|Requête arrêtée.
 8|Pas de connexion au serveur local. npm start est-il en cours d’exécution ?
-9|La clé API n’est pas acceptée. Vérifiez ANTHROPIC_API_KEY.
-10|Claude a renvoyé une erreur. Réessayez.
-11|Impossible de joindre Claude. Réessayez.
-12|Claude réfléchit…
-13|La vérification par Claude est désactivée : aucune clé API n’est définie. Arrêtez le serveur et relancez-le ainsi : ANTHROPIC_API_KEY=sk-ant-... npm start (créez une clé sur console.anthropic.com). Ou rédigez les lettres dans la version en ligne sur claude.ai, où la vérification fonctionne sans clé.
-14|La vérification avec Claude n’est pas disponible dans cette vue. Ouvrez la page sur claude.ai et autorisez l’accès à Claude lorsqu’il vous est demandé.
+9|La clé API n’est pas acceptée. Vérifiez OPENAI_API_KEY.
+10|IA a renvoyé une erreur. Réessayez.
+11|Impossible de joindre IA. Réessayez.
+12|IA réfléchit…
+13|La vérification par IA est désactivée : aucune clé API n’est définie. Arrêtez le serveur et relancez-le ainsi : OPENAI_API_KEY=sk-ant-... npm start (créez une clé sur platform.openai.com). Ou rédigez les lettres dans la version en ligne sur claude.ai, où la vérification fonctionne sans clé.
+14|La vérification avec IA n’est pas disponible dans cette vue. Ouvrez la page sur claude.ai et autorisez l’accès à IA lorsqu’il vous est demandé.
 15|▶ Lecture
 16|voix : Microsoft neural voice
 17|Ce navigateur ne peut pas lire le texte à voix haute. Ouvrez la page dans Chrome ou Edge, ou lisez la transcription.
@@ -38,7 +38,7 @@
 38|Réponse :
 39|Faux · correct :
 40|Pas de réponse · correct :
-41|Claude analyse la question…
+41|IA analyse la question…
 43|C’est un niveau suffisant pour réussir (60 % et plus).
 44|Encore en dessous de 60 %. Regardez les erreurs et cliquez sur « Pourquoi ? ».
 45|↻ Recommencer
@@ -58,10 +58,10 @@
 60|Note du supérieur et lettre du client
 62|Lisez la note du supérieur et la lettre du client, puis répondez aux questions 19 et 20.
 63|Lettre au client (Beschwerde)
-64|Vous écrivez vous-même, Claude vérifie
-65|Lisez la note du supérieur et la lettre du client, puis rédigez vous-même la réponse au client. Claude vérifie la grammaire, la construction des phrases et le niveau B2.
+64|Vous écrivez vous-même, IA vérifie
+65|Lisez la note du supérieur et la lettre du client, puis rédigez vous-même la réponse au client. IA vérifie la grammaire, la construction des phrases et le niveau B2.
 66|Opinion sur le forum : vous écrivez vous-même
-67|Rédigez un message sur le forum interne : ce qui s’est passé, avantages, inconvénients, votre opinion. Claude vérifie le texte.
+67|Rédigez un message sur le forum interne : ce qui s’est passé, avantages, inconvénients, votre opinion. IA vérifie le texte.
 68|Lacunes : mots a–j
 69|Quel mot (a–j) convient à la lacune ? Chaque mot n’est utilisé qu’une fois, certains sont en trop.
 70|Lacunes : a, b ou c
@@ -77,11 +77,11 @@
 81|Note à partir d’un message téléphonique
 82|Écoutez le message et remplissez la note : nom, téléphone, information importante, ce qu’il faut faire.
 83|Présentation + questions (2+2 min)
-84|Préparez et faites une courte présentation sur le thème (environ 2 minutes), puis répondez aux questions de l’examinatrice. Claude vérifie votre texte et joue le rôle de l’examinatrice.
+84|Préparez et faites une courte présentation sur le thème (environ 2 minutes), puis répondez aux questions de l’examinatrice. IA vérifie votre texte et joue le rôle de l’examinatrice.
 85|Smalltalk (3 min)
-86|Une conversation détendue avec un collègue sur un sujet du quotidien. Regardez l’exemple de conversation, puis parlez avec Claude.
+86|Une conversation détendue avec un collègue sur un sujet du quotidien. Regardez l’exemple de conversation, puis parlez avec IA.
 87|Trouver une solution ensemble (4 min)
-88|Vous discutez d’un problème au travail avec votre partenaire et cherchez une solution ensemble. Regardez l’exemple de dialogue, puis parlez avec Claude.
+88|Vous discutez d’un problème au travail avec votre partenaire et cherchez une solution ensemble. Regardez l’exemple de dialogue, puis parlez avec IA.
 89|Textes a–h
 90|Réponses a–f
 91|Note du supérieur
@@ -110,19 +110,19 @@
 117|Stop
 118|Vérifier la lettre
 119|Écrivez au moins 40 mots, la vérification n’en sera que plus utile.
-120|Claude vérifie la lettre selon les critères de l’examen… généralement 30–90 secondes
+120|IA vérifie la lettre selon les critères de l’examen… généralement 30–90 secondes
 121|Afficher le modèle
 122|Masquer le modèle
-123|Exemple de Claude
-124|Claude rédige un exemple…
+123|Exemple de IA
+124|IA rédige un exemple…
 125|Passer la lettre
-126|La vérification de la lettre avec Claude n’est pas disponible dans cette vue. Comparez votre texte avec le modèle et parcourez les Redemittel.
+126|La vérification de la lettre avec IA n’est pas disponible dans cette vue. Comparez votre texte avec le modèle et parcourez les Redemittel.
 127|fait
 128|en partie
 129|non
 130|Afficher le texte corrigé
 131|Masquer le texte corrigé
-132|Évaluation de Claude
+132|Évaluation de IA
 133|approximatif
 134|niveau suffisant pour réussir
 135|encore en dessous de 60 %
@@ -134,7 +134,7 @@
 142|Comment le dire au niveau B2
 143|Conseils
 144|Écrivez un message à vos collègues sur le forum : ce qui est prévu, avantages, inconvénients, votre opinion avec justification. Choisissez un seul style : ihr/euch ou Sie, et ne les mélangez pas.
-145|L’exemple du fichier (thème « Fitnessraum ») montre la structure. Pour votre propre thème, cliquez sur « Exemple de Claude ».
+145|L’exemple du fichier (thème « Fitnessraum ») montre la structure. Pour votre propre thème, cliquez sur « Exemple de IA ».
 146|Sont vérifiés les mots-clés et les chiffres. La formulation peut être personnelle ; le contenu et les chiffres comptent.
 147|↻ Recommencer
 148|Note correcte ·
@@ -155,40 +155,40 @@
 163|Envoyer
 164|Évaluer ma conversation
 165|Répondez d’abord au moins 2–3 fois.
-166|Claude évalue la conversation…
+166|IA évalue la conversation…
 167|Niveau :
 168|Ce qui a bien fonctionné
 169|Expressions utiles
 170|lire les réponses à voix haute
-171|La conversation avec Claude n’est pas disponible ici. Entraînez-vous à voix haute avec les points-clés et les Redemittel, puis comparez avec le modèle.
+171|La conversation avec IA n’est pas disponible ici. Entraînez-vous à voix haute avec les points-clés et les Redemittel, puis comparez avec le modèle.
 172|Ctrl+Entrée pour envoyer
 173|Exemple de dialogue
 174|A, c’est vous, B est votre partenaire. C’est une version possible : reprenez la structure et les expressions, mais parlez avec vos propres mots.
-175|Conversation avec le partenaire (Claude)
-176|Partenaire (Claude)
+175|Conversation avec le partenaire (IA)
+176|Partenaire (IA)
 177|Commencer la conversation
 178|Exemple de conversation
 179|A, c’est vous, B est l’autre personne. Reprenez les expressions et la structure, et répondez en parlant de vous.
-180|Conversation avec l’interlocuteur (Claude)
-181|Interlocuteur (Claude)
+180|Conversation avec l’interlocuteur (IA)
+181|Interlocuteur (IA)
 182|Exemple de présentation
 183|Structure type : salutation et plan, développement avec exemples, opinion, conclusion. Votre texte doit parler de vous.
-184|Préparez un exposé d’environ 2 minutes (150–260 mots) sur le thème et ces points. Lisez-le ensuite à voix haute ; à l’examen, vous parlez librement. Claude vérifie le texte, puis pose des questions comme une examinatrice.
+184|Préparez un exposé d’environ 2 minutes (150–260 mots) sur le thème et ces points. Lisez-le ensuite à voix haute ; à l’examen, vous parlez librement. IA vérifie le texte, puis pose des questions comme une examinatrice.
 185|Une version possible. Vous pouvez aussi l’écouter ci-dessous.
 186|Questions de l’examinatrice (2 minutes)
-187|Examinatrice (Claude)
+187|Examinatrice (IA)
 188|Poser des questions sur ma présentation
 189|issu de votre fichier
-190|exemple de Claude, ne provient pas du fichier
+190|exemple de IA, ne provient pas du fichier
 191|Copier
 192|Copié
 193|Échec
 194|Réponse à une réclamation (Beschwerde, nº 21)
-195|Lettres modèles de votre fichier. Le fichier lui-même avertit : un texte appris par cœur mot pour mot peut être considéré comme du copier-coller. Apprenez la structure et les expressions, et dans la lettre, écrivez avec vos propres mots uniquement ce que le supérieur a demandé.
+195|Modèles de lettres à apprendre. Un texte appris mot pour mot peut être considéré comme un copier-coller. Apprenez la structure et les formules, mais écrivez avec vos propres mots et seulement ce que le chef a demandé.
 197|Consigne du supérieur
 198|Lettre modèle
 200|Forum (Forumsbeitrag, nº 58)
-201|Ordre selon le fichier : formule d’appel, introduction, arguments pour, arguments contre, votre opinion, nom. Un seul paragraphe, un seul style (Sie ou du), sans les mélanger.
+201|Ordre : salutation, introduction, arguments pour, arguments contre, votre avis, nom. Un seul paragraphe, un seul registre (Sie ou du), sans les mélanger.
 202|Modèle avec trame (thème « Fitnessraum »)
 203|Modèle de forum
 205|Le fichier conseille de n’apprendre que l’essentiel : nom, téléphone, 2–4 points et ce qu’il faut faire. Les détails (noms, couleurs, chiffres) peuvent changer à l’examen, écoutez donc attentivement.
@@ -202,10 +202,10 @@
 213|Sprechen Teil 1 · présentation
 214|Sprechen Teil 3 · solution
 215|Sprechen Teil 1 : présentations modèles
-216|Important : votre fichier ne contient aucun texte pour ces thèmes, seulement des liens Telegram. J’ai écrit moi-même ces 8 thèmes et modèles comme exemple de structure. Quand vous m’enverrez les vrais 8 thèmes et les « Tipps », je les remplacerai.
-217|Même chose ici : les 77 thèmes et dialogues n’existent que sous forme de lien Telegram. J’ai écrit moi-même ces 10 situations et dialogues comme exemple.
+216|Les thèmes et modèles de présentation servent d’exemples de structure. Apprenez la construction et utilisez vos propres thèmes.
+217|Les situations et dialogues servent d’exemples de structure d’une conversation.
 218|Sprechen Teil 3 : résoudre un problème
-219|Les situations proviennent de votre fichier (p. 168–172) ; j’ai écrit les dialogues A et B comme modèle. Une version parmi bien d’autres possibles.
+219|Les dialogues A et B servent de modèle. C’est une variante parmi beaucoup d’autres.
 221|situation issue du fichier
 222|Situation
 223|Accueil
@@ -217,7 +217,7 @@
 231|Plus →
 232|🎲 Exercice aléatoire
 233|Entraîneur pour les sujets d’examen
-234|Toutes les variantes actuelles de votre fichier : Lesen, Hören avec audio, Sprachbausteine, Telefonnotiz, lettres vérifiées par Claude et Sprechen avec un partenaire. Les sujets marqués comme remplacés ont été supprimés.
+234|Toutes les variantes par partie d’examen : Lesen, Hören avec audio, Sprachbausteine, Telefonnotiz, lettres corrigées par l’IA et Sprechen avec un partenaire.
 235|✍ Écrire des lettres
 236|📖 Apprendre par cœur
 237|Examen blanc
@@ -273,7 +273,7 @@
 292|Lettre 21
 293|Forum 58
 294| : non évalué
-295|Une variante aléatoire de chaque partie, comme à l’examen réel : les réponses sont vérifiées à la fin de la partie, chaque audio n’est lu qu’une fois, la transcription est masquée. Claude vérifie les lettres ; si vous manquez de temps, vous pouvez passer une lettre.
+295|Une variante aléatoire de chaque partie, comme à l’examen réel : les réponses sont vérifiées à la fin de la partie, chaque audio n’est lu qu’une fois, la transcription est masquée. IA vérifie les lettres ; si vous manquez de temps, vous pouvez passer une lettre.
 296|Durée de l’examen
 297|Lesen + Lesen und Schreiben : 65 minutes · Hören + Hören und Schreiben : 25 minutes · Sprachbausteine + Schreiben : 35 minutes. 125 minutes au total. Le minuteur de chaque bloc démarre avec sa première partie ; vous pouvez faire une pause entre les blocs.
 298|Démarrer l’examen
@@ -286,7 +286,7 @@
 307|Résultat
 308|Résultat de l’examen blanc
 311|. Les lettres non évaluées comptent pour 0.
-312|Sprechen (60 points supplémentaires) n’est pas compté ici : entraînez-vous dans la section Sprechen avec Claude.
+312|Sprechen (60 points supplémentaires) n’est pas compté ici : entraînez-vous dans la section Sprechen avec IA.
 313|Nouvel examen blanc
 314|Mes erreurs
 315|Comme à l'examen : avant de commencer, remplissez vos données sur la feuille de réponses. Elles apparaîtront en haut de chaque page de la feuille.
@@ -306,7 +306,7 @@ r7|⏱ {1} min
 r8|Votre texte · erreurs : {1}
 r9|Variante {1}
 r10|Modèle {1}
-r11|Tous les thèmes de forum du fichier ({1})
+r11|Tous les thèmes de forum ({1})
 r12|Situation {1}
 r13|Nº {1} : correct {2} sur {3}
 r14|Nº {1} : pas encore traité

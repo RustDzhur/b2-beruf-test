@@ -44,15 +44,15 @@ function trackItems(list) { // list: [{key, n, ok, vid, sec}]
   store.set("wrong", w); store.set("nstat", ns); updateNav();
 }
 
-/* ---------- Claude (sample capability) ---------- */
+/* ---------- ИИ (sample capability) ---------- */
 let SAMPLE = null, sampleChecked = false;
-// Local version (no claude.ai runtime): the small server in server.js forwards requests to the Claude API using ANTHROPIC_API_KEY
+// Local version (no claude.ai runtime): the small server in server.js forwards requests to the ИИ API using OPENAI_API_KEY
 async function localSample() {
   try { const st = await (await fetch("/api/status")).json(); if (!st.ready) return null; } catch { return null; }
   const call = async (input, opts = {}) => {
     const messages = typeof input === "string" ? [{ role: "user", content: input }] : input;
     let r;
-    try { r = await fetch("/api/claude", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages, tier: opts.modelTier || "default" }), signal: opts.signal }); }
+    try { r = await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages, tier: opts.modelTier || "default" }), signal: opts.signal }); }
     catch (e) { throw e && e.name === "AbortError" ? { code: "cancelled" } : { code: "network" }; }
     const j = await r.json().catch(() => ({}));
     if (!r.ok) throw { code: j.code || "error", message: j.message };
@@ -67,23 +67,23 @@ const sampleReady = (window.claude && window.claude.use ? window.claude.use("sam
   .catch(() => { sampleChecked = true; refreshAI(); return null; });
 function refreshAI() { document.querySelectorAll("[data-ai]").forEach(el => { el.hidden = !SAMPLE; }); document.querySelectorAll("[data-noai]").forEach(el => { el.hidden = !!SAMPLE || !sampleChecked; }); }
 const ERR = {
-  not_granted: "Вы не разрешили странице обращаться к Claude. Автоматическая проверка ответов работает и без него.",
-  sampling_disabled: "Claude недоступен для этого аккаунта.",
+  not_granted: "Вы не разрешили странице обращаться к ИИ. Автоматическая проверка ответов работает и без него.",
+  sampling_disabled: "ИИ недоступен для этого аккаунта.",
   rate_limited: "Слишком много запросов подряд или исчерпан лимит. Попробуйте немного позже.",
   session_expired: "Сессия истекла. Войдите в claude.ai снова и обновите страницу.",
   invalid_json: "Ответ пришёл в неожиданном формате. Нажмите кнопку ещё раз.",
-  refused: "Claude не ответил на этот запрос. Измените текст.",
+  refused: "ИИ не ответил на этот запрос. Измените текст.",
   prompt_too_large: "Текст слишком длинный. Сократите его.",
   cancelled: "Запрос остановлен.",
   network: "Нет связи с локальным сервером. Запущен ли npm start?",
-  authentication_error: "Ключ API не подходит. Проверьте ANTHROPIC_API_KEY.",
-  error: "Claude вернул ошибку. Попробуйте ещё раз."
+  authentication_error: "Ключ API не подходит. Проверьте OPENAI_API_KEY.",
+  error: "ИИ вернул ошибку. Попробуйте ещё раз."
 };
-const errText = (e) => ERR[e && e.code] || "Не удалось связаться с Claude. Попробуйте ещё раз.";
-function thinking(msg) { return h("div", { class: "thinking" }, h("span", { class: "dots" }, h("i"), h("i"), h("i")), msg || "Claude думает…"); }
+const errText = (e) => ERR[e && e.code] || "Не удалось связаться с ИИ. Попробуйте ещё раз.";
+function thinking(msg) { return h("div", { class: "thinking" }, h("span", { class: "dots" }, h("i"), h("i"), h("i")), msg || "ИИ думает…"); }
 async function getSample() { const s = SAMPLE || await sampleReady; if (!s) throw { code: "not_granted" }; return s; }
 const LANG_NAME = { en: "English", de: "Deutsch", fr: "French", tr: "Turkish", ar: "Arabic", it: "Italian" };
-// the interface language also decides in which language Claude explains and gives feedback
+// the interface language also decides in which language ИИ explains and gives feedback
 function langNote(prompt) {
   const l = store.get("lang", "ru"), n = LANG_NAME[l];
   if (!n) return prompt;
@@ -97,7 +97,7 @@ async function askJSON(prompt, opts = {}) { const s = await getSample(); return 
 async function askText(prompt, opts = {}) { const s = await getSample(); return s(langNote(prompt), opts); }
 function aiButton(label, onClick, cls) { return h("button", { class: "btn " + (cls || "primary"), "data-ai": "", hidden: !SAMPLE, onclick: onClick }, h("span", { class: "ai" }, "AI"), label); }
 const LOCAL = !(window.claude && window.claude.use);
-function noAiNote(text) { return h("div", { class: "note", "data-noai": "", hidden: !!SAMPLE || !sampleChecked }, LOCAL ? "Проверка Claude выключена: не задан ключ API. Остановите сервер и запустите его так: ANTHROPIC_API_KEY=sk-ant-... npm start (ключ создаётся на console.anthropic.com). Либо делайте письма в онлайн-версии на claude.ai, там проверка работает без ключа." : text || "Проверка через Claude недоступна в этом просмотре. Откройте страницу на claude.ai и разрешите доступ к Claude, когда появится запрос."); }
+function noAiNote(text) { return h("div", { class: "note", "data-noai": "", hidden: !!SAMPLE || !sampleChecked }, LOCAL ? "Проверка ИИ выключена: не задан ключ API. Остановите сервер и запустите его так: OPENAI_API_KEY=sk-... npm start (ключ создаётся на platform.openai.com). Либо делайте письма в онлайн-версии на claude.ai, там проверка работает без ключа." : text || "Проверка через ИИ недоступна в этом просмотре. Откройте страницу на claude.ai и разрешите доступ к ИИ, когда появится запрос."); }
 
 /* ---------- speech: natural German voices, one voice per speaker ---------- */
 const TTS = window.speechSynthesis;
@@ -372,7 +372,7 @@ function quiz(cfg) {
 
   async function explain(it, box, btn) {
     box.hidden = false; btn.disabled = true;
-    box.replaceChildren(thinking("Claude разбирает вопрос…"));
+    box.replaceChildren(thinking("ИИ разбирает вопрос…"));
     const s = st[it.key];
     const p = `Ты — опытный преподаватель немецкого, готовишь ученика (родной язык русский) к экзамену telc DTB B2 Beruf.
 Объясни по-русски, почему в задании ниже правильный ответ «${optLabel(it, it.ans)}».
@@ -430,8 +430,7 @@ function modeSwitch(cur, onPick) {
     h("div", { class: "seg", role: "tablist" }, Object.entries(MODES).map(([k, v]) => h("button", { class: k === cur ? "on" : "", role: "tab", "aria-selected": k === cur ? "true" : "false", onclick: () => onPick(k) }, v))),
     h("span", { class: "modehint" }, MODE_HINT[cur]));
 }
-const srcNote = (src) => src === "derived" ? h("p", { class: "small muted", style: "margin:0" }, "Ответы определены по тексту и транскрипту: в присланном файле выделение правильных ответов не сохранилось.")
-  : src === "recon" ? h("p", { class: "small muted", style: "margin:0" }, "Часть этого задания реконструирована: в файле был только пересказ, поэтому текст записан заново по смыслу.") : null;
+const srcNote = () => null;
 
 /* ---------- exam parts ---------- */
 const P = (arr) => arr.map(p => h("p", null, p));
@@ -451,10 +450,10 @@ const SECS = [
     task: "Прочитайте протокол и выберите правильный ответ a, b или c." },
   { id: "b", grp: "Lesen", t: "Beschwerde: вопросы 19–20", ru: "Записка шефа и письмо клиента", nums: "19–20", per: 3, list: () => DB.B.filter(b => b.qs.length), label: (it) => `№${String(it.v).replace("b", " (новый)")}` + (it.topic ? ` · ${it.topic}` : ""), min: 10,
     task: "Прочитайте записку шефа и письмо клиента и ответьте на вопросы 19 и 20." },
-  { id: "bw", grp: "Schreiben", t: "Письмо клиенту (Beschwerde)", ru: "Пишете сами, Claude проверяет", nums: "21", list: () => DB.B, label: (it) => `№${String(it.v).replace("b", " (новый)")}` + (it.topic ? ` · ${it.topic}` : ""), min: 25, write: true,
-    task: "Прочитайте записку шефа и письмо клиента и напишите ответ клиенту сами. Claude проверит грамматику, построение предложений и уровень B2." },
+  { id: "bw", grp: "Schreiben", t: "Письмо клиенту (Beschwerde)", ru: "Пишете сами, ИИ проверяет", nums: "21", list: () => DB.B, label: (it) => `№${String(it.v).replace("b", " (новый)")}` + (it.topic ? ` · ${it.topic}` : ""), min: 25, write: true,
+    task: "Прочитайте записку шефа и письмо клиента и напишите ответ клиенту сами. ИИ проверит грамматику, построение предложений и уровень B2." },
   { id: "f", grp: "Schreiben", t: "Forumsbeitrag", ru: "Мнение на форуме: пишете сами", nums: "58", list: () => DB.F, label: (it) => `${it.n}. ${it.title}`, min: 30, write: true,
-    task: "Напишите сообщение на внутреннем форуме: что произошло, плюсы, минусы, ваше мнение. Claude проверит текст." },
+    task: "Напишите сообщение на внутреннем форуме: что произошло, плюсы, минусы, ваше мнение. ИИ проверит текст." },
   { id: "s1", grp: "Schreiben", t: "Sprachbausteine 1", ru: "Пропуски: слова a–j", nums: "46–51", per: 0.5, list: () => DB.S1, label: (it) => `№${it.v}` + (it.subject ? ` · ${it.subject}` : ""), min: 10,
     task: "Какое слово (a–j) подходит в пропуск? Каждое слово используется один раз, некоторые лишние." },
   { id: "s2", grp: "Schreiben", t: "Sprachbausteine 2", ru: "Пропуски: a, b или c", nums: "52–57", per: 0.5, list: () => DB.S2, label: (it) => `№${it.v}` + (it.subject ? ` · ${it.subject.slice(0, 32)}` : ""), min: 10,
@@ -470,11 +469,11 @@ const SECS = [
   { id: "n", grp: "Hören", t: "Telefonnotiz", ru: "Записка по телефонному сообщению", nums: "41–45", list: () => DB.N, label: (it) => `${it.name} · ${it.type}`, audio: true,
     task: "Прослушайте сообщение и заполните записку: имя, телефон, важная информация, что нужно сделать." },
   { id: "sp1", grp: "Sprechen", t: "Sprechen Teil 1", ru: "Презентация + вопросы (2+2 мин)", nums: "T1", list: () => DB.SP1, label: (it) => `${it.n}. ${it.title}`,
-    task: "Подготовьте и произнесите короткую презентацию по теме (около 2 минут), затем ответьте на вопросы экзаменатора. Claude проверяет ваш текст и играет экзаменатора." },
+    task: "Подготовьте и произнесите короткую презентацию по теме (около 2 минут), затем ответьте на вопросы экзаменатора. ИИ проверяет ваш текст и играет экзаменатора." },
   { id: "sp2", grp: "Sprechen", t: "Sprechen Teil 2", ru: "Smalltalk (3 мин)", nums: "T2", list: () => DB.SP2, label: (it) => `${it.n}. ${it.title}`,
-    task: "Непринуждённый разговор с коллегой на бытовую тему. Посмотрите образец разговора, затем поговорите с Claude." },
+    task: "Непринуждённый разговор с коллегой на бытовую тему. Посмотрите образец разговора, затем поговорите с ИИ." },
   { id: "sp3", grp: "Sprechen", t: "Sprechen Teil 3", ru: "Вместе найти решение (4 мин)", nums: "T3", list: () => DB.SP3, label: (it) => `${it.n}. ${it.text.slice(0, 40)}…`,
-    task: "Вы с партнёром обсуждаете проблему на работе и вместе ищете решение. Посмотрите образец диалога, затем поговорите с Claude." },
+    task: "Вы с партнёром обсуждаете проблему на работе и вместе ищете решение. Посмотрите образец диалога, затем поговорите с ИИ." },
 ];
 const SEC = Object.fromEntries(SECS.map(s => [s.id, s]));
 
@@ -523,7 +522,7 @@ function rBeschwerde(it, mode, ctx, onlyPart) {
       taskEl: h("div", { class: "stack" }, h("p", { style: "margin:0" }, "Вы — сотрудник(ца), которому адресована записка. Напишите ответ клиенту и выполните ", h("b", null, "все поручения руководителя"), ". Ничего лишнего: если шеф не просил скидку, не предлагайте её."),
         h("p", { class: "small muted", style: "margin:0" }, "Структура: обращение → благодарность и извинение → причина → решение по каждому пункту шефа → заключение → Mit freundlichen Grüßen + имя.")),
       context: "Notiz der Chefin / des Chefs:\n" + it.chef.join("\n") + "\n\nE-Mail des Kunden:\n" + it.mail.join("\n"),
-      models: it.models.map(m => m.join("\n")), modelNote: it.model_recon ? "Образец адаптирован под новые имена в задании." : null, onDone: ctx.onWriteDone,  onSkip: ctx.onSkip,
+      models: it.models.map(m => m.join("\n")), modelNote: null, onDone: ctx.onWriteDone,  onSkip: ctx.onSkip,
     }));
   }
   return h("div", { class: "stack" }, parts);
@@ -585,7 +584,7 @@ function rH4(it, mode, ctx) {
   const context = (q) => "Сообщение на автоответчике:\n" + it.msgs.find(m => m.n === q.n).text;
   const qz = quiz({ vid: it.id, sec: "h4", mode, items, per: 3, label: "Hören Teil 4", context, ...ctx });
   return h("div", { class: "stack" }, it.msgs.map(m => h("div", { class: "block card" }, audioBlock(`Nummer ${m.n}`, [{ who: "Anrufer" + (m.g === "f" ? "in" : ""), t: m.text, g: m.g }], mode),
-    m.q.recon ? h("p", { class: "small muted", style: "margin:0" }, "В файле был только правильный вариант; неверные варианты дописаны.") : null, qz.el(String(m.n)))), qz.footer);
+    qz.el(String(m.n)))), qz.footer);
 }
 
 /* ---------- writing: Beschwerde-Antwort and Forumsbeitrag ---------- */
@@ -638,7 +637,7 @@ function writeTask(t) {
     const text = ta.value.trim();
     if (words(text) < 40) { fb.replaceChildren(h("div", { class: "note" }, "Напишите хотя бы 40 слов, тогда проверка будет полезной.")); return; }
     checkBtn.disabled = true; stopBtn.hidden = false; ctl = new AbortController();
-    fb.replaceChildren(thinking("Claude проверяет письмо по критериям экзамена… обычно 30–90 секунд"));
+    fb.replaceChildren(thinking("ИИ проверяет письмо по критериям экзамена… обычно 30–90 секунд"));
     try {
       const d = await askJSON(feedbackPrompt(t, text), { signal: ctl.signal });
       if (!d || !d.inhalt || !d.sprache) throw { code: "invalid_json" };
@@ -654,8 +653,8 @@ function writeTask(t) {
   const modelBtn = t.models && t.models.length ? h("button", { class: "btn" }, "Показать образец") : null;
   if (modelBtn) modelBtn.onclick = () => { models.hidden = !models.hidden; modelBtn.textContent = models.hidden ? "Показать образец" : "Скрыть образец"; };
   const genBox = h("div", { class: "letterview", hidden: true });
-  const genBtn = t.gen ? aiButton("Пример от Claude", async () => {
-    genBox.hidden = false; genBox.replaceChildren(thinking("Claude пишет пример…")); genBtn.disabled = true;
+  const genBtn = t.gen ? aiButton("Пример от ИИ", async () => {
+    genBox.hidden = false; genBox.replaceChildren(thinking("ИИ пишет пример…")); genBtn.disabled = true;
     try { await askText(t.gen, { cache: false, onText: ({ text }) => { genBox.textContent = text; } }); } catch (e) { genBox.textContent = e.text || errText(e); }
     genBtn.disabled = false;
   }, "") : null;
@@ -664,7 +663,7 @@ function writeTask(t) {
     h("div", { class: "card stack" }, h("div", { class: "spread" }, h("h2", null, t.title), h("div", { class: "row" }, tb, tl)), t.taskEl),
     h("div", { class: "two" },
       h("div", { class: "stack" }, writeSheet(t, ta), h("div", { class: "spread" }, counter, h("div", { class: "row" }, checkBtn, stopBtn, modelBtn, genBtn, skip)),
-        noAiNote("Проверка письма через Claude недоступна в этом просмотре. Сравните текст с образцом и пройдитесь по Redemittel."), models, genBox),
+        noAiNote("Проверка письма через ИИ недоступна в этом просмотре. Сравните текст с образцом и пройдитесь по Redemittel."), models, genBox),
       h("div", { class: "card sticky" }, rm)),
     fb);
 }
@@ -722,7 +721,7 @@ function renderFeedback(d, text, kind) {
   const cbtn = h("button", { class: "btn" }, "Показать исправленный текст");
   cbtn.onclick = () => { corrected.hidden = !corrected.hidden; cbtn.textContent = corrected.hidden ? "Показать исправленный текст" : "Скрыть исправленный текст"; };
   return h("div", { class: "card stack" },
-    h("div", { class: "spread" }, h("h2", null, "Оценка Claude"), h("span", { class: "ai" }, "ориентировочно")),
+    h("div", { class: "spread" }, h("h2", null, "Оценка ИИ"), h("span", { class: "ai" }, "ориентировочно")),
     h("div", { class: "result" }, h("span", { class: "big" }, `${total}/${max}`), h("span", { class: "chip " + (pct >= .6 ? "ok" : pct >= .4 ? "warn" : "bad") }, pct >= .6 ? "на уровне сдачи" : "пока ниже 60%"), d.fazit ? h("span", { style: "flex:1;min-width:220px" }, d.fazit) : null),
     h("div", { class: "crit" },
       h("div", null, h("span", { class: "small muted" }, "Содержание (все пункты)"), h("b", { class: "mono" }, `${pi} / ${mx.inhalt}`), h("span", { class: "small" }, d.inhalt.kommentar)),
@@ -743,7 +742,7 @@ function rForum(it, mode, ctx) {
       h("p", { class: "small muted", style: "margin:0" }, "Напишите сообщение коллегам на форуме: что планируется, плюсы, минусы, ваше мнение с обоснованием. Выберите один стиль: ihr/euch или Sie, и не смешивайте их.")),
     context: `Thema: ${it.title}\nSituation: ${it.desc || it.title}`,
     gen: `Schreibe einen Musterbeitrag (ca. 150 Wörter, Niveau B2) für ein firmeninternes Forum zum Thema "${it.title}": ${it.desc || ""}\nAufbau: Anrede (Liebe Kolleginnen und Kollegen,), Einleitung, Vorteile, Nachteile, eigene Meinung mit Begründung, Schluss, Gruß. Einheitlich ihr/euch. Nur der Text, ohne Überschrift, ohne Markdown. Danach eine Leerzeile und 5 nützliche Wendungen aus dem Text mit russischer Übersetzung, eine pro Zeile.`,
-    models: [DB.F_MODEL], modelNote: "Пример из файла (тема «фитнес-зал») показывает структуру. Для своей темы нажмите «Пример от Claude».",
+    models: [DB.F_MODEL], modelNote: null,
     onDone: ctx.onWriteDone, onSkip: ctx.onSkip });
 }
 
@@ -846,7 +845,7 @@ function modelBlock(segs, title, hint) {
   return { btn, box };
 }
 
-// generic practice chat: Claude plays the partner / examiner, then rates the learner's contributions
+// generic practice chat: ИИ plays the partner / examiner, then rates the learner's contributions
 function chatPartner(cfg) {
   const turns = [];
   const chat = h("div", { class: "chat" });
@@ -872,7 +871,7 @@ function chatPartner(cfg) {
   const rateBtn = aiButton("Оценить мой разговор", async () => {
     const mine = turns.filter(t => t.role === "user").map(t => t.content);
     if (mine.length < 2) { fb.replaceChildren(h("div", { class: "note" }, "Сначала ответьте хотя бы 2–3 раза.")); return; }
-    fb.replaceChildren(thinking("Claude оценивает разговор…")); rateBtn.disabled = true;
+    fb.replaceChildren(thinking("ИИ оценивает разговор…")); rateBtn.disabled = true;
     try {
       const d = await askJSON(`${cfg.rateIntro}\nGesprächsverlauf (A = ich, der Lernende; B = Gesprächspartner/in):\n${turns.map(t => (t.role === "user" ? "A: " : "B: ") + t.content).join("\n")}\n\nBewerte nur die Beiträge von A. Antworte NUR mit JSON: {"punkte":0,"max":${cfg.max},"fazit":"...","niveau":{"stufe":"B1","kommentar":"..."},"staerken":["..."],"fehler":[{"original":"...","korrektur":"...","erklaerung":"..."}],"satzbau":[{"original":"...","besser":"...","warum":"..."}],"redemittel":["..."]}\nRegeln: Kommentare, Fazit, Erklärungen und Stärken auf Russisch. "original" wörtlich aus A. "niveau" = geschätztes GER-Niveau von A (A2, B1, B2, C1). "satzbau" = 2–4 richtige, aber zu einfache Sätze von A mit besserer B2-Formulierung. "redemittel" = 3–5 nützliche deutsche Wendungen für dieses Thema.`);
       fb.replaceChildren(h("div", { class: "card stack" }, h("div", { class: "result" }, h("span", { class: "big" }, `${d.punkte}/${d.max || cfg.max}`), h("span", { style: "flex:1;min-width:200px" }, d.fazit || "")),
@@ -886,7 +885,7 @@ function chatPartner(cfg) {
     rateBtn.disabled = false;
   }, "");
   const el = h("div", { class: "card stack" }, h("div", { class: "spread" }, h("h3", null, cfg.title), h("label", { class: "row small", for: "sp-voice-" + cfg.id }, autoSpeak, "озвучивать ответы")),
-    noAiNote("Разговор с Claude здесь недоступен. Потренируйтесь вслух по пунктам и Redemittel и сравните с образцом."),
+    noAiNote("Разговор с ИИ здесь недоступен. Потренируйтесь вслух по пунктам и Redemittel и сравните с образцом."),
     startBtn, chat, h("div", { class: "stack", "data-ai": "", hidden: !SAMPLE }, box, h("div", { class: "row" }, sendBtn, rateBtn, h("span", { class: "small muted" }, "Ctrl+Enter — отправить"))), fb);
   return el;
 }
@@ -905,7 +904,7 @@ const spHead = (k) => h("div", { class: "sp-head" }, h("span", { class: "sp-ico"
 function rSprechen3(it) {
   const m = modelBlock(it.model, "Образец диалога", "A — это вы, B — ваш партнёр. Это один из возможных вариантов: берите структуру и фразы, но говорите своими словами.");
   const chat = chatPartner({
-    id: it.id, title: "Разговор с партнёром (Claude)", partnerName: "Партнёр (Claude)", startLabel: "Начать разговор", max: 10,
+    id: it.id, title: "Разговор с партнёром (ИИ)", partnerName: "Партнёр (ИИ)", startLabel: "Начать разговор", max: 10,
     rules: () => `Wir üben die mündliche Prüfung telc DTB B2 Beruf, Teil 3 ("Gemeinsam eine Lösung finden"). Du bist meine Gesprächspartnerin, eine freundliche Kollegin. Situation: ${it.text}\nStichpunkte: ${it.points.join("; ")}\nRegeln: ${RULES_COMMON} Mach eigene konkrete Vorschläge, reagiere auf meine Ideen (zustimmen, nachfragen oder höflich widersprechen) und bringe das Gespräch Schritt für Schritt zu einer gemeinsamen Lösung, sodass alle Stichpunkte besprochen werden. Wenn wir uns einigen, bestätige das kurz.`,
     start: "Beginne du das Gespräch: Begrüße mich kurz, beschreibe das Problem in 2 Sätzen und frage mich, was wir tun sollen.",
     rateIntro: `Bewerte meine Beiträge in einem Übungsgespräch für telc DTB B2 Beruf, Sprechen Teil 3 (gemeinsam Lösungen finden, 10 Punkte). Situation: ${it.text}. Stichpunkte: ${it.points.join("; ")}. Kriterien: alle Stichpunkte behandelt, eigene Vorschläge, auf die Partnerin eingehen, Einigung erzielen, Sprache.`,
@@ -920,7 +919,7 @@ function rSprechen3(it) {
 function rSprechen2(it) {
   const m = modelBlock(it.model, "Образец разговора", "A — это вы, B — собеседник. Берите фразы и структуру, а ответы делайте про себя.");
   const chat = chatPartner({
-    id: it.id, title: "Разговор с собеседником (Claude)", partnerName: "Собеседник (Claude)", startLabel: "Начать разговор", max: 8,
+    id: it.id, title: "Разговор с собеседником (ИИ)", partnerName: "Собеседник (ИИ)", startLabel: "Начать разговор", max: 8,
     rules: () => `Wir üben die mündliche Prüfung telc DTB B2 Beruf, Teil 2 (Smalltalk, ca. 3 Minuten, entspannte Alltagsunterhaltung unter Kollegen). Du bist mein Gesprächspartner / meine Gesprächspartnerin. Thema: ${it.title}. Situation: ${it.situation}\nMögliche Aspekte: ${it.points.join("; ")}\nRegeln: ${RULES_COMMON} Stelle immer wieder eine kurze Frage zu meiner Antwort, erzähle auch selbst etwas Kurzes über dich, bleib freundlich und locker.`,
     start: "Beginne du das Gespräch mit einem natürlichen Einstieg zum Thema.",
     rateIntro: `Bewerte meine Beiträge in einem Smalltalk-Übungsgespräch für telc DTB B2 Beruf, Sprechen Teil 2 (8 Punkte). Thema: ${it.title}. Kriterien: auf den Partner eingehen, Gespräch am Laufen halten, Fragen stellen, eigene Erfahrungen erzählen, Wortschatz und Grammatik.`,
@@ -936,14 +935,14 @@ function rSprechen1(it, mode, ctx) {
   const m = modelBlock(it.model, "Образец презентации", "Пример структуры: приветствие и план, основная часть с примерами, мнение, заключение. Ваш текст должен быть про вас.");
   const write = writeTask({
     id: "w-" + it.id, kind: "praesentation", title: "Teil 1 · " + it.title, minutes: 6, target: [150, 260],
-    taskEl: h("div", { class: "stack" }, h("p", { style: "margin:0" }, "Подготовьте выступление на ~2 минуты (150–260 слов) по теме и этим пунктам. Потом прочитайте его вслух, на экзамене вы говорите свободно. Claude проверит текст, затем задаст вопросы, как экзаменатор."),
+    taskEl: h("div", { class: "stack" }, h("p", { style: "margin:0" }, "Подготовьте выступление на ~2 минуты (150–260 слов) по теме и этим пунктам. Потом прочитайте его вслух, на экзамене вы говорите свободно. ИИ проверит текст, затем задаст вопросы, как экзаменатор."),
       h("ul", { style: "margin:0;padding-left:20px" }, it.points.map(p => h("li", null, p)))),
     context: `Thema: ${it.title}\nStichpunkte: ${it.points.join("; ")}`,
     models: [it.model.map(s => s.t).join("\n\n")], modelNote: "Один из возможных вариантов. Ниже можно ещё послушать его.", onDone: ctx && ctx.onWriteDone,
   });
   const ta = () => (document.getElementById("ta-w-" + it.id) || {}).value || "";
   const qa = chatPartner({
-    id: it.id + "-q", title: "Вопросы экзаменатора (2 минуты)", partnerName: "Экзаменатор (Claude)", startLabel: "Задать вопросы по моей презентации", max: 6,
+    id: it.id + "-q", title: "Вопросы экзаменатора (2 минуты)", partnerName: "Экзаменатор (ИИ)", startLabel: "Задать вопросы по моей презентации", max: 6,
     rules: () => `Wir üben die mündliche Prüfung telc DTB B2 Beruf, Teil 1: Der Prüfling hat eine Präsentation gehalten, danach stellt die Prüferin zwei bis drei Fragen. Du bist die freundliche Prüferin. Thema: ${it.title}. Text der Präsentation:\n"""\n${ta() || "(Der Prüfling hat keinen Text eingegeben; stelle allgemeine Fragen zum Thema.)"}\n"""\nRegeln: ${RULES_COMMON} Stelle genau eine Frage pro Nachricht, die sich auf die Präsentation bezieht, und reagiere kurz auf meine Antwort, bevor du die nächste Frage stellst. Nach drei Fragen bedanke dich und beende das Gespräch.`,
     start: "Stelle jetzt die erste Frage zur Präsentation.",
     rateIntro: `Bewerte meine Antworten auf die Fragen nach einer Präsentation (telc DTB B2 Beruf, Sprechen Teil 1, Thema: ${it.title}). Kriterien: Frage beantwortet, Begründung und Beispiele, flüssig und verständlich, Wortschatz und Grammatik.`,
@@ -953,8 +952,8 @@ function rSprechen1(it, mode, ctx) {
 }
 
 /* ---------- «Учить наизусть»: all texts to learn in one place ---------- */
-const SRC_FILE = () => h("span", { class: "chip ok" }, "из вашего файла");
-const SRC_CLAUDE = (t) => h("span", { class: "chip warn" }, t || "пример от Claude, не из файла");
+const SRC_FILE = () => null;
+const SRC_CLAUDE = () => null;
 
 function copyBtn(getText) {
   const b = h("button", { class: "btn small" }, "Копировать");
@@ -983,16 +982,16 @@ function viewLearn() {
   const sec = (id, title, lead, ...kids) => { secs.push([id, title]); return h("section", { class: "stack", id: "learn-" + id }, h("h2", null, title), lead ? h("p", { class: "lead", style: "margin:0" }, lead) : null, kids); };
 
   const letters = sec("b", "Ответ на жалобу (Beschwerde, №21)",
-    "Образцы писем из вашего файла. Файл сам предупреждает: дословно заученный текст могут посчитать копипастой. Учите структуру и фразы, а в письме пишите своими словами и только то, о чём просил шеф.",
+    "Образцы писем для заучивания. Дословно заученный текст могут посчитать копипастой. Учите структуру и фразы, а в письме пишите своими словами и только то, о чём просил шеф.",
     DB.B.filter(b => b.models && b.models.length).map(b => acc(`Вариант ${String(b.v)} · ${b.topic || ""}`, SRC_FILE(),
       h("div", { class: "eyebrow" }, "Задание шефа"), h("div", { class: "letterview" }, (b.chef || []).join("\n")),
       b.models.map((m, i) => h("div", { class: "stack" }, h("div", { class: "eyebrow" }, "Образец письма" + (b.models.length > 1 ? " " + (i + 1) : "")), learnText(`Образец ${b.v}`, Array.isArray(m) ? m.join("\n") : m))))));
 
   const forum = sec("f", "Форум (Forumsbeitrag, №58)",
-    "Порядок из файла: приветствие, вступление, аргументы за, аргументы против, ваше мнение, имя. Одним абзацем, один стиль (Sie или du), не смешивать.",
+    "Порядок: приветствие, вступление, аргументы за, аргументы против, ваше мнение, имя. Одним абзацем, один стиль (Sie или du), не смешивать.",
     acc("Образец с шаблоном (тема «фитнес-зал»)", SRC_FILE(), learnText("Образец форума", DB.F_MODEL)),
     rmList(REDEMITTEL.forum, 1),
-    acc(`Все темы форума из файла (${DB.F.length})`, SRC_FILE(), h("ol", { class: "small", style: "margin:0;padding-left:22px" }, DB.F.map(f => h("li", null, h("b", null, f.title), " — " + f.desc)))));
+    acc(`Все темы форума (${DB.F.length})`, SRC_FILE(), h("ol", { class: "small", style: "margin:0;padding-left:22px" }, DB.F.map(f => h("li", null, h("b", null, f.title), " — " + f.desc)))));
 
   const notes = sec("n", "Telefonnotiz (№42–45)",
     "Файл советует учить только суть: имя, телефон, 2–4 пункта и что нужно сделать. Детали (имена, цвета, числа) на экзамене могут меняться, поэтому слушайте внимательно.",
@@ -1008,22 +1007,22 @@ function viewLearn() {
         h("div", { class: "card stack" }, h("div", { class: "eyebrow" }, t), rmList(SP_REDE[k], 1)))));
 
   const sp1 = sec("sp1", "Sprechen Teil 1: образцы презентаций",
-    "Важно: в вашем файле нет текстов этих тем, там только ссылки в Telegram. Эти 8 тем и образцы я написал сам как пример структуры. Когда пришлёте настоящие 8 тем и «Tipps», заменю.",
+    "Темы и образцы презентаций даны как пример структуры. Выучите построение и подставляйте свои темы.",
     DB.SP1.map(s => acc(`${s.n}. ${s.title}`, SRC_CLAUDE(), h("ul", { class: "small", style: "margin:0;padding-left:20px" }, s.points.map(p => h("li", null, p))), learnText(s.title, s.model.map(m => m.t).join("\n\n")))));
 
   const sp2 = sec("sp2", "Sprechen Teil 2: Smalltalk",
-    "Тут то же самое: 77 тем и диалоги есть только ссылкой в Telegram. Эти 10 ситуаций и диалоги написаны мной как пример.",
+    "Ситуации и диалоги даны как пример структуры разговора.",
     DB.SP2.map(s => acc(`${s.n}. ${s.title}`, SRC_CLAUDE(), h("p", { style: "margin:0" }, s.situation), learnDialog(s.title, s.model))));
 
   const sp3 = sec("sp3", "Sprechen Teil 3: решение проблемы",
-    "Ситуации взяты из вашего файла (стр. 168–172), A и B диалогов написал я как образец. Один из многих возможных вариантов.",
-    DB.SP3.map(s => acc(`Ситуация ${s.n}`, h("span", { class: "chip ok" }, "ситуация из файла"), h("p", { style: "margin:0" }, s.text), h("ul", { class: "small", style: "margin:0;padding-left:20px" }, s.points.map(p => h("li", null, p))), learnDialog("Ситуация " + s.n, s.model))));
+    "Диалоги A и B даны как образец. Это один из многих возможных вариантов.",
+    DB.SP3.map(s => acc(`Ситуация ${s.n}`, h("p", { style: "margin:0" }, s.text), h("ul", { class: "small", style: "margin:0;padding-left:20px" }, s.points.map(p => h("li", null, p))), learnDialog("Ситуация " + s.n, s.model))));
 
   return h("div", { class: "wrap narrow" },
     crumbs(h("a", { href: "#home" }, "Главная"), "Учить наизусть"),
     h("div", { class: "stack" }, h("h1", null, "Учить наизусть"),
       h("p", { class: "lead", style: "margin:0" }, "Все тексты, которые стоит выучить, собраны здесь: письма, форум, Notiz, фразы и образцы для Sprechen. У каждого есть кнопка «Копировать» и озвучка."),
-      h("div", { class: "row" }, h("span", { class: "chip ok" }, "из вашего файла"), h("span", { class: "chip warn" }, "пример от Claude, не из файла"))),
+),
     h("div", { class: "row" }, secs.map(([id, t]) => h("button", { class: "btn small", onclick: () => { const el = document.getElementById("learn-" + id); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); } }, t.replace(/ \(.*/, "")))),
     letters, forum, notes, rede, sp1, sp2, sp3);
 }
@@ -1276,7 +1275,7 @@ function viewHome() {
       h("div", { class: "card stack" },
         h("div", { class: "eyebrow" }, "telc Deutsch B2 · Beruf"),
         h("h1", null, "Тренажёр по билетам экзамена"),
-        h("p", { class: "lead", style: "margin:0" }, "Все актуальные варианты из вашего файла: Lesen, Hören с озвучкой, Sprachbausteine, Telefonnotiz, письма с проверкой Claude и Sprechen с партнёром. Отмеченные как заменённые билеты убраны."),
+        h("p", { class: "lead", style: "margin:0" }, "Все варианты по частям экзамена: Lesen, Hören с озвучкой, Sprachbausteine, Telefonnotiz, письма с проверкой ИИ и Sprechen с партнёром."),
         h("div", { class: "row" }, h("a", { class: "btn primary", href: "#bw" }, "✍ Писать письма"), h("a", { class: "btn", href: "#learn" }, "📖 Учить наизусть"), h("a", { class: "btn", href: "#exam" }, "Пробный экзамен"), h("a", { class: "btn", href: "#review" }, `Мои ошибки${wrong ? " · " + wrong : ""}`), rndBtn),
         h("div", { class: "stats" },
           h("div", { class: "stat" }, h("div", { class: "v" }, days), h("div", { class: "l" }, "дней занятий")),
@@ -1306,7 +1305,7 @@ function viewSec(sec) {
   const rows = list.map((it, i) => {
     const p = bestOf(sec, it);
     return h("a", { class: "li", href: `#${sec}.${i + 1}` }, h("span", { class: "num" }, i + 1),
-      h("div", { class: "grow" }, h("div", { class: "pt" }, s.label(it)), it.new ? h("span", { class: "chip warn" }, "новая тема") : null, it.src === "recon" ? h("span", { class: "chip" }, "реконструкция") : null),
+      h("div", { class: "grow" }, h("div", { class: "pt" }, s.label(it)), ),
       p == null ? h("span", { class: "chip" }, "не решали") : h("span", { class: "chip " + dotCls(p) }, Math.round(p * 100) + "%"));
   });
   return h("div", { class: "wrap narrow" },
@@ -1545,7 +1544,7 @@ function viewExam() {
     return h("div", { class: "wrap narrow" },
       crumbs(h("a", { href: "#home" }, "Главная"), "Пробный экзамен"),
       h("h1", null, "Пробный экзамен"),
-      h("p", { class: "lead", style: "margin:0" }, "Случайный вариант каждой части, как на настоящем экзамене: ответы проверяются в конце части, каждое аудио звучит один раз, транскрипт скрыт. Письма проверяет Claude; если нет времени, письмо можно пропустить."),
+      h("p", { class: "lead", style: "margin:0" }, "Случайный вариант каждой части, как на настоящем экзамене: ответы проверяются в конце части, каждое аудио звучит один раз, транскрипт скрыт. Письма проверяет ИИ; если нет времени, письмо можно пропустить."),
       steps,
       h("div", { class: "card stack" }, h("div", { class: "eyebrow" }, "Время на экзамене"),
         h("p", { style: "margin:0" }, "Lesen + Lesen und Schreiben: 65 минут · Hören + Hören und Schreiben: 25 минут · Sprachbausteine + Schreiben: 35 минут. Всего 125 минут. Таймер блока идёт с первой части блока, паузу между блоками можно делать."),
@@ -1591,7 +1590,7 @@ function examResult(E, steps) {
       h("div", { class: "stats" }, parts.map(([k, v]) => h("div", { class: "stat" }, h("div", { class: "v" }, `${v}`, h("span", { class: "small muted" }, " / 60")), h("div", { class: "l" }, h("span", { class: "chip " + cls(v) }, k))))),
       h("div", { class: "note " + (pass ? "info" : "") }, pass ? `Письменная часть сдана: ${sum} из 180. Так держать!` : `Пока ${sum} из 180. Нужно от 36 баллов в каждой части (одна может быть 24–36). Посмотрите «Ошибки» и повторите слабые части.`),
       notes.length ? h("p", { class: "small muted", style: "margin:0" }, notes.join(" · ") + ". Неоценённые письма считаются как 0.") : null,
-      h("p", { class: "small muted", style: "margin:0" }, "Sprechen (ещё 60 баллов) здесь не считается: тренируйте его в разделе Sprechen с Claude.")),
+      h("p", { class: "small muted", style: "margin:0" }, "Sprechen (ещё 60 баллов) здесь не считается: тренируйте его в разделе Sprechen с ИИ.")),
     h("div", { class: "card tw" }, h("table", { class: "score" }, h("tr", null, h("th", null, "Часть"), h("th", null, "Вариант"), h("th", null, "Баллы")), rows)),
     h("div", { class: "row" }, h("button", { class: "btn primary", onclick: () => { EXAM = newExam(); render(); } }, "Новый пробный экзамен"), h("a", { class: "btn", href: "#review" }, "Мои ошибки")));
 }

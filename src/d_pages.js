@@ -49,7 +49,7 @@ function writeTask(t) {
     const text = ta.value.trim();
     if (words(text) < 40) { fb.replaceChildren(h("div", { class: "note" }, "Напишите хотя бы 40 слов, тогда проверка будет полезной.")); return; }
     checkBtn.disabled = true; stopBtn.hidden = false; ctl = new AbortController();
-    fb.replaceChildren(thinking("Claude проверяет письмо по критериям экзамена… обычно 30–90 секунд"));
+    fb.replaceChildren(thinking("ИИ проверяет письмо по критериям экзамена… обычно 30–90 секунд"));
     try {
       const d = await askJSON(feedbackPrompt(t, text), { signal: ctl.signal });
       if (!d || !d.inhalt || !d.sprache) throw { code: "invalid_json" };
@@ -65,8 +65,8 @@ function writeTask(t) {
   const modelBtn = t.models && t.models.length ? h("button", { class: "btn" }, "Показать образец") : null;
   if (modelBtn) modelBtn.onclick = () => { models.hidden = !models.hidden; modelBtn.textContent = models.hidden ? "Показать образец" : "Скрыть образец"; };
   const genBox = h("div", { class: "letterview", hidden: true });
-  const genBtn = t.gen ? aiButton("Пример от Claude", async () => {
-    genBox.hidden = false; genBox.replaceChildren(thinking("Claude пишет пример…")); genBtn.disabled = true;
+  const genBtn = t.gen ? aiButton("Пример от ИИ", async () => {
+    genBox.hidden = false; genBox.replaceChildren(thinking("ИИ пишет пример…")); genBtn.disabled = true;
     try { await askText(t.gen, { cache: false, onText: ({ text }) => { genBox.textContent = text; } }); } catch (e) { genBox.textContent = e.text || errText(e); }
     genBtn.disabled = false;
   }, "") : null;
@@ -75,7 +75,7 @@ function writeTask(t) {
     h("div", { class: "card stack" }, h("div", { class: "spread" }, h("h2", null, t.title), h("div", { class: "row" }, tb, tl)), t.taskEl),
     h("div", { class: "two" },
       h("div", { class: "stack" }, writeSheet(t, ta), h("div", { class: "spread" }, counter, h("div", { class: "row" }, checkBtn, stopBtn, modelBtn, genBtn, skip)),
-        noAiNote("Проверка письма через Claude недоступна в этом просмотре. Сравните текст с образцом и пройдитесь по Redemittel."), models, genBox),
+        noAiNote("Проверка письма через ИИ недоступна в этом просмотре. Сравните текст с образцом и пройдитесь по Redemittel."), models, genBox),
       h("div", { class: "card sticky" }, rm)),
     fb);
 }
@@ -133,7 +133,7 @@ function renderFeedback(d, text, kind) {
   const cbtn = h("button", { class: "btn" }, "Показать исправленный текст");
   cbtn.onclick = () => { corrected.hidden = !corrected.hidden; cbtn.textContent = corrected.hidden ? "Показать исправленный текст" : "Скрыть исправленный текст"; };
   return h("div", { class: "card stack" },
-    h("div", { class: "spread" }, h("h2", null, "Оценка Claude"), h("span", { class: "ai" }, "ориентировочно")),
+    h("div", { class: "spread" }, h("h2", null, "Оценка ИИ"), h("span", { class: "ai" }, "ориентировочно")),
     h("div", { class: "result" }, h("span", { class: "big" }, `${total}/${max}`), h("span", { class: "chip " + (pct >= .6 ? "ok" : pct >= .4 ? "warn" : "bad") }, pct >= .6 ? "на уровне сдачи" : "пока ниже 60%"), d.fazit ? h("span", { style: "flex:1;min-width:220px" }, d.fazit) : null),
     h("div", { class: "crit" },
       h("div", null, h("span", { class: "small muted" }, "Содержание (все пункты)"), h("b", { class: "mono" }, `${pi} / ${mx.inhalt}`), h("span", { class: "small" }, d.inhalt.kommentar)),
@@ -154,7 +154,7 @@ function rForum(it, mode, ctx) {
       h("p", { class: "small muted", style: "margin:0" }, "Напишите сообщение коллегам на форуме: что планируется, плюсы, минусы, ваше мнение с обоснованием. Выберите один стиль: ihr/euch или Sie, и не смешивайте их.")),
     context: `Thema: ${it.title}\nSituation: ${it.desc || it.title}`,
     gen: `Schreibe einen Musterbeitrag (ca. 150 Wörter, Niveau B2) für ein firmeninternes Forum zum Thema "${it.title}": ${it.desc || ""}\nAufbau: Anrede (Liebe Kolleginnen und Kollegen,), Einleitung, Vorteile, Nachteile, eigene Meinung mit Begründung, Schluss, Gruß. Einheitlich ihr/euch. Nur der Text, ohne Überschrift, ohne Markdown. Danach eine Leerzeile und 5 nützliche Wendungen aus dem Text mit russischer Übersetzung, eine pro Zeile.`,
-    models: [DB.F_MODEL], modelNote: "Пример из файла (тема «фитнес-зал») показывает структуру. Для своей темы нажмите «Пример от Claude».",
+    models: [DB.F_MODEL], modelNote: null,
     onDone: ctx.onWriteDone, onSkip: ctx.onSkip });
 }
 
@@ -257,7 +257,7 @@ function modelBlock(segs, title, hint) {
   return { btn, box };
 }
 
-// generic practice chat: Claude plays the partner / examiner, then rates the learner's contributions
+// generic practice chat: ИИ plays the partner / examiner, then rates the learner's contributions
 function chatPartner(cfg) {
   const turns = [];
   const chat = h("div", { class: "chat" });
@@ -283,7 +283,7 @@ function chatPartner(cfg) {
   const rateBtn = aiButton("Оценить мой разговор", async () => {
     const mine = turns.filter(t => t.role === "user").map(t => t.content);
     if (mine.length < 2) { fb.replaceChildren(h("div", { class: "note" }, "Сначала ответьте хотя бы 2–3 раза.")); return; }
-    fb.replaceChildren(thinking("Claude оценивает разговор…")); rateBtn.disabled = true;
+    fb.replaceChildren(thinking("ИИ оценивает разговор…")); rateBtn.disabled = true;
     try {
       const d = await askJSON(`${cfg.rateIntro}\nGesprächsverlauf (A = ich, der Lernende; B = Gesprächspartner/in):\n${turns.map(t => (t.role === "user" ? "A: " : "B: ") + t.content).join("\n")}\n\nBewerte nur die Beiträge von A. Antworte NUR mit JSON: {"punkte":0,"max":${cfg.max},"fazit":"...","niveau":{"stufe":"B1","kommentar":"..."},"staerken":["..."],"fehler":[{"original":"...","korrektur":"...","erklaerung":"..."}],"satzbau":[{"original":"...","besser":"...","warum":"..."}],"redemittel":["..."]}\nRegeln: Kommentare, Fazit, Erklärungen und Stärken auf Russisch. "original" wörtlich aus A. "niveau" = geschätztes GER-Niveau von A (A2, B1, B2, C1). "satzbau" = 2–4 richtige, aber zu einfache Sätze von A mit besserer B2-Formulierung. "redemittel" = 3–5 nützliche deutsche Wendungen für dieses Thema.`);
       fb.replaceChildren(h("div", { class: "card stack" }, h("div", { class: "result" }, h("span", { class: "big" }, `${d.punkte}/${d.max || cfg.max}`), h("span", { style: "flex:1;min-width:200px" }, d.fazit || "")),
@@ -297,7 +297,7 @@ function chatPartner(cfg) {
     rateBtn.disabled = false;
   }, "");
   const el = h("div", { class: "card stack" }, h("div", { class: "spread" }, h("h3", null, cfg.title), h("label", { class: "row small", for: "sp-voice-" + cfg.id }, autoSpeak, "озвучивать ответы")),
-    noAiNote("Разговор с Claude здесь недоступен. Потренируйтесь вслух по пунктам и Redemittel и сравните с образцом."),
+    noAiNote("Разговор с ИИ здесь недоступен. Потренируйтесь вслух по пунктам и Redemittel и сравните с образцом."),
     startBtn, chat, h("div", { class: "stack", "data-ai": "", hidden: !SAMPLE }, box, h("div", { class: "row" }, sendBtn, rateBtn, h("span", { class: "small muted" }, "Ctrl+Enter — отправить"))), fb);
   return el;
 }
@@ -316,7 +316,7 @@ const spHead = (k) => h("div", { class: "sp-head" }, h("span", { class: "sp-ico"
 function rSprechen3(it) {
   const m = modelBlock(it.model, "Образец диалога", "A — это вы, B — ваш партнёр. Это один из возможных вариантов: берите структуру и фразы, но говорите своими словами.");
   const chat = chatPartner({
-    id: it.id, title: "Разговор с партнёром (Claude)", partnerName: "Партнёр (Claude)", startLabel: "Начать разговор", max: 10,
+    id: it.id, title: "Разговор с партнёром (ИИ)", partnerName: "Партнёр (ИИ)", startLabel: "Начать разговор", max: 10,
     rules: () => `Wir üben die mündliche Prüfung telc DTB B2 Beruf, Teil 3 ("Gemeinsam eine Lösung finden"). Du bist meine Gesprächspartnerin, eine freundliche Kollegin. Situation: ${it.text}\nStichpunkte: ${it.points.join("; ")}\nRegeln: ${RULES_COMMON} Mach eigene konkrete Vorschläge, reagiere auf meine Ideen (zustimmen, nachfragen oder höflich widersprechen) und bringe das Gespräch Schritt für Schritt zu einer gemeinsamen Lösung, sodass alle Stichpunkte besprochen werden. Wenn wir uns einigen, bestätige das kurz.`,
     start: "Beginne du das Gespräch: Begrüße mich kurz, beschreibe das Problem in 2 Sätzen und frage mich, was wir tun sollen.",
     rateIntro: `Bewerte meine Beiträge in einem Übungsgespräch für telc DTB B2 Beruf, Sprechen Teil 3 (gemeinsam Lösungen finden, 10 Punkte). Situation: ${it.text}. Stichpunkte: ${it.points.join("; ")}. Kriterien: alle Stichpunkte behandelt, eigene Vorschläge, auf die Partnerin eingehen, Einigung erzielen, Sprache.`,
@@ -331,7 +331,7 @@ function rSprechen3(it) {
 function rSprechen2(it) {
   const m = modelBlock(it.model, "Образец разговора", "A — это вы, B — собеседник. Берите фразы и структуру, а ответы делайте про себя.");
   const chat = chatPartner({
-    id: it.id, title: "Разговор с собеседником (Claude)", partnerName: "Собеседник (Claude)", startLabel: "Начать разговор", max: 8,
+    id: it.id, title: "Разговор с собеседником (ИИ)", partnerName: "Собеседник (ИИ)", startLabel: "Начать разговор", max: 8,
     rules: () => `Wir üben die mündliche Prüfung telc DTB B2 Beruf, Teil 2 (Smalltalk, ca. 3 Minuten, entspannte Alltagsunterhaltung unter Kollegen). Du bist mein Gesprächspartner / meine Gesprächspartnerin. Thema: ${it.title}. Situation: ${it.situation}\nMögliche Aspekte: ${it.points.join("; ")}\nRegeln: ${RULES_COMMON} Stelle immer wieder eine kurze Frage zu meiner Antwort, erzähle auch selbst etwas Kurzes über dich, bleib freundlich und locker.`,
     start: "Beginne du das Gespräch mit einem natürlichen Einstieg zum Thema.",
     rateIntro: `Bewerte meine Beiträge in einem Smalltalk-Übungsgespräch für telc DTB B2 Beruf, Sprechen Teil 2 (8 Punkte). Thema: ${it.title}. Kriterien: auf den Partner eingehen, Gespräch am Laufen halten, Fragen stellen, eigene Erfahrungen erzählen, Wortschatz und Grammatik.`,
@@ -347,14 +347,14 @@ function rSprechen1(it, mode, ctx) {
   const m = modelBlock(it.model, "Образец презентации", "Пример структуры: приветствие и план, основная часть с примерами, мнение, заключение. Ваш текст должен быть про вас.");
   const write = writeTask({
     id: "w-" + it.id, kind: "praesentation", title: "Teil 1 · " + it.title, minutes: 6, target: [150, 260],
-    taskEl: h("div", { class: "stack" }, h("p", { style: "margin:0" }, "Подготовьте выступление на ~2 минуты (150–260 слов) по теме и этим пунктам. Потом прочитайте его вслух, на экзамене вы говорите свободно. Claude проверит текст, затем задаст вопросы, как экзаменатор."),
+    taskEl: h("div", { class: "stack" }, h("p", { style: "margin:0" }, "Подготовьте выступление на ~2 минуты (150–260 слов) по теме и этим пунктам. Потом прочитайте его вслух, на экзамене вы говорите свободно. ИИ проверит текст, затем задаст вопросы, как экзаменатор."),
       h("ul", { style: "margin:0;padding-left:20px" }, it.points.map(p => h("li", null, p)))),
     context: `Thema: ${it.title}\nStichpunkte: ${it.points.join("; ")}`,
     models: [it.model.map(s => s.t).join("\n\n")], modelNote: "Один из возможных вариантов. Ниже можно ещё послушать его.", onDone: ctx && ctx.onWriteDone,
   });
   const ta = () => (document.getElementById("ta-w-" + it.id) || {}).value || "";
   const qa = chatPartner({
-    id: it.id + "-q", title: "Вопросы экзаменатора (2 минуты)", partnerName: "Экзаменатор (Claude)", startLabel: "Задать вопросы по моей презентации", max: 6,
+    id: it.id + "-q", title: "Вопросы экзаменатора (2 минуты)", partnerName: "Экзаменатор (ИИ)", startLabel: "Задать вопросы по моей презентации", max: 6,
     rules: () => `Wir üben die mündliche Prüfung telc DTB B2 Beruf, Teil 1: Der Prüfling hat eine Präsentation gehalten, danach stellt die Prüferin zwei bis drei Fragen. Du bist die freundliche Prüferin. Thema: ${it.title}. Text der Präsentation:\n"""\n${ta() || "(Der Prüfling hat keinen Text eingegeben; stelle allgemeine Fragen zum Thema.)"}\n"""\nRegeln: ${RULES_COMMON} Stelle genau eine Frage pro Nachricht, die sich auf die Präsentation bezieht, und reagiere kurz auf meine Antwort, bevor du die nächste Frage stellst. Nach drei Fragen bedanke dich und beende das Gespräch.`,
     start: "Stelle jetzt die erste Frage zur Präsentation.",
     rateIntro: `Bewerte meine Antworten auf die Fragen nach einer Präsentation (telc DTB B2 Beruf, Sprechen Teil 1, Thema: ${it.title}). Kriterien: Frage beantwortet, Begründung und Beispiele, flüssig und verständlich, Wortschatz und Grammatik.`,

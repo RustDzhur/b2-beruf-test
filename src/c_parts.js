@@ -17,10 +17,10 @@ const SECS = [
     task: "Прочитайте протокол и выберите правильный ответ a, b или c." },
   { id: "b", grp: "Lesen", t: "Beschwerde: вопросы 19–20", ru: "Записка шефа и письмо клиента", nums: "19–20", per: 3, list: () => DB.B.filter(b => b.qs.length), label: (it) => `№${String(it.v).replace("b", " (новый)")}` + (it.topic ? ` · ${it.topic}` : ""), min: 10,
     task: "Прочитайте записку шефа и письмо клиента и ответьте на вопросы 19 и 20." },
-  { id: "bw", grp: "Schreiben", t: "Письмо клиенту (Beschwerde)", ru: "Пишете сами, Claude проверяет", nums: "21", list: () => DB.B, label: (it) => `№${String(it.v).replace("b", " (новый)")}` + (it.topic ? ` · ${it.topic}` : ""), min: 25, write: true,
-    task: "Прочитайте записку шефа и письмо клиента и напишите ответ клиенту сами. Claude проверит грамматику, построение предложений и уровень B2." },
+  { id: "bw", grp: "Schreiben", t: "Письмо клиенту (Beschwerde)", ru: "Пишете сами, ИИ проверяет", nums: "21", list: () => DB.B, label: (it) => `№${String(it.v).replace("b", " (новый)")}` + (it.topic ? ` · ${it.topic}` : ""), min: 25, write: true,
+    task: "Прочитайте записку шефа и письмо клиента и напишите ответ клиенту сами. ИИ проверит грамматику, построение предложений и уровень B2." },
   { id: "f", grp: "Schreiben", t: "Forumsbeitrag", ru: "Мнение на форуме: пишете сами", nums: "58", list: () => DB.F, label: (it) => `${it.n}. ${it.title}`, min: 30, write: true,
-    task: "Напишите сообщение на внутреннем форуме: что произошло, плюсы, минусы, ваше мнение. Claude проверит текст." },
+    task: "Напишите сообщение на внутреннем форуме: что произошло, плюсы, минусы, ваше мнение. ИИ проверит текст." },
   { id: "s1", grp: "Schreiben", t: "Sprachbausteine 1", ru: "Пропуски: слова a–j", nums: "46–51", per: 0.5, list: () => DB.S1, label: (it) => `№${it.v}` + (it.subject ? ` · ${it.subject}` : ""), min: 10,
     task: "Какое слово (a–j) подходит в пропуск? Каждое слово используется один раз, некоторые лишние." },
   { id: "s2", grp: "Schreiben", t: "Sprachbausteine 2", ru: "Пропуски: a, b или c", nums: "52–57", per: 0.5, list: () => DB.S2, label: (it) => `№${it.v}` + (it.subject ? ` · ${it.subject.slice(0, 32)}` : ""), min: 10,
@@ -36,11 +36,11 @@ const SECS = [
   { id: "n", grp: "Hören", t: "Telefonnotiz", ru: "Записка по телефонному сообщению", nums: "41–45", list: () => DB.N, label: (it) => `${it.name} · ${it.type}`, audio: true,
     task: "Прослушайте сообщение и заполните записку: имя, телефон, важная информация, что нужно сделать." },
   { id: "sp1", grp: "Sprechen", t: "Sprechen Teil 1", ru: "Презентация + вопросы (2+2 мин)", nums: "T1", list: () => DB.SP1, label: (it) => `${it.n}. ${it.title}`,
-    task: "Подготовьте и произнесите короткую презентацию по теме (около 2 минут), затем ответьте на вопросы экзаменатора. Claude проверяет ваш текст и играет экзаменатора." },
+    task: "Подготовьте и произнесите короткую презентацию по теме (около 2 минут), затем ответьте на вопросы экзаменатора. ИИ проверяет ваш текст и играет экзаменатора." },
   { id: "sp2", grp: "Sprechen", t: "Sprechen Teil 2", ru: "Smalltalk (3 мин)", nums: "T2", list: () => DB.SP2, label: (it) => `${it.n}. ${it.title}`,
-    task: "Непринуждённый разговор с коллегой на бытовую тему. Посмотрите образец разговора, затем поговорите с Claude." },
+    task: "Непринуждённый разговор с коллегой на бытовую тему. Посмотрите образец разговора, затем поговорите с ИИ." },
   { id: "sp3", grp: "Sprechen", t: "Sprechen Teil 3", ru: "Вместе найти решение (4 мин)", nums: "T3", list: () => DB.SP3, label: (it) => `${it.n}. ${it.text.slice(0, 40)}…`,
-    task: "Вы с партнёром обсуждаете проблему на работе и вместе ищете решение. Посмотрите образец диалога, затем поговорите с Claude." },
+    task: "Вы с партнёром обсуждаете проблему на работе и вместе ищете решение. Посмотрите образец диалога, затем поговорите с ИИ." },
 ];
 const SEC = Object.fromEntries(SECS.map(s => [s.id, s]));
 
@@ -89,7 +89,7 @@ function rBeschwerde(it, mode, ctx, onlyPart) {
       taskEl: h("div", { class: "stack" }, h("p", { style: "margin:0" }, "Вы — сотрудник(ца), которому адресована записка. Напишите ответ клиенту и выполните ", h("b", null, "все поручения руководителя"), ". Ничего лишнего: если шеф не просил скидку, не предлагайте её."),
         h("p", { class: "small muted", style: "margin:0" }, "Структура: обращение → благодарность и извинение → причина → решение по каждому пункту шефа → заключение → Mit freundlichen Grüßen + имя.")),
       context: "Notiz der Chefin / des Chefs:\n" + it.chef.join("\n") + "\n\nE-Mail des Kunden:\n" + it.mail.join("\n"),
-      models: it.models.map(m => m.join("\n")), modelNote: it.model_recon ? "Образец адаптирован под новые имена в задании." : null, onDone: ctx.onWriteDone,  onSkip: ctx.onSkip,
+      models: it.models.map(m => m.join("\n")), modelNote: null, onDone: ctx.onWriteDone,  onSkip: ctx.onSkip,
     }));
   }
   return h("div", { class: "stack" }, parts);
@@ -151,5 +151,5 @@ function rH4(it, mode, ctx) {
   const context = (q) => "Сообщение на автоответчике:\n" + it.msgs.find(m => m.n === q.n).text;
   const qz = quiz({ vid: it.id, sec: "h4", mode, items, per: 3, label: "Hören Teil 4", context, ...ctx });
   return h("div", { class: "stack" }, it.msgs.map(m => h("div", { class: "block card" }, audioBlock(`Nummer ${m.n}`, [{ who: "Anrufer" + (m.g === "f" ? "in" : ""), t: m.text, g: m.g }], mode),
-    m.q.recon ? h("p", { class: "small muted", style: "margin:0" }, "В файле был только правильный вариант; неверные варианты дописаны.") : null, qz.el(String(m.n)))), qz.footer);
+    qz.el(String(m.n)))), qz.footer);
 }

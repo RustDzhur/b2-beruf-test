@@ -50,7 +50,7 @@ function viewHome() {
       h("div", { class: "card stack" },
         h("div", { class: "eyebrow" }, "telc Deutsch B2 · Beruf"),
         h("h1", null, "Тренажёр по билетам экзамена"),
-        h("p", { class: "lead", style: "margin:0" }, "Все актуальные варианты из вашего файла: Lesen, Hören с озвучкой, Sprachbausteine, Telefonnotiz, письма с проверкой Claude и Sprechen с партнёром. Отмеченные как заменённые билеты убраны."),
+        h("p", { class: "lead", style: "margin:0" }, "Все варианты по частям экзамена: Lesen, Hören с озвучкой, Sprachbausteine, Telefonnotiz, письма с проверкой ИИ и Sprechen с партнёром."),
         h("div", { class: "row" }, h("a", { class: "btn primary", href: "#bw" }, "✍ Писать письма"), h("a", { class: "btn", href: "#learn" }, "📖 Учить наизусть"), h("a", { class: "btn", href: "#exam" }, "Пробный экзамен"), h("a", { class: "btn", href: "#review" }, `Мои ошибки${wrong ? " · " + wrong : ""}`), rndBtn),
         h("div", { class: "stats" },
           h("div", { class: "stat" }, h("div", { class: "v" }, days), h("div", { class: "l" }, "дней занятий")),
@@ -80,7 +80,7 @@ function viewSec(sec) {
   const rows = list.map((it, i) => {
     const p = bestOf(sec, it);
     return h("a", { class: "li", href: `#${sec}.${i + 1}` }, h("span", { class: "num" }, i + 1),
-      h("div", { class: "grow" }, h("div", { class: "pt" }, s.label(it)), it.new ? h("span", { class: "chip warn" }, "новая тема") : null, it.src === "recon" ? h("span", { class: "chip" }, "реконструкция") : null),
+      h("div", { class: "grow" }, h("div", { class: "pt" }, s.label(it)), ),
       p == null ? h("span", { class: "chip" }, "не решали") : h("span", { class: "chip " + dotCls(p) }, Math.round(p * 100) + "%"));
   });
   return h("div", { class: "wrap narrow" },
@@ -319,7 +319,7 @@ function viewExam() {
     return h("div", { class: "wrap narrow" },
       crumbs(h("a", { href: "#home" }, "Главная"), "Пробный экзамен"),
       h("h1", null, "Пробный экзамен"),
-      h("p", { class: "lead", style: "margin:0" }, "Случайный вариант каждой части, как на настоящем экзамене: ответы проверяются в конце части, каждое аудио звучит один раз, транскрипт скрыт. Письма проверяет Claude; если нет времени, письмо можно пропустить."),
+      h("p", { class: "lead", style: "margin:0" }, "Случайный вариант каждой части, как на настоящем экзамене: ответы проверяются в конце части, каждое аудио звучит один раз, транскрипт скрыт. Письма проверяет ИИ; если нет времени, письмо можно пропустить."),
       steps,
       h("div", { class: "card stack" }, h("div", { class: "eyebrow" }, "Время на экзамене"),
         h("p", { style: "margin:0" }, "Lesen + Lesen und Schreiben: 65 минут · Hören + Hören und Schreiben: 25 минут · Sprachbausteine + Schreiben: 35 минут. Всего 125 минут. Таймер блока идёт с первой части блока, паузу между блоками можно делать."),
@@ -365,7 +365,7 @@ function examResult(E, steps) {
       h("div", { class: "stats" }, parts.map(([k, v]) => h("div", { class: "stat" }, h("div", { class: "v" }, `${v}`, h("span", { class: "small muted" }, " / 60")), h("div", { class: "l" }, h("span", { class: "chip " + cls(v) }, k))))),
       h("div", { class: "note " + (pass ? "info" : "") }, pass ? `Письменная часть сдана: ${sum} из 180. Так держать!` : `Пока ${sum} из 180. Нужно от 36 баллов в каждой части (одна может быть 24–36). Посмотрите «Ошибки» и повторите слабые части.`),
       notes.length ? h("p", { class: "small muted", style: "margin:0" }, notes.join(" · ") + ". Неоценённые письма считаются как 0.") : null,
-      h("p", { class: "small muted", style: "margin:0" }, "Sprechen (ещё 60 баллов) здесь не считается: тренируйте его в разделе Sprechen с Claude.")),
+      h("p", { class: "small muted", style: "margin:0" }, "Sprechen (ещё 60 баллов) здесь не считается: тренируйте его в разделе Sprechen с ИИ.")),
     h("div", { class: "card tw" }, h("table", { class: "score" }, h("tr", null, h("th", null, "Часть"), h("th", null, "Вариант"), h("th", null, "Баллы")), rows)),
     h("div", { class: "row" }, h("button", { class: "btn primary", onclick: () => { EXAM = newExam(); render(); } }, "Новый пробный экзамен"), h("a", { class: "btn", href: "#review" }, "Мои ошибки")));
 }

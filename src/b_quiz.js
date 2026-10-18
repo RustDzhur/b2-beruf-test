@@ -105,7 +105,7 @@ function quiz(cfg) {
 
   async function explain(it, box, btn) {
     box.hidden = false; btn.disabled = true;
-    box.replaceChildren(thinking("Claude разбирает вопрос…"));
+    box.replaceChildren(thinking("ИИ разбирает вопрос…"));
     const s = st[it.key];
     const p = `Ты — опытный преподаватель немецкого, готовишь ученика (родной язык русский) к экзамену telc DTB B2 Beruf.
 Объясни по-русски, почему в задании ниже правильный ответ «${optLabel(it, it.ans)}».
@@ -163,5 +163,4 @@ function modeSwitch(cur, onPick) {
     h("div", { class: "seg", role: "tablist" }, Object.entries(MODES).map(([k, v]) => h("button", { class: k === cur ? "on" : "", role: "tab", "aria-selected": k === cur ? "true" : "false", onclick: () => onPick(k) }, v))),
     h("span", { class: "modehint" }, MODE_HINT[cur]));
 }
-const srcNote = (src) => src === "derived" ? h("p", { class: "small muted", style: "margin:0" }, "Ответы определены по тексту и транскрипту: в присланном файле выделение правильных ответов не сохранилось.")
-  : src === "recon" ? h("p", { class: "small muted", style: "margin:0" }, "Часть этого задания реконструирована: в файле был только пересказ, поэтому текст записан заново по смыслу.") : null;
+const srcNote = () => null;
