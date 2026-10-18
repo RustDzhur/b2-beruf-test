@@ -1,0 +1,5 @@
+{
+  "installCommand": "true",
+  "buildCommand": "mkdir -p public && cp -r index.html assets public/",
+  "outputDirectory": "public"
+}
