@@ -324,3 +324,7 @@ r25|objectif {1}
 r26|série {1}
 r27|Affirmations {1}
 r28|{~1} : non évalué
+316|Comme à l’examen : remplissez les données du participant. Elles sont stockées uniquement dans ce navigateur, rien n’est envoyé à un serveur.
+317|Commencer l’entraînement
+318|Enregistrer
+319|Changer de participant

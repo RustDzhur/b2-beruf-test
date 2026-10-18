@@ -9,7 +9,7 @@ const CYR = /[А-Яа-яЁё]/;
 const PREFIX_KEYS = ["Ошибка озвучки:", "Неверно · правильно:", "Нет ответа · правильно:", "Правильно:", "Ответ:", "Уровень текста:", "Уровень:", "Правильная записка ·", "Чаще всего ошибки в заданиях №", "Ошибки в №"];
 const RULES = I18N_RULES.map(([rx, t]) => [new RegExp(rx), t]);
 const fillTpl = (tpl, m, lang) => tpl.replace(/\{(~?)(\d)\}/g, (_, nest, n) => nest ? trText(m[+n], lang) : m[+n]);
-const curLang = () => store.get("lang", "ru");
+const curLang = () => store.get("lang", "de");
 
 function trText(s, lang) {
   if (lang === "ru" || !CYR.test(s)) return s;

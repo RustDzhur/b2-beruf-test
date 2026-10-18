@@ -1038,7 +1038,7 @@ const CYR = /[А-Яа-яЁё]/;
 const PREFIX_KEYS = ["Ошибка озвучки:", "Неверно · правильно:", "Нет ответа · правильно:", "Правильно:", "Ответ:", "Уровень текста:", "Уровень:", "Правильная записка ·", "Чаще всего ошибки в заданиях №", "Ошибки в №"];
 const RULES = I18N_RULES.map(([rx, t]) => [new RegExp(rx), t]);
 const fillTpl = (tpl, m, lang) => tpl.replace(/\{(~?)(\d)\}/g, (_, nest, n) => nest ? trText(m[+n], lang) : m[+n]);
-const curLang = () => store.get("lang", "ru");
+const curLang = () => store.get("lang", "de");
 
 function trText(s, lang) {
   if (lang === "ru" || !CYR.test(s)) return s;
@@ -1274,6 +1274,7 @@ const PAPER_DE = {
 };
 // candidate data from the cover page of the Antwortbogen S30 (mock exam), shown in each sheet header
 const cand = () => store.get("cand", { fam: "", vor: "" });
+const candName = () => { const c = cand(); return c.done ? `${c.vor || ""} ${c.fam || ""}`.trim() : ""; };
 function bogenHead() {
   const c = cand();
   const boxes = (v, n) => h("span", { class: "bx" }, Array.from({ length: n }, (_, i) => h("i", null, (v || "")[i] || "")));
@@ -1417,6 +1418,36 @@ function blockTimer(E, sec) {
   const iv = setInterval(tick, 1000); tick();
   return box;
 }
+// first visit: the candidate data form of the Antwortbogen S30; data stays in this browser (localStorage), nothing is sent anywhere
+function viewProfile(first) {
+  const c = cand();
+  const F = [["fam", "Familienname", 20, "family-name"], ["vor", "Vorname", 20, "given-name"], ["geb", "Geburtsdatum (TT.MM.JJJJ)", 10, "bday"], ["str", "Straße und Hausnummer", 40, "street-address"], ["ort", "Postleitzahl und Ort", 30, "postal-code"]];
+  const inp = {};
+  const fields = F.map(([k, l, m, ac]) => { inp[k] = h("input", { class: "in", value: c[k] || "", maxlength: m, autocomplete: ac, "aria-label": l }); return h("label", { class: "cv-f" }, inp[k], h("small", null, l)); });
+  const err = h("div", { class: "small", style: "color:var(--bad)" });
+  const save = () => {
+    if (!inp.fam.value.trim() || !inp.vor.value.trim()) { err.textContent = "Bitte Familienname und Vorname eintragen."; (inp.fam.value.trim() ? inp.vor : inp.fam).focus(); return; }
+    const x = { done: true }; F.forEach(([k]) => { x[k] = inp[k].value.trim(); });
+    store.set("cand", x);
+    if ((location.hash || "#home") === "#home") render(); else location.hash = "#home";
+  };
+  const reset = () => { store.set("cand", { fam: "", vor: "" }); render(); };
+  return h("div", { class: "wrap narrow" },
+    h("div", { class: "cover" },
+      h("div", { class: "cv-head" }, h("b", null, "Deutsch-Test für den Beruf B2"), h("span", null, "Antwortbogen S30 · Teilnehmerdaten")),
+      h("p", { class: "small", style: "margin:0" }, "Как на экзамене: заполните данные участника. Они хранятся только в этом браузере, на сервер ничего не отправляется."),
+      fields, err,
+      h("div", { class: "row" }, h("button", { class: "btn primary", onclick: save }, first ? "Начать тренировку" : "Сохранить"),
+        !first && c.done ? h("button", { class: "btn", onclick: reset }, "Сменить участника") : null)));
+}
+function paintUser() {
+  const top = document.querySelector(".top-in"); if (!top) return;
+  let a = top.querySelector(".user");
+  const n = candName();
+  if (!n) { if (a) a.remove(); return; }
+  if (!a) { a = h("a", { class: "user", href: "#profile" }); top.append(a); }
+  a.textContent = "Teilnehmer/in: " + n;
+}
 // cover page of the Antwortbogen S30: before the exam the candidate fills in the data fields
 function coverEl() {
   const c = cand();
@@ -1500,7 +1531,9 @@ function render() {
   const r = (location.hash || "#home").slice(1);
   const [sec, idx] = r.split(".");
   let v;
-  if (sec === "review") v = viewReview();
+  if (!cand().done && sec !== "profile") v = viewProfile(true);
+  else if (sec === "profile") v = viewProfile(false);
+  else if (sec === "review") v = viewReview();
   else if (sec === "exam") v = viewExam();
   else if (sec === "voice") v = viewVoice();
   else if (sec === "learn") v = viewLearn();
@@ -1509,7 +1542,7 @@ function render() {
   app().replaceChildren(v);
   const top = ["home", "review", "exam", "voice", "learn"].includes(sec) ? sec : "home";
   document.querySelectorAll(".nav a").forEach(a => a.classList.toggle("on", a.getAttribute("href") === "#" + (SEC[sec] ? "" : top)));
-  refreshAI(); updateNav();
+  refreshAI(); updateNav(); paintUser();
 }
 let lastHash = location.hash;
 window.addEventListener("hashchange", () => { render(); if (location.hash !== lastHash) window.scrollTo(0, 0); lastHash = location.hash; });

@@ -413,3 +413,7 @@ table.score th { font-size: 12px; color: var(--muted); font-weight: 600; }
 .sp-ico .ico { width: 28px; height: 28px; color: #7a7a7a; }
 .sp-k { font-size: 12.5px; color: var(--muted); letter-spacing: .02em; margin-bottom: 4px; }
 .sp-p { font-size: 15px; } .sp-p span { color: var(--muted); }
+
+/* signed-in participant chip in the header */
+.top-in .user { font-size: 12.5px; padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink); text-decoration: none; background: var(--paper); max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cover .row { margin-top: 6px; }

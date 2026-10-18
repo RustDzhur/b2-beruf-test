@@ -324,3 +324,7 @@ r25|target {1}|Ziel {1}
 r26|set {1}|Satz {1}
 r27|Statements {1}|Aussagen {1}
 r28|{~1}: not rated|{~1}: nicht bewertet
+316|Like in the exam: fill in the participant data. It is stored only in this browser; nothing is sent to a server.|Wie in der Prüfung: Tragen Sie die Teilnehmerdaten ein. Sie werden nur in diesem Browser gespeichert, an einen Server wird nichts gesendet.
+317|Start practising|Mit dem Üben beginnen
+318|Save|Speichern
+319|Change participant|Teilnehmer wechseln
