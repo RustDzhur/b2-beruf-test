@@ -1,0 +1,325 @@
+0|Bu sayfanın Claude'u kullanmasına izin vermediniz. Otomatik cevap kontrolü bunsuz da çalışır.
+1|Claude bu hesap için kullanılamıyor.
+2|Art arda çok fazla istek gönderildi veya limit doldu. Biraz sonra tekrar deneyin.
+3|Oturumun süresi doldu. claude.ai'de yeniden giriş yapın ve sayfayı yenileyin.
+4|Cevap beklenmedik bir biçimde geldi. Düğmeye tekrar basın.
+5|Claude bu isteğe cevap vermedi. Metni değiştirin.
+6|Metin çok uzun. Kısaltın.
+7|İstek durduruldu.
+8|Yerel sunucuyla bağlantı yok. npm start çalışıyor mu?
+9|API anahtarı kabul edilmiyor. ANTHROPIC_API_KEY değerini kontrol edin.
+10|Claude bir hata bildirdi. Tekrar deneyin.
+11|Claude'a ulaşılamadı. Tekrar deneyin.
+12|Claude düşünüyor…
+13|Claude kontrolü kapalı: API anahtarı ayarlanmamış. Sunucuyu durdurun ve şöyle başlatın: ANTHROPIC_API_KEY=sk-ant-... npm start (anahtarı console.anthropic.com adresinde oluşturabilirsiniz). Veya mektupları claude.ai üzerindeki çevrimiçi sürümde yazın; orada kontrol anahtarsız çalışır.
+14|Claude ile kontrol bu görünümde kullanılamıyor. Sayfayı claude.ai üzerinde açın ve sorulduğunda Claude erişimine izin verin.
+15|▶ Oynat
+16|konuşmacı: Microsoft nöral ses
+17|Bu tarayıcı metni sesli okuyamıyor. Sayfayı Chrome veya Edge'de açın ya da transkripti okuyun.
+18|❚❚ Duraklat
+19|▶ Devam
+20|Oynatıldı
+21|↻ Tekrar
+22|sınavda bir kez oynatılır
+24|Transkripti gizle
+25|Transkripti göster
+26|Sesli oku
+27|Alıştırma
+28|Sınav
+29|Öğrenme
+30|Cevap, seçtiğiniz anda kontrol edilir. Sesi istediğiniz kadar dinleyebilirsiniz.
+31|Sınavdaki gibi: kontrol en sonda yapılır, ses bir kez oynatılır.
+32|Doğru cevaplar önceden işaretlidir. Okuyun ve ezberleyin; çözümü anlamak için "Neden?" düğmesine basın.
+33|X (uygun olan yok)
+34|Neden?
+35|Cevap
+36|Doğru
+37|Doğru:
+38|Cevap:
+39|Yanlış · doğru:
+40|Cevap yok · doğru:
+41|Claude soruyu analiz ediyor…
+43|Bu, geçme seviyesidir (%60 ve üzeri).
+44|Hâlâ %60'ın altında. Hatalara bakın ve "Neden?" düğmesine basın.
+45|↻ Baştan başla
+46|Sonraki varyant →
+48|Cevapları kontrol et
+49|Cevaplar metinden ve transkriptten çıkarıldı: Gönderdiğiniz dosyada doğru cevapların işaretlemesi korunmamış.
+50|Bu görevin bir kısmı yeniden oluşturuldu: Dosyada yalnızca bir özet vardı, bu yüzden metin anlamına göre yeniden yazıldı.
+51|Varyant
+52|Kişiler ve ilanlar
+53|Kişilerin ne aradığını okuyun (1–5) ve uygun metni (a–h) seçin. Her metin yalnızca bir kez seçilebilir.
+54|Yeni çalışanlar için hazırlanan karşılama dosyasındaki metni okuyun ve karar verin: richtig veya falsch, sonra a, b veya c seçin.
+55|Forum: Kim kime cevap veriyor?
+56|Hangi forum cevabı (a–f) mesaja (10–13) uyuyor? Hiçbiri uymuyorsa X seçin.
+57|Toplantı tutanağı
+58|Tutanağı okuyun ve doğru cevabı a, b veya c seçin.
+59|Beschwerde: sorular 19–20
+60|Yöneticinin notu ve müşterinin mektubu
+62|Yöneticinin notunu ve müşterinin mektubunu okuyun ve 19. ve 20. soruları cevaplayın.
+63|Müşteriye mektup (Beschwerde)
+64|Kendiniz yazarsınız, Claude kontrol eder
+65|Yöneticinin notunu ve müşterinin mektubunu okuyun ve müşteriye cevabı kendiniz yazın. Claude dilbilgisini, cümle yapısını ve B2 seviyesini kontrol eder.
+66|Forumda görüş: Kendiniz yazarsınız
+67|Şirket içi foruma bir mesaj yazın: ne oldu, artıları, eksileri, görüşünüz. Claude metni kontrol eder.
+68|Boşluklar: a–j kelimeleri
+69|Hangi kelime (a–j) boşluğa uyuyor? Her kelime yalnızca bir kez kullanılır, bazıları fazladır.
+70|Boşluklar: a, b veya c
+71|Her boşluk için doğru seçeneği a, b veya c seçin.
+72|İş yerinde üç konuşma
+73|Üç konuşma dinleyeceksiniz. Her biri için iki görev var: richtig/falsch ve a, b veya c seçimi.
+74|Çalışma arkadaşlarının görüşleri
+76|Dört kısa konuşma dinleyeceksiniz. Hangi ifade (a–f) hangi konuşmaya uyuyor?
+77|Toplantı / konuşma
+78|Bir toplantıda bir duyuru dinleyeceksiniz. Doğru cevabı a, b veya c seçin.
+79|Telesekreter mesajları
+80|Telesekreterde beş mesaj dinleyeceksiniz. Doğru cevabı a, b veya c seçin.
+81|Telefon mesajından not
+82|Mesajı dinleyin ve notu doldurun: ad, telefon, önemli bilgi, yapılması gereken.
+83|Sunum + sorular (2+2 dk.)
+84|Konu hakkında kısa bir sunum hazırlayın ve yapın (yaklaşık 2 dakika), sonra sınav görevlisinin sorularını cevaplayın. Claude metninizi kontrol eder ve sınav görevlisini canlandırır.
+85|Smalltalk (3 dk.)
+86|Bir iş arkadaşıyla günlük bir konuda rahat bir sohbet. Örnek konuşmaya bakın, sonra Claude ile konuşun.
+87|Birlikte çözüm bulma (4 dk.)
+88|Partnerinizle iş yerindeki bir sorunu tartışır ve birlikte çözüm ararsınız. Örnek diyaloğa bakın, sonra Claude ile konuşun.
+89|Metinler a–h
+90|Cevaplar a–f
+91|Yöneticinin notu
+92|Müşterinin mektubu
+93|Notun muhatabı olan çalışan sizsiniz. Müşteriye cevabı yazın ve
+94|yöneticinin tüm taleplerini
+95|yerine getirin. Fazladan bir şey yok: Yönetici indirim istemediyse, indirim teklif etmeyin.
+96|Yapı: hitap → teşekkür ve özür → neden → yöneticinin her maddesi için çözüm → kapanış → Mit freundlichen Grüßen + ad.
+97|Örnek, görevdeki yeni adlara uyarlandı.
+98|Kelimeler
+99|İfadeler a–
+100|Dosyada yalnızca doğru seçenek vardı; yanlış seçenekler eklendi.
+101|Giriş ve özür
+102|Neden
+103|Çözüm (yöneticinin talimatları)
+104|Kapanış
+105|Hitap ve giriş
+106|Artıları
+107|Eksileri
+108|Görüş ve sonuç
+111|· biraz uzun
+113|⏱ Devam
+114|Süre doldu
+115|⏱ Yeniden başlat
+116|Redemittel · eklemek için tıklayın
+117|Dur
+118|Mektubu kontrol et
+119|En az 40 kelime yazın, o zaman kontrol işe yarar.
+120|Claude mektubu sınav kriterlerine göre kontrol ediyor… genellikle 30–90 saniye
+121|Örneği göster
+122|Örneği gizle
+123|Claude'dan örnek
+124|Claude bir örnek yazıyor…
+125|Mektubu atla
+126|Claude ile mektup kontrolü bu görünümde kullanılamıyor. Metninizi örnekle karşılaştırın ve Redemittel'i gözden geçirin.
+127|yapıldı
+128|kısmen
+129|hayır
+130|Düzeltilmiş metni göster
+131|Düzeltilmiş metni gizle
+132|Claude'un değerlendirmesi
+133|yaklaşık
+134|geçme seviyesinde
+135|hâlâ %60'ın altında
+136|İçerik (tüm maddeler)
+137|Dil ve biçim
+138|Yöneticinin talimatları
+139|Yapı
+140|Metin seviyesi:
+142|B2 seviyesinde bunu böyle söylersiniz
+143|İpuçları
+144|Forumda iş arkadaşlarınıza bir mesaj yazın: ne planlanıyor, artıları, eksileri, gerekçeli görüşünüz. Bir üslup seçin: ihr/euch veya Sie, ve ikisini karıştırmayın.
+145|Dosyadaki örnek (konu "fitness odası") yapıyı gösterir. Kendi konunuz için "Claude'dan örnek" düğmesine basın.
+146|Anahtar kelimeler ve sayılar kontrol edilir. İfade size ait olabilir; anlam ve sayılar önemlidir.
+147|↻ Yeni
+148|Doğru not ·
+149|Notu kontrol et
+150|Giriş
+151|Ana bölüm
+152|Görüş ve deneyim
+153|Soruları cevaplama
+154|Sohbeti başlatma ve sürdürme
+155|Kendinizden bahsetme
+156|Karşı soru sorma
+157|Sohbeti bitirme
+158|Öneri sunma
+159|Katılma / itiraz etme
+160|Anlaşmaya varma
+161|Kısa vadeli ve uzun vadeli
+162|Siz
+163|Gönder
+164|Konuşmamı değerlendir
+165|Önce en az 2–3 kez cevap verin.
+166|Claude konuşmayı değerlendiriyor…
+167|Seviye:
+168|İyi giden noktalar
+169|Faydalı ifadeler
+170|cevapları sesli oku
+171|Claude ile konuşma burada kullanılamıyor. Maddelere ve Redemittel'e göre yüksek sesle alıştırma yapın ve örnekle karşılaştırın.
+172|Göndermek için Ctrl+Enter
+173|Örnek diyalog
+174|A siz, B partnerinizdir. Bu olası bir versiyondur: Yapıyı ve ifadeleri alın, ama kendi sözlerinizle konuşun.
+175|Partnerle konuşma (Claude)
+176|Partner (Claude)
+177|Konuşmayı başlat
+178|Örnek konuşma
+179|A siz, B karşınızdaki kişidir. İfadeleri ve yapıyı alın, kendiniz hakkında cevap verin.
+180|Karşınızdaki kişiyle konuşma (Claude)
+181|Konuşma partneri (Claude)
+182|Örnek sunum
+183|Örnek yapı: selamlama ve ana hatlar, örneklerle ana bölüm, görüş, sonuç. Metniniz sizinle ilgili olmalı.
+184|Konu ve bu maddeler hakkında yaklaşık 2 dakikalık (150–260 kelime) bir konuşma hazırlayın. Sonra yüksek sesle okuyun; sınavda serbest konuşursunuz. Claude metni kontrol eder, sonra bir sınav görevlisi gibi sorular sorar.
+185|Olası bir versiyon. Aşağıdan dinleyebilirsiniz de.
+186|Sınav görevlisinin soruları (2 dakika)
+187|Sınav görevlisi (Claude)
+188|Sunumumla ilgili soru sor
+189|dosyanızdan
+190|Claude'dan örnek, dosyadan değil
+191|Kopyala
+192|Kopyalandı
+193|Başarısız
+194|Bir şikayete cevap (Beschwerde, No. 21)
+195|Dosyanızdan örnek mektuplar. Dosyanın kendisi uyarıyor: Kelimesi kelimesine ezberlenmiş bir metin kopyala-yapıştır sayılabilir. Yapıyı ve ifadeleri öğrenin, mektupta kendi sözlerinizle ve yalnızca yöneticinin istediğini yazın.
+197|Yöneticinin görevi
+198|Örnek mektup
+200|Forum (Forumsbeitrag, No. 58)
+201|Dosyadaki sıra: hitap, giriş, lehte argümanlar, aleyhte argümanlar, görüşünüz, ad. Tek paragraf, tek üslup (Sie veya du), karıştırmayın.
+202|Şablonlu örnek (konu "fitness odası")
+203|Forum örneği
+205|Dosya yalnızca özü öğrenmenizi öneriyor: ad, telefon, 2–4 madde ve yapılması gereken. Ayrıntılar (adlar, renkler, sayılar) sınavda değişebilir, bu yüzden dikkatle dinleyin.
+206|Kim
+207|Konu
+208|Neyi hatırlamak gerekir
+209|Ne yapılmalı
+210|Redemittel (hazır ifadeler)
+211|Kendi ifadeleriniz en iyi akılda kalır, ama bunlar her bölümün yapısını kapsar.
+212|Beschwerde · müşteriye cevap
+213|Sprechen Teil 1 · sunum
+214|Sprechen Teil 3 · çözüm
+215|Sprechen Teil 1: örnek sunumlar
+216|Önemli: Dosyanızda bu konular için metin yok, yalnızca Telegram bağlantıları var. Bu 8 konuyu ve örnekleri yapıya örnek olarak kendim yazdım. Gerçek 8 konuyu ve "Tipps" bölümünü gönderirseniz, onları değiştiririm.
+217|Burada da aynı: 77 konu ve diyalog yalnızca bir Telegram bağlantısı olarak var. Bu 10 durumu ve diyalogları örnek olarak ben yazdım.
+218|Sprechen Teil 3: bir sorunu çözme
+219|Durumlar dosyanızdan alındı (s. 168–172); A ve B diyaloglarını örnek olarak ben yazdım. Birçok olası versiyondan biri.
+221|dosyadaki durum
+222|Durum
+223|Ana sayfa
+224|Ezberle
+225|Öğrenilmeye değer tüm metinler burada toplandı: mektuplar, forum, Notiz, Sprechen için ifadeler ve örnekler. Her birinde "Kopyala" düğmesi ve ses var.
+228|Bu tarayıcıda doğal bir Almanca ses yok, bu yüzden Hören robot gibi duyulabilir. Mac'te Anna veya Petra (Premium) sesini indirin; Windows'ta en iyisi Microsoft Edge'dir (Katja, Conrad "Natural" sesleri).
+229|Sesi ayarla →
+230|Tarayıcı Almanca ses bulamadı. Sayfayı Microsoft Edge veya Chrome'da açın.
+231|Daha fazla →
+232|🎲 Rastgele görev
+233|Sınav biletleri için antrenör
+234|Dosyanızdaki tüm güncel varyantlar: Lesen, sesli Hören, Sprachbausteine, Telefonnotiz, Claude tarafından kontrol edilen mektuplar ve partnerle Sprechen. Değiştirildi olarak işaretlenen biletler kaldırıldı.
+235|✍ Mektup yaz
+236|📖 Ezberle
+237|Deneme sınavı
+239|çalışma günü
+240|görev tamamlandı
+241|ortalama sonuç
+242|tekrar edilecek soru
+243|Antwortbogen · görevler 1–58
+244|emin
+245|bazen hatalı
+246|zayıf nokta
+247|denenmedi
+248|Sınav nasıl işler ve neye ihtiyacınız var
+249|Bölüm
+250|Görevler
+251|Puan
+252|1–20, her biri 3 puan
+253|22–41, her biri 3 puan, her şey bir kez oynatılır
+254|cevap mektubu 21, Notiz 42–45, Sprachbausteine 46–57, forum 58
+255|3 sözlü bölüm
+256|Geçmek için toplam 240 puandan en az 144 gerekir (%60). Her bölümde 60 puandan 36 istenir; bir bölüm 24 ile 36 arasında olabilir.
+257|yeni konu
+258|yeniden oluşturma
+259|🎲 Rastgele varyant
+262|Sınav kâğıdı görünümü
+263|Görev ifadeleri telc üslubunu izler; orijinal cevap kâğıdı biraz farklı olabilir.
+264|Hatalar
+265|Hataları tekrar et
+266|Bunlar son cevabınızın yanlış olduğu varyantlardır. Doğru cevap verdiğinizde soru listeden kaybolur.
+267|En çok hata şu görev numaralarında:
+268|. Onlardan başlayın.
+269|Hatalar, No.
+270|Henüz hata yok. Birkaç varyant ve soru çözün, tekrar edilecek sorular burada görünecek.
+271|Bu tarayıcı metni sesli okuyamıyor. Antrenörü Microsoft Edge veya Chrome'da açın.
+272|Almanca ses bulunamadı. Edge ve Chrome'da hazır olarak vardır; iPhone'da: Ayarlar → Erişilebilirlik → Seslendirilen İçerik → Sesler → Deutsch, "Anna (Gelişmiş)" sesini indirin.
+273|Tekrar kontrol et
+274|Otomatik (en iyi ses)
+275|Kadın sesi
+276|Erkek sesi
+277|Hız
+280|Doğal ses yok: Ses mekanik olacak.
+281|doğal
+282|standart
+283|e.
+284|k.
+285|Ses
+286|Konuşmacı sesi
+287|Ses, tarayıcınızın seslerini kullanır. En canlı sesler, neredeyse sınavdaki gibi:
+288|Sistem Ayarları → Erişilebilirlik → Seslendirilen İçerik → Sistem Sesi → Sesleri Yönet → Almanca: Anna (Premium), Petra (Premium) veya Markus/Yannick (Premium) sesini indirin ve tarayıcıyı yeniden başlatın. En iyisi Safari veya Chrome.
+289|Microsoft Edge, "Katja Online (Natural)", "Seraphina", "Conrad", "Killian" sesleri.
+290|"Seslendirilen İçerik" ayarlarında gelişmiş Anna veya Helena sesini indirin.
+291|Google TTS → Deutsch, yüksek kaliteli sesi indirin.
+292|Mektup 21
+293|Forum 58
+294|: değerlendirilmedi
+295|Gerçek sınavdaki gibi her bölümden rastgele bir varyant: Cevaplar bölümün sonunda kontrol edilir, her ses bir kez oynatılır, transkript gizlidir. Mektupları Claude kontrol eder; vaktiniz yoksa bir mektubu atlayabilirsiniz.
+296|Sınav süresi
+297|Lesen + Beschwerde: 90 dakika · Hören + Notiz: yaklaşık 30 dakika · Sprachbausteine + forum: 55 dakika. Burada bölümler arasında mola verebilirsiniz.
+298|Sınavı başlat
+299|🎲 Diğer varyantlar
+300|Sonucu gör →
+301|Atla ve sonucu gör →
+302|Sonraki bölüm →
+303|Bölümü atla →
+306|Notu ve müşterinin mektubunu okuyun ve 19–20. soruları cevaplayın. Mektubu bir sonraki adımda yazacaksınız.
+307|Sonuç
+308|Deneme sınavı sonucu
+311|. Değerlendirilmeyen mektuplar 0 sayılır.
+312|Sprechen (60 puan daha) burada sayılmaz: Bunu Sprechen bölümünde Claude ile alıştırın.
+313|Yeni deneme sınavı
+314|Hatalarım
+x0|Seslendirme hatası:
+x1|Tarayıcı metni sesli okuyamadı. "Ses" bölümünü açın ve Almanca sesleri kontrol edin.
+x2|Bir şikayete cevap
+x3|Forum
+x4|Başla
+r0|oynatıldı: {1}
+r1|{1}% · {2} / {3} puan
+r2|Cevapsız: {1}. Yine de kontrol et
+r3|№{1} (yeni)
+r4|· set {1}
+r5|{1} kelime
+r6|· hedef {1}
+r7|⏱ {1} dk.
+r8|Metniniz · hatalar: {1}
+r9|Varyant {1}
+r10|Örnek {1}
+r11|Dosyadaki tüm forum konuları ({1})
+r12|Durum {1}
+r13|No. {1}: doğru {2} / {3}
+r14|No. {1}: henüz denenmedi
+r15|Hatalarım · {1}
+r16|Varyantlar: {1} · görevler {2}
+r17|{1} · görevler {2}
+r18|Bu tarayıcıdaki Almanca sesler: {1}
+r19|Doğal sesler (★): {1}. Otomatik seçilirler ve diyalogdaki her konuşmacı kendi sesini alır.
+r20|bölüm {1} / {2}
+r21|Yazılı bölüm geçildi: 180 üzerinden {1}. Böyle devam edin!
+r22|Şimdiye kadar 180 üzerinden {1}. Her bölümde en az 36 puan gerekir (biri 24–36 olabilir). "Hatalar" bölümüne bakın ve zayıf bölümleri tekrar edin.
+r23|Örnek mektup {1}
+r24|Cevap {1}
+r25|hedef {1}
+r26|set {1}
+r27|İfadeler {1}
+r28|{~1}: değerlendirilmedi

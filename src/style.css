@@ -308,3 +308,10 @@ table.score th { font-size: 12px; color: var(--muted); font-weight: 600; }
 .sheet .notiz input, .sheet .notiz textarea { border-radius: 0; border: 0; border-bottom: 1px solid #000; background: #fff; }
 
 .langsw { margin-left: 8px; } .langsw button { padding: 4px 9px; font-size: 12.5px; font-family: var(--f-mono); }
+
+/* Arabic interface: UI mirrors, German exam content stays left-to-right */
+.langsw { flex-wrap: wrap; }
+[dir="rtl"] .langsw { margin-left: 0; margin-right: 8px; }
+[dir="rtl"] textarea, [dir="rtl"] input[type="text"], [dir="rtl"] .letterview, [dir="rtl"] .brand, [dir="rtl"] .sheet .de, [dir="rtl"] .ltr { direction: ltr; text-align: left; }
+[dir="rtl"] .eyebrow, [dir="rtl"] .lead, [dir="rtl"] .note { text-align: right; }
+[dir="rtl"] .num, [dir="rtl"] .langsw { direction: ltr; unicode-bidi: isolate; }

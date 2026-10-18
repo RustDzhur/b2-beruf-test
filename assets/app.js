@@ -82,7 +82,7 @@ const ERR = {
 const errText = (e) => ERR[e && e.code] || "Не удалось связаться с Claude. Попробуйте ещё раз.";
 function thinking(msg) { return h("div", { class: "thinking" }, h("span", { class: "dots" }, h("i"), h("i"), h("i")), msg || "Claude думает…"); }
 async function getSample() { const s = SAMPLE || await sampleReady; if (!s) throw { code: "not_granted" }; return s; }
-const LANG_NAME = { en: "English", de: "Deutsch" };
+const LANG_NAME = { en: "English", de: "Deutsch", fr: "French", tr: "Turkish", ar: "Arabic", it: "Italian" };
 // the interface language also decides in which language Claude explains and gives feedback
 function langNote(prompt) {
   const l = store.get("lang", "ru"), n = LANG_NAME[l];
@@ -968,53 +968,25 @@ function viewLearn() {
     letters, forum, notes, rede, sp1, sp2, sp3);
 }
 
-/* ---------- interface language: RU (default) / EN / DE ----------
+/* ---------- interface language: RU (default) / EN / DE / FR / TR / AR / IT ----------
    The Russian strings stay in the source. A DOM pass swaps text and attributes for the chosen language,
    so every page, dynamic message and tooltip follows the switch without touching each renderer. */
-const LANGS = { ru: "RU", en: "EN", de: "DE" };
+const LANGS = { ru: "RU", en: "EN", de: "DE", fr: "FR", tr: "TR", ar: "AR", it: "IT" };
+const LANG_IDX = { en: 0, de: 1, fr: 2, tr: 3, ar: 4, it: 5 };
+const LANG_TITLE = { ru: "Русский", en: "English", de: "Deutsch", fr: "Français", tr: "Türkçe", ar: "العربية", it: "Italiano" };
 const CYR = /[А-Яа-яЁё]/;
-const EXTRA = { "Ошибка озвучки:": ["Speech error:", "Fehler bei der Sprachausgabe:"],  "Браузер не смог озвучить текст. Откройте раздел «Голос» и проверьте немецкие голоса.": ["The browser could not read the text aloud. Open the \"Voice\" section and check the German voices.", "Der Browser konnte den Text nicht vorlesen. Öffnen Sie den Bereich „Stimme“ und prüfen Sie die deutschen Stimmen."],  "Ответ на жалобу": ["Reply to a complaint", "Antwort auf eine Beschwerde"], "Форум": ["Forum", "Forum"], "Начать": ["Start", "Start"] };
 const PREFIX_KEYS = ["Ошибка озвучки:", "Неверно · правильно:", "Нет ответа · правильно:", "Правильно:", "Ответ:", "Уровень текста:", "Уровень:", "Правильная записка ·", "Чаще всего ошибки в заданиях №", "Ошибки в №"];
-const RULES = [
-  [/^прослушано: (\d+)$/, (m) => [`played: ${m[1]}`, `abgespielt: ${m[1]}`]],
-  [/^(\d+)% · (.+) из (.+) баллов$/, (m) => [`${m[1]}% · ${m[2]} of ${m[3]} points`, `${m[1]} % · ${m[2]} von ${m[3]} Punkten`]],
-  [/^Без ответа: (\d+)\. Всё равно проверить$/, (m) => [`Unanswered: ${m[1]}. Check anyway`, `Ohne Antwort: ${m[1]}. Trotzdem prüfen`]],
-  [/^№(.+) \(новый\)$/, (m) => [`№${m[1]} (new)`, `Nr. ${m[1]} (neu)`]],
-  [/^· набор (.+)$/, (m) => [`· set ${m[1]}`, `· Satz ${m[1]}`]],
-  [/^(\d+) слов$/, (m) => [`${m[1]} words`, `${m[1]} Wörter`]],
-  [/^· цель (.+)$/, (m) => [`· target ${m[1]}`, `· Ziel ${m[1]}`]],
-  [/^⏱ (\d+) мин$/, (m) => [`⏱ ${m[1]} min`, `⏱ ${m[1]} Min.`]],
-  [/^Ваш текст · ошибок: (\d+)$/, (m) => [`Your text · mistakes: ${m[1]}`, `Ihr Text · Fehler: ${m[1]}`]],
-  [/^Вариант (.+)$/, (m) => [`Variant ${m[1]}`, `Variante ${m[1]}`]],
-  [/^Образец (\d+\w*)$/, (m) => [`Sample ${m[1]}`, `Muster ${m[1]}`]],
-  [/^Все темы форума из файла \((\d+)\)$/, (m) => [`All forum topics from the file (${m[1]})`, `Alle Forumsthemen aus der Datei (${m[1]})`]],
-  [/^Ситуация (.+)$/, (m) => [`Situation ${m[1]}`, `Situation ${m[1]}`]],
-  [/^№(\d+): верно (\d+) из (\d+)$/, (m) => [`No. ${m[1]}: correct ${m[2]} of ${m[3]}`, `Nr. ${m[1]}: richtig ${m[2]} von ${m[3]}`]],
-  [/^№(\d+): ещё не решали$/, (m) => [`No. ${m[1]}: not tried yet`, `Nr. ${m[1]}: noch nicht bearbeitet`]],
-  [/^Мои ошибки · (\d+)$/, (m) => [`My mistakes · ${m[1]}`, `Meine Fehler · ${m[1]}`]],
-  [/^Вариантов: (\d+) · задания (.+)$/, (m) => [`Variants: ${m[1]} · tasks ${m[2]}`, `Varianten: ${m[1]} · Aufgaben ${m[2]}`]],
-  [/^(Lesen|Hören|Schreiben|Sprechen) · задания (.+)$/, (m) => [`${m[1]} · tasks ${m[2]}`, `${m[1]} · Aufgaben ${m[2]}`]],
-  [/^Немецкие голоса в этом браузере: (\d+)$/, (m) => [`German voices in this browser: ${m[1]}`, `Deutsche Stimmen in diesem Browser: ${m[1]}`]],
-  [/^Естественных \(★\): (\d+)\. .*$/, (m) => [`Natural voices (★): ${m[1]}. They are chosen automatically, and each speaker in a dialogue gets their own voice.`, `Natürliche Stimmen (★): ${m[1]}. Sie werden automatisch gewählt, und jede Person im Dialog hat ihre eigene Stimme.`]],
-  [/^часть (\d+) из (\d+)$/, (m) => [`part ${m[1]} of ${m[2]}`, `Teil ${m[1]} von ${m[2]}`]],
-  [/^Письменная часть сдана: (.+) из 180\. Так держать!$/, (m) => [`Written part passed: ${m[1]} of 180. Keep it up!`, `Schriftlicher Teil bestanden: ${m[1]} von 180. Weiter so!`]],
-  [/^Пока (.+) из 180\. .*$/, (m) => [`So far ${m[1]} of 180. You need at least 36 points in each part (one may be 24–36). Look at "Mistakes" and repeat the weak parts.`, `Bisher ${m[1]} von 180. Sie brauchen in jedem Teil mindestens 36 Punkte (einer darf 24–36 haben). Sehen Sie sich „Fehler“ an und wiederholen Sie die schwachen Teile.`]],
-  [/^Образец письма (\d+)$/, (m) => [`Sample letter ${m[1]}`, `Musterbrief ${m[1]}`]],
-  [/^Ответ ([a-hxA-HXRF])$/, (m) => [`Answer ${m[1]}`, `Antwort ${m[1]}`]],
-  [/^цель (.+)$/, (m) => [`target ${m[1]}`, `Ziel ${m[1]}`]],
-  [/^набор (.+)$/, (m) => [`set ${m[1]}`, `Satz ${m[1]}`]],
-  [/^Высказывания (.+)$/, (m) => [`Statements ${m[1]}`, `Aussagen ${m[1]}`]],
-  [/^(.*): не оценено$/, (m, t) => [`${t(m[1])}: not rated`, `${t(m[1])}: nicht bewertet`]],
-];
+const RULES = I18N_RULES.map(([rx, t]) => [new RegExp(rx), t]);
+const fillTpl = (tpl, m, lang) => tpl.replace(/\{(~?)(\d)\}/g, (_, nest, n) => nest ? trText(m[+n], lang) : m[+n]);
 const curLang = () => store.get("lang", "ru");
 
 function trText(s, lang) {
   if (lang === "ru" || !CYR.test(s)) return s;
-  const li = lang === "en" ? 0 : 1;
+  const li = LANG_IDX[lang];
   const lead = s.match(/^\s*/)[0], trail = s.match(/\s*$/)[0];
   const core = s.trim();
   if (!core) return s;
-  const hit = (c) => { const e = I18N[c] || EXTRA[c]; if (e) return e[li]; for (const [rx, fn] of RULES) { const m = c.match(rx); if (m) return fn(m, (x) => trText(x, lang))[li]; } return null; };
+  const hit = (c) => { const e = I18N[c]; if (e) return e[li]; for (const [rx, t] of RULES) { const m = c.match(rx); if (m) return fillTpl(t[li], m, lang); } return null; };
   let out = hit(core);
   if (out == null) {
     for (const k of PREFIX_KEYS) {
@@ -1057,6 +1029,7 @@ let langObs = null;
 function applyLang(root) {
   const lang = curLang();
   document.documentElement.lang = lang;
+  document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
   if (langObs) langObs.disconnect();
   langNode(root || document.body, lang);
   if (langObs) langObs.observe(document.body, { childList: true, subtree: true, characterData: true });
@@ -1076,7 +1049,7 @@ function initLang() {
   if (top && !top.querySelector(".langsw")) {
     const sw = h("div", { class: "seg langsw", role: "group", "aria-label": "Language" });
     const paint = () => sw.querySelectorAll("button").forEach((b) => b.classList.toggle("on", b.dataset.l === curLang()));
-    Object.entries(LANGS).forEach(([k, v]) => sw.append(h("button", { "data-l": k, title: k === "ru" ? "Русский" : k === "en" ? "English" : "Deutsch", onclick: () => { store.set("lang", k); paint(); render(); applyLang(document.body); } }, v)));
+    Object.entries(LANGS).forEach(([k, v]) => sw.append(h("button", { "data-l": k, title: LANG_TITLE[k], onclick: () => { store.set("lang", k); paint(); render(); applyLang(document.body); } }, v)));
     paint(); top.append(sw);
   }
   applyLang(document.body);

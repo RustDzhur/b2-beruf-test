@@ -82,7 +82,7 @@ const ERR = {
 const errText = (e) => ERR[e && e.code] || "Не удалось связаться с Claude. Попробуйте ещё раз.";
 function thinking(msg) { return h("div", { class: "thinking" }, h("span", { class: "dots" }, h("i"), h("i"), h("i")), msg || "Claude думает…"); }
 async function getSample() { const s = SAMPLE || await sampleReady; if (!s) throw { code: "not_granted" }; return s; }
-const LANG_NAME = { en: "English", de: "Deutsch" };
+const LANG_NAME = { en: "English", de: "Deutsch", fr: "French", tr: "Turkish", ar: "Arabic", it: "Italian" };
 // the interface language also decides in which language Claude explains and gives feedback
 function langNote(prompt) {
   const l = store.get("lang", "ru"), n = LANG_NAME[l];

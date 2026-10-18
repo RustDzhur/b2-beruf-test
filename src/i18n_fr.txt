@@ -1,0 +1,325 @@
+0|Vous n’avez pas autorisé cette page à utiliser Claude. La vérification automatique des réponses fonctionne aussi sans lui.
+1|Claude n’est pas disponible pour ce compte.
+2|Trop de requêtes à la suite ou limite atteinte. Réessayez un peu plus tard.
+3|La session a expiré. Reconnectez-vous à claude.ai et rechargez la page.
+4|La réponse a un format inattendu. Cliquez de nouveau sur le bouton.
+5|Claude n’a pas répondu à cette requête. Modifiez le texte.
+6|Le texte est trop long. Raccourcissez-le.
+7|Requête arrêtée.
+8|Pas de connexion au serveur local. npm start est-il en cours d’exécution ?
+9|La clé API n’est pas acceptée. Vérifiez ANTHROPIC_API_KEY.
+10|Claude a renvoyé une erreur. Réessayez.
+11|Impossible de joindre Claude. Réessayez.
+12|Claude réfléchit…
+13|La vérification par Claude est désactivée : aucune clé API n’est définie. Arrêtez le serveur et relancez-le ainsi : ANTHROPIC_API_KEY=sk-ant-... npm start (créez une clé sur console.anthropic.com). Ou rédigez les lettres dans la version en ligne sur claude.ai, où la vérification fonctionne sans clé.
+14|La vérification avec Claude n’est pas disponible dans cette vue. Ouvrez la page sur claude.ai et autorisez l’accès à Claude lorsqu’il vous est demandé.
+15|▶ Lecture
+16|voix : Microsoft neural voice
+17|Ce navigateur ne peut pas lire le texte à voix haute. Ouvrez la page dans Chrome ou Edge, ou lisez la transcription.
+18|❚❚ Pause
+19|▶ Continuer
+20|Écouté
+21|↻ Encore une fois
+22|à l’examen, l’audio n’est lu qu’une fois
+24|Masquer la transcription
+25|Afficher la transcription
+26|Lire à voix haute
+27|Entraînement
+28|Examen
+29|Apprendre
+30|La réponse est vérifiée dès que vous l’avez choisie. Vous pouvez écouter l’audio autant de fois que vous le souhaitez.
+31|Comme à l’examen : vérification à la fin, l’audio n’est lu qu’une fois.
+32|Les bonnes réponses sont déjà marquées. Lisez et mémorisez, cliquez sur « Pourquoi ? » pour comprendre.
+33|X (aucune ne convient)
+34|Pourquoi ?
+35|Réponse
+36|Correct
+37|Correct :
+38|Réponse :
+39|Faux · correct :
+40|Pas de réponse · correct :
+41|Claude analyse la question…
+43|C’est un niveau suffisant pour réussir (60 % et plus).
+44|Encore en dessous de 60 %. Regardez les erreurs et cliquez sur « Pourquoi ? ».
+45|↻ Recommencer
+46|Variante suivante →
+48|Vérifier les réponses
+49|Les réponses ont été déduites du texte et de la transcription : le marquage des bonnes réponses n’a pas été conservé dans le fichier envoyé.
+50|Une partie de cet exercice a été reconstituée : le fichier ne contenait qu’un résumé, le texte a donc été réécrit d’après son sens.
+51|Variante
+52|Personnes et annonces
+53|Lisez ce que cherchent les personnes (1–5) et choisissez le texte correspondant (a–h). Chaque texte ne peut être choisi qu’une seule fois.
+54|Lisez le texte du livret d’accueil pour les nouveaux collaborateurs et décidez : richtig ou falsch, puis choisissez a, b ou c.
+55|Forum : qui répond à qui ?
+56|Quelle réponse du forum (a–f) correspond au message (10–13) ? Si aucune ne convient, choisissez X.
+57|Compte rendu de réunion
+58|Lisez le compte rendu et choisissez la bonne réponse a, b ou c.
+59|Beschwerde : questions 19–20
+60|Note du supérieur et lettre du client
+62|Lisez la note du supérieur et la lettre du client, puis répondez aux questions 19 et 20.
+63|Lettre au client (Beschwerde)
+64|Vous écrivez vous-même, Claude vérifie
+65|Lisez la note du supérieur et la lettre du client, puis rédigez vous-même la réponse au client. Claude vérifie la grammaire, la construction des phrases et le niveau B2.
+66|Opinion sur le forum : vous écrivez vous-même
+67|Rédigez un message sur le forum interne : ce qui s’est passé, avantages, inconvénients, votre opinion. Claude vérifie le texte.
+68|Lacunes : mots a–j
+69|Quel mot (a–j) convient à la lacune ? Chaque mot n’est utilisé qu’une fois, certains sont en trop.
+70|Lacunes : a, b ou c
+71|Pour chaque lacune, choisissez la bonne option a, b ou c.
+72|Trois conversations au travail
+73|Vous allez entendre trois conversations. Chacune comporte deux exercices : richtig/falsch et un choix entre a, b ou c.
+74|Opinions de collègues
+76|Vous allez entendre quatre courtes conversations. Quelle affirmation (a–f) correspond à chacune ?
+77|Réunion / exposé
+78|Vous allez entendre une communication lors d’une réunion. Choisissez la bonne réponse a, b ou c.
+79|Messages sur le répondeur
+80|Vous allez entendre cinq messages sur un répondeur. Choisissez la bonne réponse a, b ou c.
+81|Note à partir d’un message téléphonique
+82|Écoutez le message et remplissez la note : nom, téléphone, information importante, ce qu’il faut faire.
+83|Présentation + questions (2+2 min)
+84|Préparez et faites une courte présentation sur le thème (environ 2 minutes), puis répondez aux questions de l’examinatrice. Claude vérifie votre texte et joue le rôle de l’examinatrice.
+85|Smalltalk (3 min)
+86|Une conversation détendue avec un collègue sur un sujet du quotidien. Regardez l’exemple de conversation, puis parlez avec Claude.
+87|Trouver une solution ensemble (4 min)
+88|Vous discutez d’un problème au travail avec votre partenaire et cherchez une solution ensemble. Regardez l’exemple de dialogue, puis parlez avec Claude.
+89|Textes a–h
+90|Réponses a–f
+91|Note du supérieur
+92|Lettre du client
+93|Vous êtes la personne à qui la note est adressée. Rédigez la réponse au client et exécutez
+94|toutes les consignes du supérieur
+95|. Rien de plus : si le chef ou la cheffe n’a pas demandé de remise, n’en proposez pas.
+96|Structure : formule d’appel → remerciements et excuses → raison → solution pour chaque point du supérieur → conclusion → Mit freundlichen Grüßen + nom.
+97|Le modèle a été adapté aux nouveaux noms de l’exercice.
+98|Mots
+99|Affirmations a–
+100|Le fichier ne contenait que la bonne option ; les mauvaises options ont été ajoutées.
+101|Introduction et excuses
+102|Raison
+103|Solution (consignes du supérieur)
+104|Conclusion
+105|Formule d’appel et introduction
+106|Avantages
+107|Inconvénients
+108|Opinion et conclusion
+111|· un peu trop long
+113|⏱ Continuer
+114|Le temps est écoulé
+115|⏱ Redémarrer
+116|Redemittel · cliquez pour insérer
+117|Stop
+118|Vérifier la lettre
+119|Écrivez au moins 40 mots, la vérification n’en sera que plus utile.
+120|Claude vérifie la lettre selon les critères de l’examen… généralement 30–90 secondes
+121|Afficher le modèle
+122|Masquer le modèle
+123|Exemple de Claude
+124|Claude rédige un exemple…
+125|Passer la lettre
+126|La vérification de la lettre avec Claude n’est pas disponible dans cette vue. Comparez votre texte avec le modèle et parcourez les Redemittel.
+127|fait
+128|en partie
+129|non
+130|Afficher le texte corrigé
+131|Masquer le texte corrigé
+132|Évaluation de Claude
+133|approximatif
+134|niveau suffisant pour réussir
+135|encore en dessous de 60 %
+136|Contenu (tous les points)
+137|Langue et forme
+138|Consignes du supérieur
+139|Structure
+140|Niveau du texte :
+142|Comment le dire au niveau B2
+143|Conseils
+144|Écrivez un message à vos collègues sur le forum : ce qui est prévu, avantages, inconvénients, votre opinion avec justification. Choisissez un seul style : ihr/euch ou Sie, et ne les mélangez pas.
+145|L’exemple du fichier (thème « Fitnessraum ») montre la structure. Pour votre propre thème, cliquez sur « Exemple de Claude ».
+146|Sont vérifiés les mots-clés et les chiffres. La formulation peut être personnelle ; le contenu et les chiffres comptent.
+147|↻ Recommencer
+148|Note correcte ·
+149|Vérifier la note
+150|Introduction
+151|Développement
+152|Opinion et expérience
+153|Répondre aux questions
+154|Engager et entretenir la conversation
+155|Parler de soi
+156|Poser une question en retour
+157|Terminer la conversation
+158|Proposer
+159|Approuver / contredire
+160|Se mettre d’accord
+161|À court terme et à long terme
+162|Vous
+163|Envoyer
+164|Évaluer ma conversation
+165|Répondez d’abord au moins 2–3 fois.
+166|Claude évalue la conversation…
+167|Niveau :
+168|Ce qui a bien fonctionné
+169|Expressions utiles
+170|lire les réponses à voix haute
+171|La conversation avec Claude n’est pas disponible ici. Entraînez-vous à voix haute avec les points-clés et les Redemittel, puis comparez avec le modèle.
+172|Ctrl+Entrée pour envoyer
+173|Exemple de dialogue
+174|A, c’est vous, B est votre partenaire. C’est une version possible : reprenez la structure et les expressions, mais parlez avec vos propres mots.
+175|Conversation avec le partenaire (Claude)
+176|Partenaire (Claude)
+177|Commencer la conversation
+178|Exemple de conversation
+179|A, c’est vous, B est l’autre personne. Reprenez les expressions et la structure, et répondez en parlant de vous.
+180|Conversation avec l’interlocuteur (Claude)
+181|Interlocuteur (Claude)
+182|Exemple de présentation
+183|Structure type : salutation et plan, développement avec exemples, opinion, conclusion. Votre texte doit parler de vous.
+184|Préparez un exposé d’environ 2 minutes (150–260 mots) sur le thème et ces points. Lisez-le ensuite à voix haute ; à l’examen, vous parlez librement. Claude vérifie le texte, puis pose des questions comme une examinatrice.
+185|Une version possible. Vous pouvez aussi l’écouter ci-dessous.
+186|Questions de l’examinatrice (2 minutes)
+187|Examinatrice (Claude)
+188|Poser des questions sur ma présentation
+189|issu de votre fichier
+190|exemple de Claude, ne provient pas du fichier
+191|Copier
+192|Copié
+193|Échec
+194|Réponse à une réclamation (Beschwerde, nº 21)
+195|Lettres modèles de votre fichier. Le fichier lui-même avertit : un texte appris par cœur mot pour mot peut être considéré comme du copier-coller. Apprenez la structure et les expressions, et dans la lettre, écrivez avec vos propres mots uniquement ce que le supérieur a demandé.
+197|Consigne du supérieur
+198|Lettre modèle
+200|Forum (Forumsbeitrag, nº 58)
+201|Ordre selon le fichier : formule d’appel, introduction, arguments pour, arguments contre, votre opinion, nom. Un seul paragraphe, un seul style (Sie ou du), sans les mélanger.
+202|Modèle avec trame (thème « Fitnessraum »)
+203|Modèle de forum
+205|Le fichier conseille de n’apprendre que l’essentiel : nom, téléphone, 2–4 points et ce qu’il faut faire. Les détails (noms, couleurs, chiffres) peuvent changer à l’examen, écoutez donc attentivement.
+206|Qui
+207|Sujet
+208|Ce qu’il faut retenir
+209|Ce qu’il faut faire
+210|Redemittel (expressions toutes faites)
+211|Ce sont vos propres expressions que l’on retient le mieux, mais celles-ci couvrent la structure de chaque partie.
+212|Beschwerde · réponse au client
+213|Sprechen Teil 1 · présentation
+214|Sprechen Teil 3 · solution
+215|Sprechen Teil 1 : présentations modèles
+216|Important : votre fichier ne contient aucun texte pour ces thèmes, seulement des liens Telegram. J’ai écrit moi-même ces 8 thèmes et modèles comme exemple de structure. Quand vous m’enverrez les vrais 8 thèmes et les « Tipps », je les remplacerai.
+217|Même chose ici : les 77 thèmes et dialogues n’existent que sous forme de lien Telegram. J’ai écrit moi-même ces 10 situations et dialogues comme exemple.
+218|Sprechen Teil 3 : résoudre un problème
+219|Les situations proviennent de votre fichier (p. 168–172) ; j’ai écrit les dialogues A et B comme modèle. Une version parmi bien d’autres possibles.
+221|situation issue du fichier
+222|Situation
+223|Accueil
+224|Apprendre par cœur
+225|Tous les textes à apprendre sont réunis ici : lettres, forum, Notiz, expressions et modèles pour Sprechen. Chacun dispose d’un bouton « Copier » et d’un audio.
+228|Ce navigateur n’a pas de voix allemande naturelle, Hören peut donc sonner de façon robotique. Sur Mac, téléchargez la voix Anna ou Petra (Premium) ; sous Windows, Microsoft Edge est le meilleur choix (voix Katja, Conrad « Natural »).
+229|Configurer la voix →
+230|Le navigateur n’a trouvé aucune voix allemande. Ouvrez la page dans Microsoft Edge ou Chrome.
+231|Plus →
+232|🎲 Exercice aléatoire
+233|Entraîneur pour les sujets d’examen
+234|Toutes les variantes actuelles de votre fichier : Lesen, Hören avec audio, Sprachbausteine, Telefonnotiz, lettres vérifiées par Claude et Sprechen avec un partenaire. Les sujets marqués comme remplacés ont été supprimés.
+235|✍ Écrire des lettres
+236|📖 Apprendre par cœur
+237|Examen blanc
+239|jours d’étude
+240|exercices faits
+241|résultat moyen
+242|questions à revoir
+243|Antwortbogen · exercices 1–58
+244|maîtrisé
+245|parfois des erreurs
+246|point faible
+247|non traité
+248|Comment se déroule l’examen et ce qu’il vous faut
+249|Partie
+250|Exercices
+251|Points
+252|1–20, 3 points chacun
+253|22–41, 3 points chacun, tout est lu une seule fois
+254|lettre de réponse 21, Notiz 42–45, Sprachbausteine 46–57, forum 58
+255|3 parties orales
+256|Pour réussir, il faut au total au moins 144 points sur 240 (60 %). Dans chaque partie, 36 sur 60 sont souhaitables ; une partie peut avoir entre 24 et 36.
+257|nouveau thème
+258|reconstitution
+259|🎲 Variante aléatoire
+262|Présentation façon feuille d’examen
+263|La formulation des exercices suit le style telc ; la feuille originale peut différer légèrement.
+264|Erreurs
+265|Revoir les erreurs
+266|Ce sont les variantes pour lesquelles votre dernière réponse était fausse. Dès que vous répondez correctement, la question disparaît de la liste.
+267|La plupart des erreurs concernent les exercices nº
+268|. Commencez par ceux-ci.
+269|Erreurs dans le nº
+270|Pas encore d’erreurs. Faites quelques variantes et les questions à revoir apparaîtront ici.
+271|Ce navigateur ne peut pas lire le texte à voix haute. Ouvrez l’entraîneur dans Microsoft Edge ou Chrome.
+272|Aucune voix allemande trouvée. Edge et Chrome en disposent d’office ; sur iPhone : Réglages → Accessibilité → Contenu énoncé → Voix → Deutsch, téléchargez « Anna (améliorée) ».
+273|Vérifier de nouveau
+274|Auto (meilleure voix)
+275|Voix féminine
+276|Voix masculine
+277|Vitesse
+280|Il n’y a pas de voix naturelles : le son sera mécanique.
+281|naturelle
+282|standard
+283|m.
+284|f.
+285|Voix
+286|Voix du locuteur
+287|L’audio utilise les voix de votre navigateur. Les voix les plus réalistes, presque comme à l’examen :
+288|Réglages Système → Accessibilité → Contenu énoncé → Voix du système → Gérer les voix → Allemand : téléchargez Anna (Premium), Petra (Premium) ou Markus/Yannick (Premium), puis redémarrez le navigateur. Idéal dans Safari ou Chrome.
+289|Microsoft Edge, voix « Katja Online (Natural) », « Seraphina », « Conrad », « Killian ».
+290|téléchargez la voix améliorée Anna ou Helena dans les réglages « Contenu énoncé ».
+291|Google TTS → Deutsch, téléchargez la voix de haute qualité.
+292|Lettre 21
+293|Forum 58
+294| : non évalué
+295|Une variante aléatoire de chaque partie, comme à l’examen réel : les réponses sont vérifiées à la fin de la partie, chaque audio n’est lu qu’une fois, la transcription est masquée. Claude vérifie les lettres ; si vous manquez de temps, vous pouvez passer une lettre.
+296|Durée de l’examen
+297|Lesen + Beschwerde : 90 minutes · Hören + Notiz : environ 30 minutes · Sprachbausteine + forum : 55 minutes. Ici, vous pouvez faire des pauses entre les parties.
+298|Démarrer l’examen
+299|🎲 Autres variantes
+300|Voir le résultat →
+301|Passer et voir le résultat →
+302|Partie suivante →
+303|Passer la partie →
+306|Lisez la note et la lettre du client et répondez aux questions 19–20. Vous rédigerez la lettre à l’étape suivante.
+307|Résultat
+308|Résultat de l’examen blanc
+311|. Les lettres non évaluées comptent pour 0.
+312|Sprechen (60 points supplémentaires) n’est pas compté ici : entraînez-vous dans la section Sprechen avec Claude.
+313|Nouvel examen blanc
+314|Mes erreurs
+x0|Erreur de synthèse vocale :
+x1|Le navigateur n’a pas pu lire le texte à voix haute. Ouvrez la section « Voix » et vérifiez les voix allemandes.
+x2|Réponse à une réclamation
+x3|Forum
+x4|Début
+r0|écouté : {1}
+r1|{1} % · {2} sur {3} points
+r2|Sans réponse : {1}. Vérifier quand même
+r3|nº {1} (nouveau)
+r4|· série {1}
+r5|{1} mots
+r6|· objectif {1}
+r7|⏱ {1} min
+r8|Votre texte · erreurs : {1}
+r9|Variante {1}
+r10|Modèle {1}
+r11|Tous les thèmes de forum du fichier ({1})
+r12|Situation {1}
+r13|Nº {1} : correct {2} sur {3}
+r14|Nº {1} : pas encore traité
+r15|Mes erreurs · {1}
+r16|Variantes : {1} · exercices {2}
+r17|{1} · exercices {2}
+r18|Voix allemandes dans ce navigateur : {1}
+r19|Voix naturelles (★) : {1}. Elles sont choisies automatiquement, et chaque personne du dialogue a sa propre voix.
+r20|partie {1} sur {2}
+r21|Partie écrite réussie : {1} sur 180. Continuez ainsi !
+r22|Jusqu’ici {1} sur 180. Il vous faut au moins 36 points dans chaque partie (une peut avoir 24–36). Consultez « Erreurs » et révisez les parties faibles.
+r23|Lettre modèle {1}
+r24|Réponse {1}
+r25|objectif {1}
+r26|série {1}
+r27|Affirmations {1}
+r28|{~1} : non évalué
