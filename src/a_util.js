@@ -170,7 +170,18 @@ const segKey = (s) => fnv((s.who || "") + "\u0001" + s.t);
 let AUDIO = {}; // pre-rendered neural recordings (assets/audio/index.json), produced by src/gen_audio.py
 const audioReady = location.protocol.startsWith("http") ? fetch("assets/audio/index.json").then(r => r.ok ? r.json() : {}).then(j => { AUDIO = j || {}; }).catch(() => {}) : Promise.resolve();
 let activePlayer = null;
-function stopAll() { if (activePlayer) activePlayer.stop(); else if (TTS) TTS.cancel(); }
+let liveAudio = null;
+function stopAll() { if (liveAudio) { liveAudio.onerror = null; liveAudio.pause(); liveAudio = null; } if (activePlayer) activePlayer.stop(); else if (TTS) TTS.cancel(); }
+// speak any text: neural voice from the local server (npm start), browser voice as fallback
+function browserSpeak(text, g) { if (!TTS) return; loadVoices(); const c = castVoices([{ who: "x", t: text, g: g || "f" }]).x; speakLater(chunks(speakable(text)).map(t => { const u = new SpeechSynthesisUtterance(t); if (c.v) { u.voice = c.v; u.lang = c.v.lang; } else u.lang = "de-DE"; u.pitch = c.pitch; u.rate = vcfg().rate || 1; return u; })); }
+function speakText(text, g) {
+  stopAll();
+  if (!(LOCAL && location.protocol.startsWith("http"))) return browserSpeak(text, g);
+  const au = liveAudio = new Audio("api/tts?g=" + (g === "m" ? "m" : "f") + "&t=" + encodeURIComponent(speakable(text)));
+  au.playbackRate = vcfg().rate || 1;
+  au.onerror = () => { if (liveAudio === au) { liveAudio = null; browserSpeak(text, g); } };
+  au.play().catch(() => au.onerror && au.onerror());
+}
 
 function makePlayer(segs, opt = {}) {
   // segs: [{who, t, g?}]; opt: {title, once, onLine(i), onEnd}
@@ -252,5 +263,5 @@ const SPOKEN = [];
 // Chrome drops speak() right after cancel(): queue the utterances after a short pause and keep them referenced
 function speakLater(utts) { TTS.cancel(); SPOKEN.length = 0; SPOKEN.push(...utts); setTimeout(() => utts.forEach((u) => TTS.speak(u)), 120); }
 function speakBtn(text, g) {
-  return h("button", { class: "btn ghost small", title: "Озвучить", onclick: () => { if (!TTS) return; stopAll(); loadVoices(); const c = castVoices([{ who: "x", t: text, g: g || "f" }]).x; speakLater(chunks(speakable(text)).map(t => { const u = new SpeechSynthesisUtterance(t); if (c.v) { u.voice = c.v; u.lang = c.v.lang; } else u.lang = "de-DE"; u.pitch = c.pitch; u.rate = vcfg().rate || 1; return u; })); } }, "🔊");
+  return h("button", { class: "btn ghost small", title: "Озвучить", onclick: () => speakText(text, g) }, "🔊");
 }
