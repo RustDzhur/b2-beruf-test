@@ -25,7 +25,7 @@ const norm = (s) => String(s || "").toLowerCase().replace(/ä/g, "ae").replace(/
 
 const store = {
   get(k, d) { try { const v = localStorage.getItem("dtb." + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
-  set(k, v) { try { localStorage.setItem("dtb." + k, JSON.stringify(v)); } catch {} }
+  set(k, v) { try { localStorage.setItem("dtb." + k, JSON.stringify(v)); } catch {} if (store.onSet) store.onSet(k); }
 };
 function markActive() { const d = store.get("days", []); if (!d.includes(today())) { d.push(today()); store.set("days", d.slice(-400)); } }
 function saveRes(vid, score, max) {

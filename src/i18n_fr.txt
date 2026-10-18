@@ -324,7 +324,7 @@ r25|objectif {1}
 r26|série {1}
 r27|Affirmations {1}
 r28|{~1} : non évalué
-316|Comme à l’examen : remplissez les données du participant. Elles sont stockées uniquement dans ce navigateur, rien n’est envoyé à un serveur.
+316|Comme à l’examen : remplissez les données du participant. Sans mot de passe, elles et votre progression restent uniquement dans ce navigateur. Avec un mot de passe, la progression est enregistrée dans le cloud ; sur un autre appareil, il suffit de saisir les mêmes nom, prénom, date de naissance et mot de passe.
 317|Commencer l’entraînement
 318|Enregistrer
 319|Changer de participant

@@ -324,7 +324,7 @@ r25|obiettivo {1}
 r26|serie {1}
 r27|Affermazioni {1}
 r28|{~1}: non valutato
-316|Come all’esame: compila i dati del partecipante. Vengono salvati solo in questo browser, non viene inviato nulla a un server.
+316|Come all’esame: compila i dati del partecipante. Senza password restano, insieme ai tuoi progressi, solo in questo browser. Con una password i progressi vengono salvati nel cloud; su un altro dispositivo basta inserire lo stesso cognome, nome, data di nascita e password.
 317|Inizia ad allenarti
 318|Salva
 319|Cambia partecipante

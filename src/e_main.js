@@ -409,21 +409,29 @@ function viewProfile(first) {
       boxIn("ort", L7("Postleitzahl und Ort", "Postcode and town", "Code postal et ville", "CAP e città", "Posta kodu ve şehir", "Индекс и город"), 30),
       boxIn("zentrum", L7("Prüfungszentrum", "Examination Centre", "Centre d'examen", "Centro d'esame", "Sınav merkezi", "Экзаменационное учреждение"), 30),
       dateIn("datum", L7("Prüfungsdatum", "Date of Examination", "Date d'examen", "Data dell'esame", "Sınav tarihi", "Дата экзамена"))),
+    h("label", { class: "cv-row" }, h("input", { class: "datein", type: "password", name: "pw", autocomplete: "new-password", placeholder: "••••••", minlength: 6 }), h("small", null, "Kennwort zum Speichern in der Cloud (optional, mindestens 6 Zeichen)")),
     err,
     h("div", { class: "s30-foot" }, h("b", null, "Antwortbogen S30"), h("span", null, "www.telc.net")));
-  form.onsubmit = (e) => {
+  form.onsubmit = async (e) => {
     e.preventDefault();
     const fd = new FormData(form), x = {};
     for (const [k, v] of fd.entries()) x[k] = String(v).trim();
-    if (!x.fam || !x.vor) { err.hidden = false; return; }
+    const pw = x.pw || ""; delete x.pw;
+    if (!x.fam || !x.vor) { err.textContent = "Укажите фамилию и имя."; err.hidden = false; return; }
+    if (pw && pw.length < 6) { err.textContent = "Das Kennwort ist zu kurz (mindestens 6 Zeichen)."; err.hidden = false; return; }
     store.set("cand", { ...x, done: true });
+    if (pw) {
+      err.hidden = true; const btn = document.querySelector(".btn.primary"); if (btn) btn.disabled = true;
+      try { await cloudConnect({ ...x }, pw); }
+      catch (ex) { if (btn) btn.disabled = false; err.textContent = cloudErrText(ex); err.hidden = false; if (ex.msg === "PW") { store.set("cand", { ...cand(), done: false }); return; } await new Promise(r => setTimeout(r, 2500)); }
+    }
     location.hash = first ? (location.hash && location.hash !== "#profile" ? location.hash : "#home") : "#home";
     render();
   };
-  const del = first ? null : h("button", { type: "button", class: "btn ghost", onclick: () => { store.set("cand", { fam: "", vor: "" }); render(); } }, "Сменить участника");
+  const del = first ? null : h("button", { type: "button", class: "btn ghost", onclick: () => { cloudOff(cloudOn()); store.set("cand", { fam: "", vor: "" }); render(); } }, "Сменить участника");
   return h("div", { class: "wrap narrow" },
     first ? null : crumbs(h("a", { href: "#home" }, "Главная"), "Данные участника"),
-    h("p", { class: "lead", style: "margin:0" }, "Как на экзамене: заполните данные участника. Они хранятся только в этом браузере, на сервер ничего не отправляется."),
+    h("p", { class: "lead", style: "margin:0" }, "Как на экзамене: заполните данные участника. Без пароля они и ваш прогресс хранятся только в этом браузере. С паролем прогресс сохраняется в облаке, и на другом устройстве достаточно ввести те же фамилию, имя, дату рождения и пароль."),
     form,
     h("div", { class: "row" }, h("button", { class: "btn primary", onclick: () => form.requestSubmit() }, first ? "Начать тренировку" : "Сохранить"), del));
 }
@@ -434,7 +442,7 @@ function updateWho() {
   const c = cand();
   if (!c.done) { if (a) a.remove(); return; }
   if (!a) { a = h("a", { class: "who", href: "#profile", title: "Данные участника" }); top.insertBefore(a, top.querySelector(".langsw")); }
-  a.replaceChildren(h("span", { class: "who-ico", "aria-hidden": "true" }, "👤"), h("span", null, `${c.vor} ${c.fam}`));
+  a.replaceChildren(h("span", { class: "who-ico", "aria-hidden": "true" }, "👤"), h("span", null, `${c.vor} ${c.fam}`), cloudOn() ? h("span", { class: "who-ico", title: "Cloud", "aria-hidden": "true" }, "☁") : null);
 }
 function render() {
   stopAll();
@@ -457,5 +465,6 @@ function render() {
 let lastHash = location.hash;
 window.addEventListener("hashchange", () => { render(); if (location.hash !== lastHash) window.scrollTo(0, 0); lastHash = location.hash; });
 initLang();
+cloudBoot(() => render());
 audioReady.then(render);
 })();
