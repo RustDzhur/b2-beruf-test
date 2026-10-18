@@ -1,0 +1,315 @@
+0|You did not allow this page to use Claude. Automatic answer checking still works without it.|Sie haben der Seite den Zugriff auf Claude nicht erlaubt. Die automatische Antwortprüfung funktioniert auch ohne Claude.
+1|Claude is not available for this account.|Claude ist für dieses Konto nicht verfügbar.
+2|Too many requests in a row or the limit is used up. Try again a little later.|Zu viele Anfragen hintereinander oder das Limit ist erreicht. Versuchen Sie es etwas später noch einmal.
+3|Session expired. Sign in to claude.ai again and reload the page.|Die Sitzung ist abgelaufen. Melden Sie sich bei claude.ai erneut an und laden Sie die Seite neu.
+4|The answer came in an unexpected format. Press the button again.|Die Antwort hatte ein unerwartetes Format. Klicken Sie die Schaltfläche noch einmal.
+5|Claude did not answer this request. Change the text.|Claude hat auf diese Anfrage nicht geantwortet. Ändern Sie den Text.
+6|The text is too long. Shorten it.|Der Text ist zu lang. Kürzen Sie ihn.
+7|Request stopped.|Anfrage gestoppt.
+8|No connection to the local server. Is npm start running?|Keine Verbindung zum lokalen Server. Läuft npm start?
+9|The API key is not accepted. Check ANTHROPIC_API_KEY.|Der API-Schlüssel wird nicht akzeptiert. Prüfen Sie ANTHROPIC_API_KEY.
+10|Claude returned an error. Try again.|Claude hat einen Fehler gemeldet. Versuchen Sie es noch einmal.
+11|Could not reach Claude. Try again.|Claude ist nicht erreichbar. Versuchen Sie es noch einmal.
+12|Claude is thinking…|Claude denkt nach…
+13|Claude checking is off: no API key set. Stop the server and start it like this: ANTHROPIC_API_KEY=sk-ant-... npm start (create a key at console.anthropic.com). Or write the letters in the online version on claude.ai, where checking works without a key.|Die Claude-Prüfung ist aus: Es ist kein API-Schlüssel gesetzt. Stoppen Sie den Server und starten Sie ihn so: ANTHROPIC_API_KEY=sk-ant-... npm start (den Schlüssel erstellen Sie auf console.anthropic.com). Oder schreiben Sie die Briefe in der Online-Version auf claude.ai, dort funktioniert die Prüfung ohne Schlüssel.
+14|Checking with Claude is not available in this view. Open the page on claude.ai and allow access to Claude when asked.|Die Prüfung mit Claude ist in dieser Ansicht nicht verfügbar. Öffnen Sie die Seite auf claude.ai und erlauben Sie den Zugriff auf Claude, wenn Sie gefragt werden.
+15|▶ Play|▶ Abspielen
+16|speaker: Microsoft neural voice|Sprecher: Microsoft-Neural-Stimme
+17|This browser cannot read text aloud. Open the page in Chrome or Edge, or read the transcript.|Dieser Browser kann Text nicht vorlesen. Öffnen Sie die Seite in Chrome oder Edge oder lesen Sie das Transkript.
+18|❚❚ Pause|❚❚ Pause
+19|▶ Continue|▶ Weiter
+20|Played|Abgespielt
+21|↻ Again|↻ Noch einmal
+22|in the exam it plays once|in der Prüfung wird es einmal abgespielt
+23|-|-
+24|Hide transcript|Transkript ausblenden
+25|Show transcript|Transkript anzeigen
+26|Read aloud|Vorlesen
+27|Practice|Training
+28|Exam|Prüfung
+29|Learn|Lernen
+30|The answer is checked right after you choose. You can listen to the audio as often as you like.|Die Antwort wird sofort nach der Auswahl geprüft. Das Audio können Sie beliebig oft hören.
+31|Like the exam: checked at the end, the audio plays once.|Wie in der Prüfung: Prüfung am Ende, das Audio läuft einmal.
+32|Correct answers are already marked. Read and memorize, press "Why?" to understand.|Die richtigen Antworten sind schon markiert. Lesen und einprägen, mit „Warum?“ verstehen Sie die Lösung.
+33|X (no suitable one)|X (keine passende)
+34|Why?|Warum?
+35|Answer|Antwort
+36|Correct|Richtig
+37|Correct:|Richtig:
+38|Answer:|Antwort:
+39|Wrong · correct:|Falsch · richtig:
+40|No answer · correct:|Keine Antwort · richtig:
+41|Claude is analysing the question…|Claude analysiert die Frage…
+42|-|-
+43|This is a passing level (60% and above).|Das ist Bestehensniveau (60 % und mehr).
+44|Still below 60%. Look at the mistakes and press "Why?".|Noch unter 60 %. Sehen Sie sich die Fehler an und klicken Sie „Warum?“.
+45|↻ Start again|↻ Noch einmal von vorn
+46|Next variant →|Nächste Variante →
+47|-|-
+48|Check answers|Antworten prüfen
+49|Answers were derived from the text and transcript: the highlighting of correct answers did not survive in the file you sent.|Die Antworten wurden aus Text und Transkript abgeleitet: Die Markierung der richtigen Antworten ist in der gesendeten Datei nicht erhalten.
+50|Part of this task was reconstructed: the file only had a retelling, so the text was rewritten from its meaning.|Ein Teil dieser Aufgabe wurde rekonstruiert: In der Datei gab es nur eine Nacherzählung, deshalb wurde der Text sinngemäß neu geschrieben.
+51|Variant|Variante
+52|People and ads|Personen und Anzeigen
+53|Read what the people are looking for (1–5) and choose the matching text (a–h). Each text can be chosen only once.|Lesen Sie, was die Personen suchen (1–5), und wählen Sie den passenden Text (a–h). Jeder Text darf nur einmal gewählt werden.
+54|Read the text from the welcome folder for new employees and decide: richtig or falsch, then choose a, b or c.|Lesen Sie den Text aus der Willkommensmappe für neue Mitarbeiter und entscheiden Sie: richtig oder falsch, dann wählen Sie a, b oder c.
+55|Forum: who answers whom|Forum: Wer antwortet wem?
+56|Which forum answer (a–f) fits the message (10–13)? If none fits, choose X.|Welche Forumsantwort (a–f) passt zum Beitrag (10–13)? Wenn keine passt, wählen Sie X.
+57|Meeting minutes|Besprechungsprotokoll
+58|Read the minutes and choose the correct answer a, b or c.|Lesen Sie das Protokoll und wählen Sie die richtige Antwort a, b oder c.
+59|Beschwerde: questions 19–20|Beschwerde: Fragen 19–20
+60|Boss's note and customer's letter|Notiz der Chefin / des Chefs und Kundenbrief
+61|-|-
+62|Read the boss's note and the customer's letter and answer questions 19 and 20.|Lesen Sie die Notiz und den Kundenbrief und beantworten Sie die Fragen 19 und 20.
+63|Letter to the customer (Beschwerde)|Brief an den Kunden (Beschwerde)
+64|You write it yourself, Claude checks|Sie schreiben selbst, Claude prüft
+65|Read the boss's note and the customer's letter and write the reply to the customer yourself. Claude checks grammar, sentence structure and B2 level.|Lesen Sie die Notiz und den Kundenbrief und schreiben Sie die Antwort an den Kunden selbst. Claude prüft Grammatik, Satzbau und B2-Niveau.
+66|Opinion on the forum: you write it yourself|Meinung im Forum: Sie schreiben selbst
+67|Write a message on the internal forum: what happened, pros, cons, your opinion. Claude checks the text.|Schreiben Sie einen Beitrag im internen Forum: was passiert ist, Vorteile, Nachteile, Ihre Meinung. Claude prüft den Text.
+68|Gaps: words a–j|Lücken: Wörter a–j
+69|Which word (a–j) fits the gap? Each word is used once, some are extra.|Welches Wort (a–j) passt in die Lücke? Jedes Wort wird nur einmal verwendet, einige bleiben übrig.
+70|Gaps: a, b or c|Lücken: a, b oder c
+71|For each gap choose the correct option a, b or c.|Wählen Sie für jede Lücke die richtige Lösung a, b oder c.
+72|Three conversations at work|Drei Gespräche bei der Arbeit
+73|You will hear three conversations. Each has two tasks: richtig/falsch and a choice of a, b or c.|Sie hören drei Gespräche. Zu jedem gibt es zwei Aufgaben: richtig/falsch und eine Auswahl a, b oder c.
+74|Colleagues' opinions|Meinungen von Kollegen
+75|-|-
+76|You will hear four short conversations. Which statement (a–f) fits each one?|Sie hören vier kurze Gespräche. Welche Aussage (a–f) passt zu welchem Gespräch?
+77|Meeting / talk|Besprechung / Vortrag
+78|You will hear a message at a meeting. Choose the correct answer a, b or c.|Sie hören eine Mitteilung in einer Besprechung. Wählen Sie die richtige Antwort a, b oder c.
+79|Answering machine messages|Nachrichten auf dem Anrufbeantworter
+80|You will hear five messages on an answering machine. Choose the correct answer a, b or c.|Sie hören fünf Nachrichten auf dem Anrufbeantworter. Wählen Sie die richtige Antwort a, b oder c.
+81|Note from a phone message|Notiz zu einer Telefonnachricht
+82|Listen to the message and fill in the note: name, phone, important information, what has to be done.|Hören Sie die Nachricht und füllen Sie die Notiz aus: Name, Telefon, wichtige Information, was zu tun ist.
+83|Presentation + questions (2+2 min)|Präsentation + Fragen (2+2 Min.)
+84|Prepare and give a short presentation on the topic (about 2 minutes), then answer the examiner's questions. Claude checks your text and plays the examiner.|Bereiten Sie eine kurze Präsentation zum Thema vor (etwa 2 Minuten) und beantworten Sie danach die Fragen der Prüferin. Claude prüft Ihren Text und spielt die Prüferin.
+85|Smalltalk (3 min)|Smalltalk (3 Min.)
+86|A relaxed chat with a colleague about an everyday topic. Look at the sample conversation, then talk with Claude.|Ein lockeres Gespräch mit einer Kollegin / einem Kollegen über ein Alltagsthema. Sehen Sie sich das Mustergespräch an und sprechen Sie dann mit Claude.
+87|Find a solution together (4 min)|Gemeinsam eine Lösung finden (4 Min.)
+88|You and your partner discuss a problem at work and look for a solution together. Look at the sample dialogue, then talk with Claude.|Sie besprechen mit Ihrer Partnerin / Ihrem Partner ein Problem bei der Arbeit und suchen gemeinsam eine Lösung. Sehen Sie sich den Musterdialog an und sprechen Sie dann mit Claude.
+89|Texts a–h|Texte a–h
+90|Answers a–f|Antworten a–f
+91|Note from the manager|Notiz der Führungskraft
+92|Customer's letter|Brief der Kundin / des Kunden
+93|You are the employee the note is addressed to. Write the reply to the customer and carry out|Sie sind die Mitarbeiterin / der Mitarbeiter, an die / den die Notiz gerichtet ist. Schreiben Sie die Antwort an den Kunden und erledigen Sie
+94|all the manager's instructions|alle Aufträge der Führungskraft
+95|. Nothing extra: if the boss did not ask for a discount, do not offer one.|. Nichts Zusätzliches: Wenn die Chefin / der Chef keinen Rabatt verlangt hat, bieten Sie keinen an.
+96|Structure: greeting → thanks and apology → reason → solution for each point of the boss → closing → Mit freundlichen Grüßen + name.|Aufbau: Anrede → Dank und Entschuldigung → Grund → Lösung zu jedem Punkt der Chefin / des Chefs → Schluss → Mit freundlichen Grüßen + Name.
+97|The sample was adapted to the new names in the task.|Das Muster wurde an die neuen Namen in der Aufgabe angepasst.
+98|Words|Wörter
+99|Statements a–|Aussagen a–
+100|The file only had the correct option; the wrong options were added.|In der Datei gab es nur die richtige Lösung; die falschen Antworten wurden ergänzt.
+101|Opening and apology|Einleitung und Entschuldigung
+102|Reason|Grund
+103|Solution (the boss's instructions)|Lösung (Aufträge der Chefin / des Chefs)
+104|Closing|Schluss
+105|Greeting and introduction|Anrede und Einleitung
+106|Pros|Vorteile
+107|Cons|Nachteile
+108|Opinion and conclusion|Meinung und Fazit
+109|-|-
+110|-|-
+111|· a bit long|· etwas zu lang
+112|-|-
+113|⏱ Continue|⏱ Weiter
+114|Time is up|Die Zeit ist um
+115|⏱ Restart|⏱ Neu starten
+116|Redemittel · click to insert|Redemittel · zum Einfügen anklicken
+117|Stop|Stopp
+118|Check the letter|Brief prüfen
+119|Write at least 40 words, then the check will be useful.|Schreiben Sie mindestens 40 Wörter, dann ist die Prüfung hilfreich.
+120|Claude is checking the letter against the exam criteria… usually 30–90 seconds|Claude prüft den Brief nach den Prüfungskriterien… meist 30–90 Sekunden
+121|Show sample|Muster anzeigen
+122|Hide sample|Muster ausblenden
+123|Example from Claude|Beispiel von Claude
+124|Claude is writing an example…|Claude schreibt ein Beispiel…
+125|Skip the letter|Brief überspringen
+126|Checking the letter with Claude is not available in this view. Compare your text with the sample and go through the Redemittel.|Die Briefprüfung mit Claude ist in dieser Ansicht nicht verfügbar. Vergleichen Sie Ihren Text mit dem Muster und gehen Sie die Redemittel durch.
+127|done|erledigt
+128|partly|teilweise
+129|no|nein
+130|Show corrected text|Korrigierten Text anzeigen
+131|Hide corrected text|Korrigierten Text ausblenden
+132|Claude's assessment|Bewertung von Claude
+133|approximate|ungefähr
+134|at passing level|auf Bestehensniveau
+135|still below 60%|noch unter 60 %
+136|Content (all points)|Inhalt (alle Punkte)
+137|Language and layout|Sprache und Form
+138|Boss's instructions|Aufträge der Chefin / des Chefs
+139|Structure|Aufbau
+140|Text level:|Textniveau:
+141|-|-
+142|How to say it at B2 level|So sagt man es auf B2-Niveau
+143|Tips|Tipps
+144|Write a message to your colleagues on the forum: what is planned, pros, cons, your opinion with reasons. Choose one style: ihr/euch or Sie, and do not mix them.|Schreiben Sie Ihren Kolleginnen und Kollegen im Forum: was geplant ist, Vorteile, Nachteile, Ihre Meinung mit Begründung. Wählen Sie einen Stil: ihr/euch oder Sie, und mischen Sie sie nicht.
+145|The example from the file (topic "fitness room") shows the structure. For your own topic press "Example from Claude".|Das Beispiel aus der Datei (Thema „Fitnessraum“) zeigt den Aufbau. Für Ihr eigenes Thema klicken Sie „Beispiel von Claude“.
+146|Checked by keywords and numbers. The wording can be your own; meaning and numbers matter.|Geprüft werden Stichwörter und Zahlen. Die Formulierung darf eigen sein, wichtig sind Inhalt und Zahlen.
+147|↻ Again|↻ Neu
+148|Correct note ·|Richtige Notiz ·
+149|Check the note|Notiz prüfen
+150|Opening|Einstieg
+151|Main part|Hauptteil
+152|Opinion and experience|Meinung und Erfahrung
+153|Answering questions|Fragen beantworten
+154|Starting and keeping the conversation going|Gespräch beginnen und in Gang halten
+155|Talking about yourself|Über sich erzählen
+156|Asking a question back|Eine Gegenfrage stellen
+157|Ending the conversation|Gespräch beenden
+158|Suggesting|Vorschlagen
+159|Agreeing / objecting|Zustimmen / widersprechen
+160|Reaching an agreement|Sich einigen
+161|Short-term and long-term|Kurzfristig und langfristig
+162|You|Sie
+163|Send|Senden
+164|Rate my conversation|Mein Gespräch bewerten
+165|First answer at least 2–3 times.|Antworten Sie zuerst mindestens 2–3 Mal.
+166|Claude is rating the conversation…|Claude bewertet das Gespräch…
+167|Level:|Niveau:
+168|What went well|Das ist gut gelungen
+169|Useful phrases|Nützliche Wendungen
+170|read replies aloud|Antworten vorlesen
+171|Conversation with Claude is not available here. Practise aloud following the points and Redemittel and compare with the sample.|Das Gespräch mit Claude ist hier nicht verfügbar. Üben Sie laut anhand der Stichpunkte und Redemittel und vergleichen Sie mit dem Muster.
+172|Ctrl+Enter to send|Strg+Enter zum Senden
+173|Sample dialogue|Musterdialog
+174|A is you, B is your partner. This is one possible version: take the structure and phrases, but speak in your own words.|A sind Sie, B ist Ihr Partner. Das ist eine mögliche Variante: Übernehmen Sie Aufbau und Wendungen, sprechen Sie aber mit eigenen Worten.
+175|Conversation with the partner (Claude)|Gespräch mit dem Partner (Claude)
+176|Partner (Claude)|Partner (Claude)
+177|Start the conversation|Gespräch beginnen
+178|Sample conversation|Mustergespräch
+179|A is you, B is the other person. Take the phrases and structure, and answer about yourself.|A sind Sie, B ist die andere Person. Übernehmen Sie Wendungen und Aufbau und antworten Sie über sich selbst.
+180|Conversation with the other person (Claude)|Gespräch mit dem Gegenüber (Claude)
+181|Conversation partner (Claude)|Gesprächspartner (Claude)
+182|Sample presentation|Musterpräsentation
+183|Example structure: greeting and outline, main part with examples, opinion, conclusion. Your text must be about you.|Beispielaufbau: Begrüßung und Gliederung, Hauptteil mit Beispielen, Meinung, Schluss. Ihr Text muss von Ihnen handeln.
+184|Prepare a talk of about 2 minutes (150–260 words) on the topic and these points. Then read it aloud; in the exam you speak freely. Claude checks the text, then asks questions like an examiner.|Bereiten Sie einen Vortrag von etwa 2 Minuten (150–260 Wörter) zum Thema und zu diesen Punkten vor. Lesen Sie ihn danach laut vor; in der Prüfung sprechen Sie frei. Claude prüft den Text und stellt dann Fragen wie eine Prüferin.
+185|One possible version. You can also listen to it below.|Eine mögliche Variante. Sie können sie unten auch anhören.
+186|Examiner's questions (2 minutes)|Fragen der Prüferin (2 Minuten)
+187|Examiner (Claude)|Prüferin (Claude)
+188|Ask questions about my presentation|Fragen zu meiner Präsentation stellen
+189|from your file|aus Ihrer Datei
+190|example by Claude, not from the file|Beispiel von Claude, nicht aus der Datei
+191|Copy|Kopieren
+192|Copied|Kopiert
+193|Failed|Fehlgeschlagen
+194|Reply to a complaint (Beschwerde, no. 21)|Antwort auf eine Beschwerde (Beschwerde, Nr. 21)
+195|Sample letters from your file. The file itself warns: a text learned word for word may be treated as copy-paste. Learn the structure and phrases, and in the letter write in your own words and only what the boss asked for.|Musterbriefe aus Ihrer Datei. Die Datei warnt selbst: Ein wörtlich auswendig gelernter Text kann als Copy-and-paste gewertet werden. Lernen Sie Aufbau und Wendungen und schreiben Sie im Brief mit eigenen Worten nur das, worum die Chefin / der Chef gebeten hat.
+196|-|-
+197|Boss's task|Auftrag der Chefin / des Chefs
+198|Sample letter|Musterbrief
+199|-|-
+200|Forum (Forumsbeitrag, no. 58)|Forum (Forumsbeitrag, Nr. 58)
+201|Order from the file: greeting, introduction, arguments for, arguments against, your opinion, name. One paragraph, one style (Sie or du), do not mix.|Reihenfolge aus der Datei: Anrede, Einleitung, Argumente dafür, Argumente dagegen, Ihre Meinung, Name. Ein Absatz, ein Stil (Sie oder du), nicht mischen.
+202|Sample with template (topic "fitness room")|Muster mit Vorlage (Thema „Fitnessraum“)
+203|Forum sample|Forumsmuster
+204|-|-
+205|The file advises learning only the gist: name, phone, 2–4 points and what has to be done. Details (names, colours, numbers) may change in the exam, so listen carefully.|Die Datei rät, nur das Wesentliche zu lernen: Name, Telefon, 2–4 Punkte und was zu tun ist. Details (Namen, Farben, Zahlen) können sich in der Prüfung ändern, deshalb hören Sie genau zu.
+206|Who|Wer
+207|Topic|Thema
+208|What to remember|Was man sich merken muss
+209|What to do|Was zu tun ist
+210|Redemittel (ready phrases)|Redemittel (fertige Wendungen)
+211|Your own phrases are remembered best, but these cover the structure of each part.|Eigene Wendungen merkt man sich am besten, diese decken aber den Aufbau jedes Teils ab.
+212|Beschwerde · reply to the customer|Beschwerde · Antwort an den Kunden
+213|Sprechen Teil 1 · presentation|Sprechen Teil 1 · Präsentation
+214|Sprechen Teil 3 · solution|Sprechen Teil 3 · Lösung
+215|Sprechen Teil 1: sample presentations|Sprechen Teil 1: Musterpräsentationen
+216|Important: your file has no texts for these topics, only Telegram links. I wrote these 8 topics and samples myself as an example of structure. When you send the real 8 topics and "Tipps", I will replace them.|Wichtig: In Ihrer Datei gibt es keine Texte zu diesen Themen, nur Telegram-Links. Diese 8 Themen und Muster habe ich selbst als Beispiel für den Aufbau geschrieben. Wenn Sie die echten 8 Themen und „Tipps“ schicken, ersetze ich sie.
+217|Same here: the 77 topics and dialogues exist only as a Telegram link. These 10 situations and dialogues were written by me as an example.|Hier ist es genauso: Die 77 Themen und Dialoge gibt es nur als Telegram-Link. Diese 10 Situationen und Dialoge habe ich selbst als Beispiel geschrieben.
+218|Sprechen Teil 3: solving a problem|Sprechen Teil 3: ein Problem lösen
+219|The situations are taken from your file (pp. 168–172); I wrote the A and B dialogues as a sample. One of many possible versions.|Die Situationen stammen aus Ihrer Datei (S. 168–172); die Dialoge A und B habe ich als Muster geschrieben. Eine von vielen möglichen Varianten.
+220|-|-
+221|situation from the file|Situation aus der Datei
+222|Situation|Situation
+223|Home|Start
+224|Learn by heart|Auswendig lernen
+225|All the texts worth learning are collected here: letters, forum, Notiz, phrases and samples for Sprechen. Each has a "Copy" button and audio.|Alle Texte, die man lernen sollte, sind hier gesammelt: Briefe, Forum, Notiz, Wendungen und Muster für Sprechen. Jeder hat eine Schaltfläche „Kopieren“ und Audio.
+226|-|-
+227|-|-
+228|This browser has no natural German voice, so Hören may sound robotic. On a Mac download the voice Anna or Petra (Premium); on Windows Microsoft Edge is best (voices Katja, Conrad "Natural").|Dieser Browser hat keine natürliche deutsche Stimme, deshalb kann Hören roboterhaft klingen. Auf dem Mac laden Sie die Stimme Anna oder Petra (Premium) herunter; unter Windows ist Microsoft Edge am besten (Stimmen Katja, Conrad „Natural“).
+229|Set up the voice →|Stimme einrichten →
+230|The browser found no German voice. Open the page in Microsoft Edge or Chrome.|Der Browser hat keine deutsche Stimme gefunden. Öffnen Sie die Seite in Microsoft Edge oder Chrome.
+231|More →|Mehr →
+232|🎲 Random task|🎲 Zufällige Aufgabe
+233|Trainer for the exam tickets|Trainer für die Prüfungstickets
+234|All current variants from your file: Lesen, Hören with audio, Sprachbausteine, Telefonnotiz, letters checked by Claude and Sprechen with a partner. Tickets marked as replaced are removed.|Alle aktuellen Varianten aus Ihrer Datei: Lesen, Hören mit Audio, Sprachbausteine, Telefonnotiz, von Claude geprüfte Briefe und Sprechen mit Partner. Als ersetzt markierte Tickets sind entfernt.
+235|✍ Write letters|✍ Briefe schreiben
+236|📖 Learn by heart|📖 Auswendig lernen
+237|Mock exam|Probeprüfung
+238|-|-
+239|days of study|Lerntage
+240|tasks done|Aufgaben bearbeitet
+241|average result|Durchschnitt
+242|questions to review|Fragen zur Wiederholung
+243|Antwortbogen · tasks 1–58|Antwortbogen · Aufgaben 1–58
+244|confident|sicher
+245|sometimes wrong|manchmal Fehler
+246|weak spot|Schwachstelle
+247|not tried|nicht bearbeitet
+248|How the exam works and what you need|So funktioniert die Prüfung und was Sie brauchen
+249|Part|Teil
+250|Tasks|Aufgaben
+251|Points|Punkte
+252|1–20, 3 points each|1–20, je 3 Punkte
+253|22–41, 3 points each, everything plays once|22–41, je 3 Punkte, alles wird einmal gespielt
+254|reply letter 21, Notiz 42–45, Sprachbausteine 46–57, forum 58|Antwortbrief 21, Notiz 42–45, Sprachbausteine 46–57, Forum 58
+255|3 oral parts|3 mündliche Teile
+256|To pass you need at least 144 of 240 points (60%). In each part 36 of 60 is desirable; one part may be 24 to 36.|Zum Bestehen brauchen Sie insgesamt mindestens 144 von 240 Punkten (60 %). In jedem Teil sind 36 von 60 wünschenswert; ein Teil darf 24 bis 36 haben.
+257|new topic|neues Thema
+258|reconstruction|Rekonstruktion
+259|🎲 Random variant|🎲 Zufällige Variante
+260|-|-
+261|-|-
+262|Exam-paper look|Prüfungsbogen-Optik
+263|Task wording follows the telc style; the original answer sheet may differ slightly.|Die Aufgabenformulierung folgt dem telc-Stil; der originale Bogen kann leicht abweichen.
+264|Mistakes|Fehler
+265|Review mistakes|Fehler wiederholen
+266|These are the variants where your last answer was wrong. When you answer correctly, the question disappears from the list.|Das sind die Varianten, bei denen Ihre letzte Antwort falsch war. Sobald Sie richtig antworten, verschwindet die Frage aus der Liste.
+267|Most mistakes are in tasks no.|Die meisten Fehler gibt es in den Aufgaben Nr.
+268|. Start with them.|. Beginnen Sie damit.
+269|Mistakes in no.|Fehler in Nr.
+270|No mistakes yet. Do a few variants and questions to review will appear here.|Noch keine Fehler. Bearbeiten Sie einige Varianten, dann erscheinen hier Fragen zur Wiederholung.
+271|This browser cannot read text aloud. Open the trainer in Microsoft Edge or Chrome.|Dieser Browser kann Text nicht vorlesen. Öffnen Sie den Trainer in Microsoft Edge oder Chrome.
+272|No German voices found. Edge and Chrome have them out of the box; on iPhone: Settings → Accessibility → Spoken Content → Voices → Deutsch, download "Anna (Enhanced)".|Keine deutschen Stimmen gefunden. Edge und Chrome haben sie sofort; auf dem iPhone: Einstellungen → Bedienungshilfen → Gesprochene Inhalte → Stimmen → Deutsch, laden Sie „Anna (erweitert)“ herunter.
+273|Check again|Noch einmal prüfen
+274|Auto (best voice)|Automatisch (beste Stimme)
+275|Female voice|Weibliche Stimme
+276|Male voice|Männliche Stimme
+277|Speed|Geschwindigkeit
+278|-|-
+279|-|-
+280|There are no natural voices: the sound will be mechanical.|Es gibt keine natürlichen Stimmen: Der Klang wird mechanisch sein.
+281|natural|natürlich
+282|standard|normal
+283|m.|m.
+284|f.|w.
+285|Voice|Stimme
+286|Speaker voice|Sprecherstimme
+287|Audio uses your browser's voices. The most lifelike voices, almost like the exam:|Die Wiedergabe nutzt die Stimmen Ihres Browsers. Die lebendigsten Stimmen, fast wie in der Prüfung:
+288|System Settings → Accessibility → Spoken Content → System Voice → Manage Voices → German: download Anna (Premium), Petra (Premium) or Markus/Yannick (Premium), then restart the browser. Best in Safari or Chrome.|Systemeinstellungen → Bedienungshilfen → Gesprochene Inhalte → Systemstimme → Stimmen verwalten → Deutsch: Laden Sie Anna (Premium), Petra (Premium) oder Markus/Yannick (Premium) herunter und starten Sie den Browser neu. Am besten in Safari oder Chrome.
+289|Microsoft Edge, voices "Katja Online (Natural)", "Seraphina", "Conrad", "Killian".|Microsoft Edge, Stimmen „Katja Online (Natural)“, „Seraphina“, „Conrad“, „Killian“.
+290|download the enhanced voice Anna or Helena in the "Spoken Content" settings.|Laden Sie die erweiterte Stimme Anna oder Helena in den Einstellungen „Gesprochene Inhalte“ herunter.
+291|Google TTS → Deutsch, download the high-quality voice.|Google TTS → Deutsch, laden Sie die hochwertige Stimme herunter.
+292|Letter 21|Brief 21
+293|Forum 58|Forum 58
+294|: not rated|: nicht bewertet
+295|A random variant of each part, as in the real exam: answers are checked at the end of the part, each audio plays once, the transcript is hidden. Claude checks the letters; if you have no time, you can skip a letter.|Eine zufällige Variante jedes Teils wie in der echten Prüfung: Die Antworten werden am Ende des Teils geprüft, jedes Audio läuft einmal, das Transkript ist verborgen. Die Briefe prüft Claude; wenn Sie keine Zeit haben, können Sie einen Brief überspringen.
+296|Exam time|Prüfungszeit
+297|Lesen + Beschwerde: 90 minutes · Hören + Notiz: about 30 minutes · Sprachbausteine + forum: 55 minutes. Here you can take breaks between parts.|Lesen + Beschwerde: 90 Minuten · Hören + Notiz: etwa 30 Minuten · Sprachbausteine + Forum: 55 Minuten. Hier können Sie zwischen den Teilen Pausen machen.
+298|Start the exam|Prüfung starten
+299|🎲 Other variants|🎲 Andere Varianten
+300|See the result →|Ergebnis ansehen →
+301|Skip and see the result →|Überspringen und Ergebnis ansehen →
+302|Next part →|Nächster Teil →
+303|Skip the part →|Teil überspringen →
+304|-|-
+305|-|-
+306|Read the note and the customer's letter and answer questions 19–20. You will write the letter in the next step.|Lesen Sie die Notiz und den Kundenbrief und beantworten Sie die Fragen 19–20. Den Brief schreiben Sie im nächsten Schritt.
+307|Result|Ergebnis
+308|Mock exam result|Ergebnis der Probeprüfung
+309|-|-
+310|-|-
+311|. Unrated letters count as 0.|. Nicht bewertete Briefe zählen als 0.
+312|Sprechen (another 60 points) is not counted here: practise it in the Sprechen section with Claude.|Sprechen (weitere 60 Punkte) wird hier nicht gezählt: Üben Sie es im Bereich Sprechen mit Claude.
+313|New mock exam|Neue Probeprüfung
+314|My mistakes|Meine Fehler

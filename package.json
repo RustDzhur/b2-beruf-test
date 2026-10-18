@@ -1,0 +1,12 @@
+{
+  "name": "dtb-b2-trainer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Trainer for the telc Deutsch-Test für den Beruf B2 exam (Lesen, Hören, Schreiben, Sprechen)",
+  "scripts": {
+    "start": "node server.js",
+    "build": "python3 src/build_web.py",
+    "audio": "python3 src/gen_audio.py"
+  },
+  "license": "UNLICENSED"
+}
