@@ -53,6 +53,12 @@ def recordings(DB):
     for x in DB['N']: yield [{'who': x['who'], 't': x['text'], 'g': x['g']}]
     for k in ('SP1', 'SP2', 'SP3'):
         for x in DB[k]: yield x['model']
+    # texts of the "Учить наизусть" page: one single-voice recording each (same flattening as learnText() in the app)
+    flat = lambda t: re.sub(r'\s*\n+\s*', ' ', t)
+    for b in DB['B']:
+        for m in b.get('models') or []: yield [{'who': '', 't': flat('\n'.join(m) if isinstance(m, list) else m), 'g': 'f'}]
+    yield [{'who': '', 't': flat(DB['F_MODEL']), 'g': 'f'}]
+    for x in DB['SP1']: yield [{'who': '', 't': flat('\n\n'.join(s['t'] for s in x['model'])), 'g': 'f'}]
 
 def jobs(DB):
     out = {}
@@ -73,6 +79,7 @@ def jobs(DB):
 
 async def main():
     src = open(os.path.join(ROOT, 'assets', 'data.js'), encoding='utf-8').read()
+    src = src.split('\nconst I18N')[0]  # data.js also carries the UI translations
     DB = json.loads(src[src.index('{'): src.rindex('}') + 1])
     os.makedirs(OUT, exist_ok=True)
     J = jobs(DB)

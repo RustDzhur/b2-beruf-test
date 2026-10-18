@@ -4,8 +4,8 @@
    so every page, dynamic message and tooltip follows the switch without touching each renderer. */
 const LANGS = { ru: "RU", en: "EN", de: "DE" };
 const CYR = /[А-Яа-яЁё]/;
-const EXTRA = { "Ответ на жалобу": ["Reply to a complaint", "Antwort auf eine Beschwerde"], "Форум": ["Forum", "Forum"], "Начать": ["Start", "Start"] };
-const PREFIX_KEYS = ["Неверно · правильно:", "Нет ответа · правильно:", "Правильно:", "Ответ:", "Уровень текста:", "Уровень:", "Правильная записка ·", "Чаще всего ошибки в заданиях №", "Ошибки в №"];
+const EXTRA = { "Ошибка озвучки:": ["Speech error:", "Fehler bei der Sprachausgabe:"],  "Браузер не смог озвучить текст. Откройте раздел «Голос» и проверьте немецкие голоса.": ["The browser could not read the text aloud. Open the \"Voice\" section and check the German voices.", "Der Browser konnte den Text nicht vorlesen. Öffnen Sie den Bereich „Stimme“ und prüfen Sie die deutschen Stimmen."],  "Ответ на жалобу": ["Reply to a complaint", "Antwort auf eine Beschwerde"], "Форум": ["Forum", "Forum"], "Начать": ["Start", "Start"] };
+const PREFIX_KEYS = ["Ошибка озвучки:", "Неверно · правильно:", "Нет ответа · правильно:", "Правильно:", "Ответ:", "Уровень текста:", "Уровень:", "Правильная записка ·", "Чаще всего ошибки в заданиях №", "Ошибки в №"];
 const RULES = [
   [/^прослушано: (\d+)$/, (m) => [`played: ${m[1]}`, `abgespielt: ${m[1]}`]],
   [/^(\d+)% · (.+) из (.+) баллов$/, (m) => [`${m[1]}% · ${m[2]} of ${m[3]} points`, `${m[1]} % · ${m[2]} von ${m[3]} Punkten`]],

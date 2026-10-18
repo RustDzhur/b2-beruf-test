@@ -192,7 +192,7 @@ function makePlayer(segs, opt = {}) {
     playBtn.textContent = s === "playing" ? "❚❚ Пауза" : s === "paused" ? "▶ Дальше" : locked ? "Прослушано" : plays ? "↻ Ещё раз" : "▶ Слушать";
     playBtn.disabled = locked && s === "idle"; stopBtn.disabled = s === "idle";
   };
-  let cur = null, ai = 0, atimer = null;
+  let cur = null, ai = 0, atimer = null; const keep = [];
   const halt = () => { if (TTS) TTS.cancel(); clearTimeout(atimer); if (cur) { cur.onended = cur.onerror = null; cur.pause(); cur = null; } };
   const done = () => { if (activePlayer === api) { plays++; if (opt.once) locked = true; count.textContent = opt.once ? "на экзамене звучит 1 раз" : `прослушано: ${plays}`; stop(); opt.onEnd && opt.onEnd(); } };
   function nextAudio() {
@@ -210,18 +210,26 @@ function makePlayer(segs, opt = {}) {
     if (useAudio) { ai = 0; setState("playing"); nextAudio(); return; }
     const rate = vcfg().rate || 1;
     const q = [];
+    const startSpeech = () => {
     segs.forEach((s, i) => chunks(speakable(s.t)).forEach(t => q.push({ i, t, who: s.who })));
     q.forEach((it, n) => {
       const c = cast[it.who] || {};
       const u = new SpeechSynthesisUtterance(it.t);
       if (c.v) { u.voice = c.v; u.lang = c.v.lang; } else u.lang = "de-DE";
       u.pitch = c.pitch || 1; u.rate = rate;
-      u.onstart = () => opt.onLine && opt.onLine(it.i);
+      u.onstart = () => { api.mark && api.mark(); opt.onLine && opt.onLine(it.i); };
+      u.onerror = (e) => { if (e.error && e.error !== "interrupted" && e.error !== "canceled") { castLine.textContent = "Ошибка озвучки: " + e.error; } };
       if (n === q.length - 1) u.onend = done;
-      TTS.speak(u);
-      if (n < q.length - 1 && q[n + 1].i !== it.i) { const p = new SpeechSynthesisUtterance(","); p.volume = 0; p.rate = 1.4; TTS.speak(p); }
+      keep.push(u); TTS.speak(u);
+      if (n < q.length - 1 && q[n + 1].i !== it.i) { const p = new SpeechSynthesisUtterance(","); p.volume = 0; p.rate = 1.4; keep.push(p); TTS.speak(p); }
     });
+    };
     setState("playing");
+    // Chrome swallows speak() right after cancel(), so wait a moment; also keep the utterances referenced
+    TTS.cancel(); let started = false;
+    setTimeout(() => { if (activePlayer === api && state === "playing") startSpeech(); }, 120);
+    setTimeout(() => { if (activePlayer === api && state === "playing" && !started && !TTS.speaking) { stop(); castLine.textContent = "Браузер не смог озвучить текст. Откройте раздел «Голос» и проверьте немецкие голоса."; } }, 3500);
+    api.mark = () => { started = true; };
   }
   playBtn.onclick = () => {
     if (state === "playing") { if (useAudio) { clearTimeout(atimer); cur && cur.pause(); } else TTS.pause(); setState("paused"); }
@@ -240,6 +248,9 @@ function transcript(segs, open) {
   btn.onclick = () => { box.hidden = !box.hidden; btn.textContent = box.hidden ? "Показать транскрипт" : "Скрыть транскрипт"; };
   return { box, btn, highlight(i) { lines.forEach((l, n) => l.lastChild.classList.toggle("now", n === i)); } };
 }
+const SPOKEN = [];
+// Chrome drops speak() right after cancel(): queue the utterances after a short pause and keep them referenced
+function speakLater(utts) { TTS.cancel(); SPOKEN.length = 0; SPOKEN.push(...utts); setTimeout(() => utts.forEach((u) => TTS.speak(u)), 120); }
 function speakBtn(text, g) {
-  return h("button", { class: "btn ghost small", title: "Озвучить", onclick: () => { if (!TTS) return; stopAll(); loadVoices(); const c = castVoices([{ who: "x", t: text, g: g || "f" }]).x; chunks(speakable(text)).forEach(t => { const u = new SpeechSynthesisUtterance(t); if (c.v) { u.voice = c.v; u.lang = c.v.lang; } else u.lang = "de-DE"; u.pitch = c.pitch; u.rate = vcfg().rate || 1; TTS.speak(u); }); } }, "🔊");
+  return h("button", { class: "btn ghost small", title: "Озвучить", onclick: () => { if (!TTS) return; stopAll(); loadVoices(); const c = castVoices([{ who: "x", t: text, g: g || "f" }]).x; speakLater(chunks(speakable(text)).map(t => { const u = new SpeechSynthesisUtterance(t); if (c.v) { u.voice = c.v; u.lang = c.v.lang; } else u.lang = "de-DE"; u.pitch = c.pitch; u.rate = vcfg().rate || 1; return u; })); } }, "🔊");
 }

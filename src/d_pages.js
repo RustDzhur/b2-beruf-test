@@ -239,7 +239,7 @@ function chatPartner(cfg) {
   autoSpeak.onchange = () => store.set("spVoice", autoSpeak.checked);
   let ctl = null, first = null;
   const bubble = (who, text) => { const m = h("div", { class: "msg " + (who === "me" ? "me" : "cl") }, h("span", { class: "who" }, who === "me" ? "Вы" : cfg.partnerName), h("span", null, text)); chat.append(m); return m.lastChild; };
-  const say = (t) => { if (autoSpeak.checked && TTS) { stopAll(); const c = castVoices([{ who: "p", t, g: "f" }]).p; chunks(speakable(t)).forEach(x => { const u = new SpeechSynthesisUtterance(x); if (c.v) { u.voice = c.v; u.lang = c.v.lang; } else u.lang = "de-DE"; u.pitch = c.pitch; u.rate = vcfg().rate || 1; TTS.speak(u); }); } };
+  const say = (t) => { if (autoSpeak.checked && TTS) { stopAll(); const c = castVoices([{ who: "p", t, g: "f" }]).p; speakLater(chunks(speakable(t)).map(x => { const u = new SpeechSynthesisUtterance(x); if (c.v) { u.voice = c.v; u.lang = c.v.lang; } else u.lang = "de-DE"; u.pitch = c.pitch; u.rate = vcfg().rate || 1; return u; })); } };
   async function partner() {
     const b = bubble("cl", ""); b.replaceChildren(thinking("…"));
     sendBtn.disabled = true; ctl = new AbortController();
