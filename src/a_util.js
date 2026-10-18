@@ -82,12 +82,21 @@ const ERR = {
 const errText = (e) => ERR[e && e.code] || "Не удалось связаться с ИИ. Попробуйте ещё раз.";
 function thinking(msg) { return h("div", { class: "thinking" }, h("span", { class: "dots" }, h("i"), h("i"), h("i")), msg || "ИИ думает…"); }
 async function getSample() { const s = SAMPLE || await sampleReady; if (!s) throw { code: "not_granted" }; return s; }
-const LANG_NAME = { en: "English", de: "Deutsch", fr: "French", tr: "Turkish", ar: "Arabic", it: "Italian" };
-// the interface language also decides in which language ИИ explains and gives feedback
+const LANG_NAME = { ru: "Russian", en: "English", de: "German", fr: "French", tr: "Turkish", ar: "Arabic", it: "Italian" };
+// German names for prompts written in German ("Übersetzung ins …")
+const LANG_DE = { ru: "Russische", en: "Englische", fr: "Französische", tr: "Türkische", ar: "Arabische", it: "Italienische" };
+// the interface language (German by default) decides in which language the AI explains, and into which language it translates
+// "auf …" for German prompts: the language explanations are written in
+const LANG_AUF = { ru: "Russisch", en: "Englisch", de: "Deutsch", fr: "Französisch", tr: "Türkisch", ar: "Arabisch", it: "Italienisch" };
+const aufLang = () => "auf " + (LANG_AUF[aiLang()] || "Deutsch");
+const aiLang = () => (typeof curLang === "function" ? curLang() : store.get("lang", "de"));
+// rule for word lists after an AI answer: none for a German interface, otherwise translations into the interface language
+const glossaryDe = (what) => aiLang() === "de" ? "" : ` Danach eine Leerzeile und ${what} aus dem Text mit Übersetzung ins ${LANG_DE[aiLang()]}, eine pro Zeile.`;
 function langNote(prompt) {
-  const l = store.get("lang", "ru"), n = LANG_NAME[l];
-  if (!n) return prompt;
-  const note = `\n\n[Interface language: ${n}. Write every explanation, comment, tip, summary and error description in ${n} instead of Russian. Keep German quotes, corrections and examples in German. Role-play replies of a conversation partner or examiner stay in German.]`;
+  const l = aiLang(), n = LANG_NAME[l];
+  const note = l === "de"
+    ? "\n\n[Interface language: German. Write every explanation, comment, tip, summary and error description in simple, clear German (level B2). Do NOT translate German words or sentences into any other language and do not add glossaries or word lists with translations. Role-play replies stay in German.]"
+    : `\n\n[Interface language: ${n}. Write every explanation, comment, tip, summary and error description in ${n}. Whenever you translate German words or sentences, translate them into ${n} only${l === "ru" ? "" : ", never into Russian or any other language"}. Keep German quotes, corrections and examples in German. Role-play replies of a conversation partner or examiner stay in German.]`;
   if (typeof prompt === "string") return prompt + note;
   const c = prompt.map((m) => Object.assign({}, m));
   for (let i = c.length - 1; i >= 0; i--) if (c[i].role === "user") { c[i].content += note; break; }

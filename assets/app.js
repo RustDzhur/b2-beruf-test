@@ -82,12 +82,21 @@ const ERR = {
 const errText = (e) => ERR[e && e.code] || "Не удалось связаться с ИИ. Попробуйте ещё раз.";
 function thinking(msg) { return h("div", { class: "thinking" }, h("span", { class: "dots" }, h("i"), h("i"), h("i")), msg || "ИИ думает…"); }
 async function getSample() { const s = SAMPLE || await sampleReady; if (!s) throw { code: "not_granted" }; return s; }
-const LANG_NAME = { en: "English", de: "Deutsch", fr: "French", tr: "Turkish", ar: "Arabic", it: "Italian" };
-// the interface language also decides in which language ИИ explains and gives feedback
+const LANG_NAME = { ru: "Russian", en: "English", de: "German", fr: "French", tr: "Turkish", ar: "Arabic", it: "Italian" };
+// German names for prompts written in German ("Übersetzung ins …")
+const LANG_DE = { ru: "Russische", en: "Englische", fr: "Französische", tr: "Türkische", ar: "Arabische", it: "Italienische" };
+// the interface language (German by default) decides in which language the AI explains, and into which language it translates
+// "auf …" for German prompts: the language explanations are written in
+const LANG_AUF = { ru: "Russisch", en: "Englisch", de: "Deutsch", fr: "Französisch", tr: "Türkisch", ar: "Arabisch", it: "Italienisch" };
+const aufLang = () => "auf " + (LANG_AUF[aiLang()] || "Deutsch");
+const aiLang = () => (typeof curLang === "function" ? curLang() : store.get("lang", "de"));
+// rule for word lists after an AI answer: none for a German interface, otherwise translations into the interface language
+const glossaryDe = (what) => aiLang() === "de" ? "" : ` Danach eine Leerzeile und ${what} aus dem Text mit Übersetzung ins ${LANG_DE[aiLang()]}, eine pro Zeile.`;
 function langNote(prompt) {
-  const l = store.get("lang", "ru"), n = LANG_NAME[l];
-  if (!n) return prompt;
-  const note = `\n\n[Interface language: ${n}. Write every explanation, comment, tip, summary and error description in ${n} instead of Russian. Keep German quotes, corrections and examples in German. Role-play replies of a conversation partner or examiner stay in German.]`;
+  const l = aiLang(), n = LANG_NAME[l];
+  const note = l === "de"
+    ? "\n\n[Interface language: German. Write every explanation, comment, tip, summary and error description in simple, clear German (level B2). Do NOT translate German words or sentences into any other language and do not add glossaries or word lists with translations. Role-play replies stay in German.]"
+    : `\n\n[Interface language: ${n}. Write every explanation, comment, tip, summary and error description in ${n}. Whenever you translate German words or sentences, translate them into ${n} only${l === "ru" ? "" : ", never into Russian or any other language"}. Keep German quotes, corrections and examples in German. Role-play replies of a conversation partner or examiner stay in German.]`;
   if (typeof prompt === "string") return prompt + note;
   const c = prompt.map((m) => Object.assign({}, m));
   for (let i = c.length - 1; i >= 0; i--) if (c[i].role === "user") { c[i].content += note; break; }
@@ -374,10 +383,11 @@ function quiz(cfg) {
     box.hidden = false; btn.disabled = true;
     box.replaceChildren(thinking("ИИ разбирает вопрос…"));
     const s = st[it.key];
-    const p = `Ты — опытный преподаватель немецкого, готовишь ученика (родной язык русский) к экзамену telc DTB B2 Beruf.
-Объясни по-русски, почему в задании ниже правильный ответ «${optLabel(it, it.ans)}».
+    const L = aiLang(), de = L === "de";
+    const p = `Ты — опытный преподаватель немецкого, готовишь ученика к экзамену telc DTB B2 Beruf.
+Объясни ${de ? "на простом, понятном немецком языке (уровень B2)" : "на языке интерфейса ученика: " + LANG_NAME[L]}, почему в задании ниже правильный ответ «${optLabel(it, it.ans)}».
 ${s.val && s.val !== it.ans ? `Ученик выбрал «${optLabel(it, s.val)}» — объясни, почему это неверно.` : ""}
-Процитируй дословно немецкую фразу из текста, которая доказывает ответ, и переведи её. В конце дай 2–3 полезных немецких слова или выражения из этого места с переводом.
+Процитируй дословно немецкую фразу из текста, которая доказывает ответ${de ? " (без перевода на другие языки)" : ", и переведи её на " + LANG_NAME[L]}. В конце дай 2–3 полезных немецких слова или выражения из этого места${de ? " с коротким объяснением по-немецки, без переводов" : " с переводом на " + LANG_NAME[L]}.
 Пиши коротко и понятно (5–9 предложений), без Markdown-разметки, без заголовков.
 
 Часть экзамена: ${cfg.label}
@@ -672,7 +682,7 @@ function feedbackPrompt(t, text) {
   const task = t.kind === "praesentation" ? PRAES_TASK : t.kind === "beschwerde"
     ? `Aufgabe 21 (DTB B2 Beruf): Antwort auf eine Kundenbeschwerde im Auftrag der Vorgesetzten. Bewertet wird vor allem, ob ALLE Aufträge aus der Notiz der Vorgesetzten umgesetzt sind, ob nichts Unpassendes versprochen wird (z. B. kein Rabatt, wenn er nicht erwähnt ist), ob das Register formell und höflich ist und ob die Textsorte stimmt (Anrede, Bezug, Entschuldigung, Erklärung, Lösung, Schluss, Gruß).\n\n${t.context}`
     : `Aufgabe 58 (DTB B2 Beruf): Forumsbeitrag im Intranet zu folgender Situation. Erwartet werden: kurze Einleitung zum Thema, Vorteile, Nachteile, eigene begründete Meinung, passender Schluss; einheitliches Register (du/ihr oder Sie, nicht gemischt); ca. 150 Wörter.\n\n${t.context}`;
-  return `Du bist ein erfahrener, strenger, aber ermutigender Prüfer für telc Deutsch B2 Beruf (DTB). Bewerte den Text eines Lernenden (Muttersprache Russisch).
+  return `Du bist ein erfahrener, strenger, aber ermutigender Prüfer für telc Deutsch B2 Beruf (DTB). Bewerte den Text eines Lernenden.
 
 ${task}
 
@@ -694,13 +704,13 @@ Antworte NUR mit JSON in genau diesem Format:
 "verbesserter_text":"...","fazit":"...","tipps":["..."]}
 
 Regeln:
-- Alle Kommentare, Erklärungen, das Fazit und die Tipps auf Russisch.
+- Alle Kommentare, Erklärungen, das Fazit und die Tipps auf ${aiLang() === "de" ? "Deutsch (einfach und klar, ohne Übersetzungen in andere Sprachen)" : LANG_NAME[aiLang()] + " (Sprache der Benutzeroberfläche)"}.
 - "leitpunkte": ${t.kind === "beschwerde" ? "jeder einzelne Auftrag aus der Notiz der Vorgesetzten als eigener Punkt (auf Deutsch kurz benannt)" : t.kind === "praesentation" ? "Einleitung mit Gliederung, jeder Stichpunkt des Themas, eigene Meinung, Schluss" : "Einleitung, Vorteile, Nachteile, eigene Meinung, Schluss"}; "status" ist "ja", "teilweise" oder "nein".
 - "original" muss wörtlich und exakt im Text des Lernenden vorkommen (1–6 Wörter), "korrektur" ist die korrigierte Form desselben Ausschnitts.
 - "typ" ist eines von: Grammatik, Wortschatz, Rechtschreibung, Zeichensetzung, Stil.
 - Alle echten Fehler auflisten (höchstens 30), keine Geschmacksfragen.
-- "niveau": ehrliche Einschätzung, auf welchem GER-Niveau der Text insgesamt geschrieben ist (A2, B1, B2 oder C1) und warum: Satzbau (Nebensätze, Konnektoren, Satzvielfalt), Wortschatz, Register, Textaufbau. Kommentar auf Russisch.
-- "satzbau": 3–6 Sätze aus dem Text, die grammatisch richtig, aber zu einfach für B2 sind (nur Hauptsätze, Wiederholungen, einfache Wörter). "original" wörtlich aus dem Text, "besser" eine elegantere B2-Formulierung (z. B. Nebensatz, Passiv, Nominalisierung, Konnektor), "warum" kurz auf Russisch.
+- "niveau": ehrliche Einschätzung, auf welchem GER-Niveau der Text insgesamt geschrieben ist (A2, B1, B2 oder C1) und warum: Satzbau (Nebensätze, Konnektoren, Satzvielfalt), Wortschatz, Register, Textaufbau. Kommentar ${aufLang()}.
+- "satzbau": 3–6 Sätze aus dem Text, die grammatisch richtig, aber zu einfach für B2 sind (nur Hauptsätze, Wiederholungen, einfache Wörter). "original" wörtlich aus dem Text, "besser" eine elegantere B2-Formulierung (z. B. Nebensatz, Passiv, Nominalisierung, Konnektor), "warum" kurz ${aufLang()}.
 - "verbesserter_text": vollständige korrigierte Fassung auf B2-Niveau, nah am Original, mit Absätzen (\\n).
 - 3–5 konkrete Tipps mit deutschen Beispielformulierungen.`;
 }
@@ -741,7 +751,7 @@ function rForum(it, mode, ctx) {
     taskEl: h("div", { class: "stack" }, h("p", { class: "doc", style: "margin:0;padding:14px 16px" }, it.desc || it.title),
       h("p", { class: "small muted", style: "margin:0" }, "Напишите сообщение коллегам на форуме: что планируется, плюсы, минусы, ваше мнение с обоснованием. Выберите один стиль: ihr/euch или Sie, и не смешивайте их.")),
     context: `Thema: ${it.title}\nSituation: ${it.desc || it.title}`,
-    gen: `Schreibe einen Musterbeitrag (ca. 150 Wörter, Niveau B2) für ein firmeninternes Forum zum Thema "${it.title}": ${it.desc || ""}\nAufbau: Anrede (Liebe Kolleginnen und Kollegen,), Einleitung, Vorteile, Nachteile, eigene Meinung mit Begründung, Schluss, Gruß. Einheitlich ihr/euch. Nur der Text, ohne Überschrift, ohne Markdown. Danach eine Leerzeile und 5 nützliche Wendungen aus dem Text mit russischer Übersetzung, eine pro Zeile.`,
+    gen: `Schreibe einen Musterbeitrag (ca. 150 Wörter, Niveau B2) für ein firmeninternes Forum zum Thema "${it.title}": ${it.desc || ""}\nAufbau: Anrede (Liebe Kolleginnen und Kollegen,), Einleitung, Vorteile, Nachteile, eigene Meinung mit Begründung, Schluss, Gruß. Einheitlich ihr/euch. Nur der Text, ohne Überschrift, ohne Markdown. ${glossaryDe("5 nützliche Wendungen")}`,
     models: [DB.F_MODEL], modelNote: null,
     onDone: ctx.onWriteDone, onSkip: ctx.onSkip });
 }
@@ -873,7 +883,7 @@ function chatPartner(cfg) {
     if (mine.length < 2) { fb.replaceChildren(h("div", { class: "note" }, "Сначала ответьте хотя бы 2–3 раза.")); return; }
     fb.replaceChildren(thinking("ИИ оценивает разговор…")); rateBtn.disabled = true;
     try {
-      const d = await askJSON(`${cfg.rateIntro}\nGesprächsverlauf (A = ich, der Lernende; B = Gesprächspartner/in):\n${turns.map(t => (t.role === "user" ? "A: " : "B: ") + t.content).join("\n")}\n\nBewerte nur die Beiträge von A. Antworte NUR mit JSON: {"punkte":0,"max":${cfg.max},"fazit":"...","niveau":{"stufe":"B1","kommentar":"..."},"staerken":["..."],"fehler":[{"original":"...","korrektur":"...","erklaerung":"..."}],"satzbau":[{"original":"...","besser":"...","warum":"..."}],"redemittel":["..."]}\nRegeln: Kommentare, Fazit, Erklärungen und Stärken auf Russisch. "original" wörtlich aus A. "niveau" = geschätztes GER-Niveau von A (A2, B1, B2, C1). "satzbau" = 2–4 richtige, aber zu einfache Sätze von A mit besserer B2-Formulierung. "redemittel" = 3–5 nützliche deutsche Wendungen für dieses Thema.`);
+      const d = await askJSON(`${cfg.rateIntro}\nGesprächsverlauf (A = ich, der Lernende; B = Gesprächspartner/in):\n${turns.map(t => (t.role === "user" ? "A: " : "B: ") + t.content).join("\n")}\n\nBewerte nur die Beiträge von A. Antworte NUR mit JSON: {"punkte":0,"max":${cfg.max},"fazit":"...","niveau":{"stufe":"B1","kommentar":"..."},"staerken":["..."],"fehler":[{"original":"...","korrektur":"...","erklaerung":"..."}],"satzbau":[{"original":"...","besser":"...","warum":"..."}],"redemittel":["..."]}\nRegeln: Kommentare, Fazit, Erklärungen und Stärken ${aufLang()}. "original" wörtlich aus A. "niveau" = geschätztes GER-Niveau von A (A2, B1, B2, C1). "satzbau" = 2–4 richtige, aber zu einfache Sätze von A mit besserer B2-Formulierung. "redemittel" = 3–5 nützliche deutsche Wendungen für dieses Thema.`);
       fb.replaceChildren(h("div", { class: "card stack" }, h("div", { class: "result" }, h("span", { class: "big" }, `${d.punkte}/${d.max || cfg.max}`), h("span", { style: "flex:1;min-width:200px" }, d.fazit || "")),
         d.niveau && d.niveau.stufe ? h("div", { class: "row", style: "align-items:flex-start" }, h("span", { class: "chip " + (/B2|C1/.test(d.niveau.stufe) ? "ok" : "warn") }, "Уровень: " + d.niveau.stufe), h("span", { class: "small", style: "flex:1;min-width:200px" }, d.niveau.kommentar || "")) : null,
         d.staerken && d.staerken.length ? h("div", null, h("div", { class: "eyebrow" }, "Хорошо получилось"), h("ul", null, d.staerken.map(s => h("li", null, s)))) : null,
