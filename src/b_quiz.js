@@ -7,6 +7,7 @@ const MODE_HINT = {
   learn: "Правильные ответы уже отмечены. Читайте и запоминайте, нажимайте «Почему?», чтобы понять."
 };
 function letterOf(i) { return LET[i]; }
+let LAST_QZ = null; // the quiz built by the latest render, picked up by the exam-paper Antwortbogen
 
 function quiz(cfg) {
   const { vid, sec, items } = cfg;
@@ -39,6 +40,7 @@ function quiz(cfg) {
       btns.forEach(b => b.classList.toggle("sel", b.dataset.v === val));
       if (it.kind === "gap") sel.classList.toggle("chosen", !!val);
       if (mode === "train") { reveal(it); afterTrain(); }
+      paint(it);
       cfg.onChange && cfg.onChange();
     };
     let sel = null;
@@ -48,7 +50,7 @@ function quiz(cfg) {
       sel.onchange = () => choose(sel.value || null);
       const fix = h("span", { class: "fix", hidden: true });
       el = h("span", { class: "gap" }, h("span", { class: "gn" }, it.n), sel, fix);
-      W[it.key] = { el, btns, sel, fix, why, explainBox, verdict, foot };
+      W[it.key] = { el, btns, sel, fix, why, explainBox, verdict, foot, choose: (v) => { sel.value = v; choose(v); } };
       return el;
     }
     let optsEl;
@@ -60,7 +62,7 @@ function quiz(cfg) {
       optsEl = h("div", { class: "letters" }, it.letters.map(l => { const b = h("button", { class: "lb", "data-v": l, onclick: () => choose(l), "aria-label": "Ответ " + l }, l === "x" ? "X" : l); btns.push(b); return b; }));
     }
     el = h("div", { class: "q" }, h("div", { class: "qh" }, h("span", { class: "qn" }, it.n), h("div", { class: "qt" }, it.textEl || it.text)), optsEl, foot, explainBox);
-    W[it.key] = { el, btns, why, explainBox, verdict, foot };
+    W[it.key] = { el, btns, why, explainBox, verdict, foot, choose };
     return el;
   }
 
@@ -79,7 +81,26 @@ function quiz(cfg) {
         ok ? h("span", { class: "chip ok" }, "Верно") : h("span", { class: "chip bad" }, s.val ? "Неверно · правильно: " + optLabel(it, it.ans) : "Нет ответа · правильно: " + optLabel(it, it.ans)));
       w.why.hidden = !SAMPLE;
     }
+    paint(it);
     cfg.onReveal && cfg.onReveal(it, ok);
+  }
+
+  /* Antwortbogen: telc-style answer sheet rows (number · bubbles · number), in sync with the task */
+  const marks = {};
+  const choicesOf = (it) => it.kind === "rf" ? [["R", "richtig"], ["F", "falsch"]] : it.kind === "mc" ? it.opts.map((o, i) => [LET[i], LET[i]])
+    : it.kind === "gap" ? it.opts.map(o => [o[0], o[0]]) : it.letters.map(l => [l, l]);
+  function paint(it) {
+    const m = marks[it.key]; if (!m) return;
+    const s = st[it.key];
+    m.forEach(b => { const v = b.dataset.v; b.classList.toggle("on", s.val === v);
+      b.classList.toggle("good", s.done && v === it.ans); b.classList.toggle("badc", s.done && s.val === v && v !== it.ans); b.disabled = s.done || finished; });
+  }
+  function bogen() {
+    return h("div", { class: "bg-rows" }, items.map((it, r) => {
+      const bs = choicesOf(it).map(([v, l]) => h("button", { class: "bub" + (it.kind === "rf" ? " wide" : ""), "data-v": v, "aria-label": `${it.n}: ${l}`, onclick: () => W[it.key].choose(v) }, h("i"), h("span", null, l)));
+      marks[it.key] = bs; paint(it);
+      return h("div", { class: "bg-row" + (r % 2 ? "" : " alt") }, h("b", null, it.n), h("div", { class: "bubs" }, bs), h("b", null, it.n));
+    }));
   }
 
   async function explain(it, box, btn) {
@@ -132,7 +153,9 @@ ${it.kind === "mc" ? it.opts.map((o, i) => `${LET[i]}) ${o}`).join("\n") : it.ki
   items.forEach(it => { els[it.key] = build(it); });
   if (mode === "learn") items.forEach(it => { st[it.key].val = it.ans; if (W[it.key].sel) W[it.key].sel.value = it.ans; reveal(it); });
   const footer = h("div", { class: "stack" }, h("div", { class: "footer-bar" }, checkBtn), resultBox);
-  return { el: (k) => els[k], footer, items, state: st };
+  const api = { el: (k) => els[k], footer, items, state: st, bogen };
+  LAST_QZ = api;
+  return api;
 }
 
 function modeSwitch(cur, onPick) {

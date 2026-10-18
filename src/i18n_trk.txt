@@ -235,9 +235,9 @@
 250|Görevler
 251|Puan
 252|1–20, her biri 3 puan
-253|22–41, her biri 3 puan, her şey bir kez oynatılır
-254|cevap mektubu 21, Notiz 42–45, Sprachbausteine 46–57, forum 58
-255|3 sözlü bölüm
+253|22–40 ve 41 (arama nedeni), her biri 3 puan, hepsi bir kez çalınır
+254|cevap mektubu 21 (7), Notiz 42–45 (6), Sprachbausteine 46–57 (6), forum 58 (14) ve tüm metinlerin dili (27)
+255|Teil 1A/1B/1C, Teil 2, Teil 3, çift hâlinde yaklaşık 16 dakika
 256|Geçmek için toplam 240 puandan en az 144 gerekir (%60). Her bölümde 60 puandan 36 istenir; bir bölüm 24 ile 36 arasında olabilir.
 257|yeni konu
 258|yeniden oluşturma
@@ -275,7 +275,7 @@
 294|: değerlendirilmedi
 295|Gerçek sınavdaki gibi her bölümden rastgele bir varyant: Cevaplar bölümün sonunda kontrol edilir, her ses bir kez oynatılır, transkript gizlidir. Mektupları Claude kontrol eder; vaktiniz yoksa bir mektubu atlayabilirsiniz.
 296|Sınav süresi
-297|Lesen + Beschwerde: 90 dakika · Hören + Notiz: yaklaşık 30 dakika · Sprachbausteine + forum: 55 dakika. Burada bölümler arasında mola verebilirsiniz.
+297|Lesen + Lesen und Schreiben: 65 dakika · Hören + Hören und Schreiben: 25 dakika · Sprachbausteine + Schreiben: 35 dakika. Toplam 125 dakika. Her bloğun sayacı ilk bölümüyle başlar; bloklar arasında ara verebilirsiniz.
 298|Sınavı başlat
 299|🎲 Diğer varyantlar
 300|Sonucu gör →
@@ -289,6 +289,7 @@
 312|Sprechen (60 puan daha) burada sayılmaz: Bunu Sprechen bölümünde Claude ile alıştırın.
 313|Yeni deneme sınavı
 314|Hatalarım
+315|Sınavdaki gibi: başlamadan önce cevap kâğıdındaki bilgilerinizi doldurun. Bunlar cevap kâğıdının her sayfasının başında görünecek.
 x0|Seslendirme hatası:
 x1|Tarayıcı metni sesli okuyamadı. "Ses" bölümünü açın ve Almanca sesleri kontrol edin.
 x2|Bir şikayete cevap

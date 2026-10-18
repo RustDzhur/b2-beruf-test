@@ -235,9 +235,9 @@
 250|Esercizi
 251|Punti
 252|1–20, 3 punti ciascuno
-253|22–41, 3 punti ciascuno, tutto viene riprodotto una sola volta
-254|lettera di risposta 21, Notiz 42–45, Sprachbausteine 46–57, forum 58
-255|3 parti orali
+253|22–40 e 41 (motivo della chiamata), 3 punti ciascuno, tutto si ascolta una volta
+254|lettera di risposta 21 (7), Notiz 42–45 (6), Sprachbausteine 46–57 (6), forum 58 (14) e la lingua di tutti i testi (27)
+255|Teil 1A/1B/1C, Teil 2, Teil 3, circa 16 minuti in coppia
 256|Per superare l'esame servono almeno 144 punti su 240 (60%). In ogni parte sono auspicabili 36 su 60; una parte può avere da 24 a 36.
 257|nuovo argomento
 258|ricostruzione
@@ -275,7 +275,7 @@
 294|: non valutato
 295|Una variante casuale di ogni parte, come nell'esame vero: le risposte vengono controllate alla fine della parte, ogni audio viene riprodotto una sola volta, la trascrizione è nascosta. Le lettere le controlla Claude; se non ha tempo, può saltare una lettera.
 296|Tempo d'esame
-297|Lesen + Beschwerde: 90 minuti · Hören + Notiz: circa 30 minuti · Sprachbausteine + forum: 55 minuti. Qui può fare pause tra le parti.
+297|Lesen + Lesen und Schreiben: 65 minuti · Hören + Hören und Schreiben: 25 minuti · Sprachbausteine + Schreiben: 35 minuti. In totale 125 minuti. Il timer di ogni blocco parte con la sua prima parte; tra un blocco e l'altro puoi fare una pausa.
 298|Avvia l'esame
 299|🎲 Altre varianti
 300|Vedi il risultato →
@@ -289,6 +289,7 @@
 312|Sprechen (altri 60 punti) non viene conteggiato qui: lo eserciti nella sezione Sprechen con Claude.
 313|Nuovo esame di prova
 314|I miei errori
+315|Come all'esame: prima di iniziare compila i tuoi dati sul foglio delle risposte. Compariranno nell'intestazione di ogni pagina del foglio.
 x0|Errore vocale:
 x1|Il browser non è riuscito a leggere il testo ad alta voce. Apra la sezione «Voce» e controlli le voci tedesche.
 x2|Risposta a un reclamo

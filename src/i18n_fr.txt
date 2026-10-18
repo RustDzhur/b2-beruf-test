@@ -235,9 +235,9 @@
 250|Exercices
 251|Points
 252|1–20, 3 points chacun
-253|22–41, 3 points chacun, tout est lu une seule fois
-254|lettre de réponse 21, Notiz 42–45, Sprachbausteine 46–57, forum 58
-255|3 parties orales
+253|22–40 et 41 (motif de l'appel), 3 points chacune, tout passe une fois
+254|lettre de réponse 21 (7), Notiz 42–45 (6), Sprachbausteine 46–57 (6), forum 58 (14) et la langue de tous les textes (27)
+255|Teil 1A/1B/1C, Teil 2, Teil 3, environ 16 minutes en binôme
 256|Pour réussir, il faut au total au moins 144 points sur 240 (60 %). Dans chaque partie, 36 sur 60 sont souhaitables ; une partie peut avoir entre 24 et 36.
 257|nouveau thème
 258|reconstitution
@@ -275,7 +275,7 @@
 294| : non évalué
 295|Une variante aléatoire de chaque partie, comme à l’examen réel : les réponses sont vérifiées à la fin de la partie, chaque audio n’est lu qu’une fois, la transcription est masquée. Claude vérifie les lettres ; si vous manquez de temps, vous pouvez passer une lettre.
 296|Durée de l’examen
-297|Lesen + Beschwerde : 90 minutes · Hören + Notiz : environ 30 minutes · Sprachbausteine + forum : 55 minutes. Ici, vous pouvez faire des pauses entre les parties.
+297|Lesen + Lesen und Schreiben : 65 minutes · Hören + Hören und Schreiben : 25 minutes · Sprachbausteine + Schreiben : 35 minutes. 125 minutes au total. Le minuteur de chaque bloc démarre avec sa première partie ; vous pouvez faire une pause entre les blocs.
 298|Démarrer l’examen
 299|🎲 Autres variantes
 300|Voir le résultat →
@@ -289,6 +289,7 @@
 312|Sprechen (60 points supplémentaires) n’est pas compté ici : entraînez-vous dans la section Sprechen avec Claude.
 313|Nouvel examen blanc
 314|Mes erreurs
+315|Comme à l'examen : avant de commencer, remplissez vos données sur la feuille de réponses. Elles apparaîtront en haut de chaque page de la feuille.
 x0|Erreur de synthèse vocale :
 x1|Le navigateur n’a pas pu lire le texte à voix haute. Ouvrez la section « Voix » et vérifiez les voix allemandes.
 x2|Réponse à une réclamation

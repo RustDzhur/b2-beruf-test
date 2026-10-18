@@ -69,9 +69,9 @@ function viewHome() {
       h("div", { class: "tw" }, h("table", { class: "score" },
         h("tr", null, h("th", null, "Часть"), h("th", null, "Задания"), h("th", null, "Баллы")),
         h("tr", null, h("td", null, "Lesen"), h("td", null, "1–20, каждое по 3 балла"), h("td", null, "60")),
-        h("tr", null, h("td", null, "Hören"), h("td", null, "22–41, каждое по 3 балла, всё звучит один раз"), h("td", null, "60")),
-        h("tr", null, h("td", null, "Schreiben"), h("td", null, "письмо-ответ 21, Notiz 42–45, Sprachbausteine 46–57, форум 58"), h("td", null, "60")),
-        h("tr", null, h("td", null, "Sprechen"), h("td", null, "3 части устно"), h("td", null, "60")))),
+        h("tr", null, h("td", null, "Hören"), h("td", null, "22–40 и 41 (причина звонка), каждое по 3 балла, всё звучит один раз"), h("td", null, "60")),
+        h("tr", null, h("td", null, "Schreiben"), h("td", null, "письмо-ответ 21 (7), Notiz 42–45 (6), Sprachbausteine 46–57 (6), форум 58 (14) и язык всех текстов (27)"), h("td", null, "60")),
+        h("tr", null, h("td", null, "Sprechen"), h("td", null, "Teil 1A/1B/1C, Teil 2, Teil 3, около 16 минут в паре"), h("td", null, "60")))),
       h("p", { class: "small muted", style: "margin:0" }, "Для сдачи нужно в сумме от 144 из 240 баллов (60%). В каждой части желательно от 36 из 60; одна часть может быть от 24 до 36.")));
 }
 
@@ -106,7 +106,9 @@ function viewItem(sec, idx) {
   const mode = store.get("mode", "train");
   const next = idx < list.length ? `#${sec}.${idx + 1}` : null;
   const ctx = { restart: () => render(), next };
+  LAST_QZ = null;
   const body = RENDER[sec](it, NO_MODE[sec] ? "train" : mode, ctx);
+  const qz = LAST_QZ;
   return h("div", { class: "wrap" },
     crumbs(h("a", { href: "#home" }, "Главная"), h("a", { href: "#" + sec }, s.t), s.label(it)),
     h("div", { class: "spread" }, h("div", { class: "stack", style: "gap:4px" }, h("div", { class: "eyebrow" }, `${s.grp} · задания ${s.nums}`), h("h1", null, s.t + " · " + s.label(it))),
@@ -116,39 +118,76 @@ function viewItem(sec, idx) {
     NO_MODE[sec] ? null : modeSwitch(mode, (m) => { store.set("mode", m); render(); }),
     PAPER_SECS.includes(sec) ? h("label", { class: "row small" }, h("input", { type: "checkbox", checked: store.get("paper", true), onchange: (e) => { store.set("paper", e.target.checked); render(); } }), "Бланк как на экзамене") : null,
     NO_MODE[sec] ? null : srcNote(it.src),
-    paperOn(sec) ? sheetEl(sec, s, it, body) : body);
+    paperOn(sec) ? sheetEl(sec, s, it, body, qz) : body);
 }
 
 /* exam-paper skin: telc-like Prüfungsbogen around the test */
 const PAPER_SECS = ["l1", "l2", "l3", "l4", "b", "s1", "s2", "h1", "h2", "h3", "h4", "n"];
 const paperOn = (sec) => PAPER_SECS.includes(sec) && store.get("paper", true);
+// booklet header per part: [subtest on the side tab, minutes in the header, title, "Teil …", answer-sheet page]
 const PAPER_HEAD = {
-  l1: ["Leseverstehen", "Teil 1"], l2: ["Leseverstehen", "Teil 2"], l3: ["Leseverstehen", "Teil 3"], l4: ["Leseverstehen", "Teil 4"], b: ["Leseverstehen", "Beschwerde"],
-  s1: ["Sprachbausteine", "Teil 1"], s2: ["Sprachbausteine", "Teil 2"],
-  h1: ["Hörverstehen", "Teil 1"], h2: ["Hörverstehen", "Teil 2"], h3: ["Hörverstehen", "Teil 3"], h4: ["Hörverstehen", "Teil 4"], n: ["Hörverstehen", "Telefonnotiz"],
+  l1: ["Lesen", "45 Minuten", "Lesen", "Teil 1", 3], l2: ["Lesen", "45 Minuten", "Lesen", "Teil 2", 3], l3: ["Lesen", "45 Minuten", "Lesen", "Teil 3", 3], l4: ["Lesen", "45 Minuten", "Lesen", "Teil 4", 3],
+  b: ["Lesen und Schreiben", "20 Minuten", "Lesen und Schreiben", "", 3],
+  h1: ["Hören", "20 Minuten", "Hören", "Teil 1", 4], h2: ["Hören", "20 Minuten", "Hören", "Teil 2", 4], h3: ["Hören", "20 Minuten", "Hören", "Teil 3", 4], h4: ["Hören", "20 Minuten", "Hören", "Teil 4", 4],
+  n: ["Hören und Schreiben", "5 Minuten", "Hören und Schreiben", "", 6],
+  s1: ["Sprachbausteine und Schreiben", "35 Minuten", "Sprachbausteine", "Teil 1", 4], s2: ["Sprachbausteine und Schreiben", "35 Minuten", "Sprachbausteine", "Teil 2", 4],
 };
+// answer-sheet section of each part: [panel title, icon]
+const BOGEN_SEC = { l: ["Lesen", "book"], b: ["Lesen", "book"], h: ["Hören", "speaker"], s: ["Sprachbausteine", "blocks"] };
+const ICONS = {
+  book: '<svg viewBox="0 0 24 24"><path d="M6 3h11l1 1v16l-1 1H6l-1-1V4z" fill="currentColor"/><path d="M8 3v18" stroke="#fff" stroke-opacity=".35"/></svg>',
+  speaker: '<svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>',
+  blocks: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" fill="currentColor"/><rect x="13" y="3" width="8" height="8" fill="currentColor"/><rect x="13" y="13" width="8" height="8" fill="currentColor"/></svg>',
+  pencil: '<svg viewBox="0 0 24 24"><path d="M15.5 4.5l4 4L9 19l-5 1 1-5z" fill="currentColor"/></svg>',
+  talk: '<svg viewBox="0 0 24 24"><path d="M4 5h16v10H9l-4 4v-4H4z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>',
+};
+const icon = (k) => { const s = h("span", { class: "ico", "aria-hidden": "true" }); s.innerHTML = ICONS[k]; return s; };
 const PAPER_DE = {
   l1: "Lesen Sie zuerst die Aufgaben 1 bis 5 und dann die Anzeigen a bis h. Welche Anzeige passt zu wem? Sie können jede Anzeige nur einmal verwenden. Markieren Sie Ihre Lösungen für die Aufgaben 1–5 auf dem Antwortbogen.",
   l2: "Lesen Sie den Text und die Aufgaben 6 bis 9. Ist die Aussage richtig oder falsch und welche Antwort (a, b oder c) passt am besten? Markieren Sie Ihre Lösungen für die Aufgaben 6–9 auf dem Antwortbogen.",
   l3: "Lesen Sie die Beiträge 10 bis 13 und die Antworten a bis f. Welche Antwort passt zu welchem Beitrag? Wenn keine Antwort passt, markieren Sie X. Markieren Sie Ihre Lösungen für die Aufgaben 10–13 auf dem Antwortbogen.",
   l4: "Lesen Sie das Protokoll und die Aufgaben 14 bis 18. Welche Antwort (a, b oder c) passt am besten? Markieren Sie Ihre Lösungen für die Aufgaben 14–18 auf dem Antwortbogen.",
-  b: "Lesen Sie die Nachricht Ihrer Chefin / Ihres Chefs und die E-Mail der Kundin / des Kunden. Welche Antwort (a, b oder c) passt am besten zu den Aufgaben 19 und 20? Markieren Sie Ihre Lösungen auf dem Antwortbogen.",
+  b: "Ihre Teamleitung leitet Ihnen die E-Mail einer Kundin / eines Kunden weiter und bittet Sie zu antworten. Welche Lösung (a, b oder c) passt am besten? Markieren Sie Ihre Lösungen für die Aufgaben 19 und 20 auf dem Antwortbogen.",
   s1: "Lesen Sie den Text und entscheiden Sie, welche Lösung (a–j) in die Lücken 46–51 passt. Jedes Wort passt nur einmal. Nicht alle Wörter passen in den Text. Markieren Sie Ihre Lösungen auf dem Antwortbogen.",
   s2: "Lesen Sie den Text und entscheiden Sie, welche Lösung (a, b oder c) in die Lücken 52–57 passt. Markieren Sie Ihre Lösungen auf dem Antwortbogen.",
   h1: "Sie hören drei Gespräche. Zu jedem Gespräch gibt es zwei Aufgaben. Ist die Aussage dazu richtig oder falsch und welche Antwort (a, b oder c) passt am besten? Markieren Sie Ihre Lösungen für die Aufgaben 22–27 auf dem Antwortbogen.",
   h2: "Sie hören vier Gespräche. Welcher der Sätze a–f passt am besten zu welchem Gespräch? Markieren Sie Ihre Lösungen für die Aufgaben 28–31 auf dem Antwortbogen.",
   h3: "Sie hören eine Präsentation. Welche Antwort (a, b oder c) passt am besten? Markieren Sie Ihre Lösungen für die Aufgaben 32–35 auf dem Antwortbogen.",
-  h4: "Sie hören fünf Nachrichten auf dem Anrufbeantworter. Welche Antwort (a, b oder c) passt am besten? Markieren Sie Ihre Lösungen für die Aufgaben 36–40 auf dem Antwortbogen.",
-  n: "Sie hören eine Nachricht auf dem Anrufbeantworter. Machen Sie Notizen für Ihre Kollegin / Ihren Kollegen. Schreiben Sie nur Stichpunkte (Aufgaben 41–45).",
+  h4: "Sie hören fünf telefonische Mitteilungen. Zu jeder Mitteilung gibt es eine Aufgabe. Welche Lösung (a, b oder c) passt am besten? Markieren Sie Ihre Lösungen für die Aufgaben 36–40 auf dem Antwortbogen.",
+  n: "Sie hören eine telefonische Mitteilung. Informieren Sie Ihre Kollegin. 41: Wählen Sie den Grund für den Anruf (a, b oder c). 42–45: Notieren Sie Name, Telefonnummer, weitere Informationen und was zu erledigen ist, direkt auf dem Antwortbogen. Sie hören die Mitteilung einmal.",
 };
-function sheetEl(sec, s, it, body) {
-  const hd = PAPER_HEAD[sec] || [s.grp, s.t];
-  return h("div", { class: "sheet" },
-    h("div", { class: "sh-top" }, h("span", { class: "sh-brand" }, "telc Deutsch B2·Beruf"), h("span", { class: "sh-nr" }, "Teilnehmernummer: ", h("i", null, "0 2 · · · · ·"))),
-    h("div", { class: "sh-title" }, h("b", null, hd[0]), h("span", null, hd[1]), h("span", { class: "sh-nums" }, "Aufgaben " + s.nums)),
-    h("div", { class: "sh-inst" }, h("b", null, "Anleitung. "), PAPER_DE[sec] || ""),
-    body,
-    h("div", { class: "sh-foot" }, "Формулировка заданий дана по образцу telc, оригинальный бланк может немного отличаться."));
+// candidate data from the cover page of the Antwortbogen S30 (mock exam), shown in each sheet header
+const cand = () => store.get("cand", { fam: "", vor: "" });
+function bogenHead() {
+  const c = cand();
+  const boxes = (v, n) => h("span", { class: "bx" }, Array.from({ length: n }, (_, i) => h("i", null, (v || "")[i] || "")));
+  return h("div", { class: "bg-data" },
+    h("div", null, boxes(c.fam.toUpperCase(), 20), h("small", null, "Familienname · Surname · Nom · Cognome · Soyadı · Фамилия")),
+    h("div", null, boxes(c.vor.toUpperCase(), 20), h("small", null, "Vorname · First Name · Prénom · Nome · Adı · Имя")));
+}
+// one Antwortbogen panel (Lesen / Hören / Sprachbausteine) with the rows of the current task
+function bogenPanel(sec, qz) {
+  const hd = PAPER_HEAD[sec]; const [title, ic] = BOGEN_SEC[sec[0]] || BOGEN_SEC.l;
+  const teil = sec === "b" ? "Lesen und Schreiben" : hd[3];
+  return h("aside", { class: "bogen", "aria-label": "Antwortbogen" },
+    h("div", { class: "bg-top" }, h("b", null, "Deutsch-Test für den Beruf B2"), h("span", { class: "bg-pg" }, "Antwortbogen · Seite " + hd[4])),
+    bogenHead(),
+    h("div", { class: "bg-sub" }, "Schriftliche Prüfung"),
+    h("div", { class: "bg-panel" }, h("span", { class: "bg-ico" }, icon(ic)), h("div", { class: "bg-ttl" }, title), h("div", { class: "bg-teil" }, teil), qz.bogen()));
+}
+function sheetEl(sec, s, it, body, qz) {
+  const hd = PAPER_HEAD[sec] || [s.grp, "", s.grp, s.t, 0];
+  const ic = sec === "n" || sec === "b" ? "pencil" : (BOGEN_SEC[sec[0]] || BOGEN_SEC.l)[1];
+  const booklet = h("div", { class: "bk" },
+    h("div", { class: "bk-side" }, icon(ic), h("span", { class: "bk-vert" }, hd[0])),
+    h("div", { class: "bk-main" },
+      h("div", { class: "bk-head" }, h("span", null, hd[1] + " "), h("b", null, hd[0])),
+      sec.match(/^(l1|h1|s1)$/) ? h("div", { class: "bk-big" }, "Schriftliche Prüfung") : null,
+      h("h2", { class: "bk-title" }, h("b", null, hd[2]), hd[3] ? h("span", null, " " + hd[3]) : null),
+      h("div", { class: "bk-inst" }, PAPER_DE[sec] || ""),
+      body,
+      h("div", { class: "bk-foot" }, h("span", null, "Формулировка заданий дана по образцу telc, оригинальный бланк может немного отличаться."), h("b", null, "Deutsch-Test für den Beruf B2"))));
+  return h("div", { class: "sheet" + (qz ? " desk" : "") }, booklet, qz ? bogenPanel(sec, qz) : null);
 }
 
 function viewReview() {
@@ -237,12 +276,40 @@ function examScore(E) {
   const notes = [];
   E.steps.forEach((s, i) => {
     const r = E.res[i]; if (!r) { if (s.write) notes.push(s.t + ": не оценено"); return; }
-    if (s.part === "Notiz") { const f = r.sc / r.mx; P["Hören"] += 3 * f; P.Schreiben += 6 * f; }
+    if (s.part === "Notiz") { if (r.pts) { P["Hören"] += r.pts.h; P.Schreiben += r.pts.s; } else { const f = r.sc / r.mx; P["Hören"] += 3 * f; P.Schreiben += 6 * f; } }
     else if (s.write) P.Schreiben += r.sc;
     else P[s.part] += r.sc * s.per;
   });
   Object.keys(P).forEach(k => P[k] = Math.round(P[k] * 10) / 10);
   return { P, notes };
+}
+// the written exam runs in three timed blocks (telc DTB B2): Lesen 65 min, Hören 25 min, Sprachbausteine und Schreiben 35 min
+const EXAM_BLOCKS = { A: ["Lesen · Lesen und Schreiben", 65], B: ["Hören · Hören und Schreiben", 25], C: ["Sprachbausteine und Schreiben", 35] };
+const blockOf = (sec) => /^(l|b)/.test(sec) ? "A" : /^(h|n)/.test(sec) ? "B" : "C";
+function blockTimer(E, sec) {
+  const k = blockOf(sec), [name, min] = EXAM_BLOCKS[k];
+  E.t0 = E.t0 || {}; if (!E.t0[k]) E.t0[k] = Date.now();
+  const out = h("span", { class: "mono" });
+  const box = h("div", { class: "examtimer" }, h("span", null, name), out);
+  const tick = () => {
+    if (box._shown && !box.isConnected) return clearInterval(iv); // page left: stop
+    box._shown = box.isConnected;
+    const left = Math.round((E.t0[k] + min * 60000 - Date.now()) / 1000);
+    out.textContent = left > 0 ? `${String(Math.floor(left / 60)).padStart(2, "0")}:${String(left % 60).padStart(2, "0")}` : "Zeit ist um";
+    box.classList.toggle("over", left <= 0); box.classList.toggle("soon", left > 0 && left <= 300);
+  };
+  const iv = setInterval(tick, 1000); tick();
+  return box;
+}
+// cover page of the Antwortbogen S30: before the exam the candidate fills in the data fields
+function coverEl() {
+  const c = cand();
+  const inp = (k, label) => { const i = h("input", { class: "in", value: c[k] || "", maxlength: 20, autocomplete: "off", "aria-label": label, oninput: () => { const x = cand(); x[k] = i.value; store.set("cand", x); } }); return h("label", { class: "cv-f" }, i, h("small", null, label)); };
+  return h("div", { class: "cover" },
+    h("div", { class: "cv-head" }, h("b", null, "Deutsch-Test für den Beruf"), h("span", null, "Antwortbogen S30")),
+    h("p", { class: "small", style: "margin:0" }, "Как на экзамене: перед началом заполните данные на бланке ответов. Они появятся в шапке каждой страницы бланка."),
+    inp("fam", "Familienname · Surname · Nom · Cognome · Soyadı · Фамилия"),
+    inp("vor", "Vorname · First Name · Prénom · Nome · Adı · Имя"));
 }
 function viewExam() {
   if (!EXAM) EXAM = newExam();
@@ -255,7 +322,8 @@ function viewExam() {
       h("p", { class: "lead", style: "margin:0" }, "Случайный вариант каждой части, как на настоящем экзамене: ответы проверяются в конце части, каждое аудио звучит один раз, транскрипт скрыт. Письма проверяет Claude; если нет времени, письмо можно пропустить."),
       steps,
       h("div", { class: "card stack" }, h("div", { class: "eyebrow" }, "Время на экзамене"),
-        h("p", { style: "margin:0" }, "Lesen + Beschwerde: 90 минут · Hören + Notiz: около 30 минут · Sprachbausteine + форум: 55 минут. Здесь можно делать паузы между частями."),
+        h("p", { style: "margin:0" }, "Lesen + Lesen und Schreiben: 65 минут · Hören + Hören und Schreiben: 25 минут · Sprachbausteine + Schreiben: 35 минут. Всего 125 минут. Таймер блока идёт с первой части блока, паузу между блоками можно делать."),
+        coverEl(),
         h("div", { class: "row" }, h("button", { class: "btn primary", onclick: () => { E.i = 0; render(); } }, "Начать экзамен"), h("button", { class: "btn", onclick: () => { EXAM = newExam(); render(); } }, "🎲 Другие варианты"))));
   }
   if (E.i >= E.steps.length) return examResult(E, steps);
@@ -264,16 +332,19 @@ function viewExam() {
   const last = E.i === E.steps.length - 1;
   const label = (d) => last ? (d ? "Посмотреть результат →" : "Пропустить и посмотреть результат →") : d ? "Следующая часть →" : "Пропустить часть →";
   const nexts = [0, 1].map(() => h("button", { class: "btn " + (done ? "primary" : ""), onclick: () => { E.i++; render(); } }, label(done)));
-  const mark = (sc, mx) => { E.res[E.i] = { sc, mx }; nexts.forEach(b => { b.className = "btn primary"; b.textContent = label(true); }); };
+  const mark = (sc, mx, pts) => { E.res[E.i] = { sc, mx, pts }; nexts.forEach(b => { b.className = "btn primary"; b.textContent = label(true); }); };
   const ctx = { onDone: mark, onWriteDone: mark, onSkip: () => { E.i++; render(); } };
   const S = SEC[s.sec];
+  const timer = blockTimer(E, s.sec);
+  LAST_QZ = null;
   const body = s.only ? rBeschwerde(s.it, "exam", ctx, s.only) : RENDER[s.sec](s.it, "exam", ctx);
+  const qz = LAST_QZ;
   return h("div", { class: "wrap" },
     crumbs(h("a", { href: "#home" }, "Главная"), "Пробный экзамен", `часть ${E.i + 1} из ${E.steps.length}`),
-    steps,
+    steps, timer,
     h("div", { class: "spread" }, h("div", { class: "stack", style: "gap:4px" }, h("div", { class: "eyebrow" }, `${S.grp} · задания ${s.only === "quiz" ? "19–20" : s.only === "write" ? "21" : S.nums}`), h("h1", null, s.t)), nexts[0]),
     h("p", { class: "lead", style: "margin:0" }, s.only === "quiz" ? "Прочитайте записку и письмо клиента и ответьте на вопросы 19–20. Письмо напишете на следующем шаге." : S.task),
-    paperOn(s.sec === "b" || !s.only ? s.sec : "x") ? sheetEl(s.sec, S, s.it, body) : body,
+    paperOn(s.sec === "b" || !s.only ? s.sec : "x") ? sheetEl(s.sec, S, s.it, body, qz) : body,
     h("div", { class: "row", style: "justify-content:flex-end" }, nexts[1]));
 }
 function examResult(E, steps) {
@@ -283,7 +354,7 @@ function examResult(E, steps) {
   const strong = parts.filter(([, v]) => v >= 36).length, mid = parts.filter(([, v]) => v >= 24 && v < 36).length;
   const sum = Math.round(parts.reduce((a, [, v]) => a + v, 0) * 10) / 10;
   const pass = strong === 3 || (strong === 2 && mid === 1);
-  const rows = E.steps.map((s, i) => { const r = E.res[i]; const pts = !r ? null : s.write ? r.sc : s.part === "Notiz" ? Math.round(9 * r.sc / r.mx * 10) / 10 : r.sc * s.per;
+  const rows = E.steps.map((s, i) => { const r = E.res[i]; const pts = !r ? null : s.write ? r.sc : s.part === "Notiz" ? (r.pts ? Math.round((r.pts.h + r.pts.s) * 10) / 10 : Math.round(9 * r.sc / r.mx * 10) / 10) : r.sc * s.per;
     const mx = s.write ? (s.sec === "f" ? 29 : 19) : s.part === "Notiz" ? 9 : (r ? r.mx : 0) * s.per;
     return h("tr", null, h("td", null, s.t), h("td", null, SEC[s.sec].label(s.it)), h("td", { class: "mono" }, pts == null ? "—" : `${pts}${mx ? " / " + mx : ""}`)); });
   return h("div", { class: "wrap narrow" },

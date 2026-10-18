@@ -16,6 +16,16 @@ const REDEMITTEL = {
 };
 const WMAX = { beschwerde: { inhalt: 7, sprache: 12 }, forum: { inhalt: 14, sprache: 15 } };
 
+// the writing field looks like the Antwortbogen: page 5 (21, an e-mail form with An / Cc / Betreff) and page 7 (58, lined paper)
+function writeSheet(t, ta) {
+  if (t.kind !== "beschwerde" && t.kind !== "forum") return ta;
+  const mailHead = t.kind === "beschwerde" ? h("div", { class: "ws-mail" },
+    h("span", { class: "ws-send", "aria-hidden": "true" }, "➤", h("small", null, "Senden")),
+    h("div", { class: "ws-fields" }, ["An…", "Cc…", "Betreff"].map(l => h("label", null, h("span", null, l), h("input", { class: "ws-in", autocomplete: "off", "aria-label": l }))))) : null;
+  return h("div", { class: "ws" },
+    h("div", { class: "ws-hd" }, h("span", { class: "ws-ico" }, icon("pencil")), h("b", null, t.kind === "beschwerde" ? "21  Lesen und Schreiben" : "58  Schreiben"), h("span", { class: "ws-nur" }, "Nur für die Bewertung")),
+    h("div", { class: "ws-body" }, h("div", { class: "ws-paper" }, mailHead, ta), h("div", { class: "ws-side" })));
+}
 function writeTask(t) {
   const drafts = store.get("drafts", {});
   const ta = h("textarea", { class: "letter", id: "ta-" + t.id, spellcheck: "false", placeholder: t.kind === "forum" ? "Liebe Kolleginnen und Kollegen,\n…" : t.kind === "praesentation" ? "Guten Tag, ich möchte Ihnen heute … vorstellen.\n…" : "Sehr geehrte Frau …,\n…" });
@@ -64,7 +74,7 @@ function writeTask(t) {
   return h("div", { class: "stack" },
     h("div", { class: "card stack" }, h("div", { class: "spread" }, h("h2", null, t.title), h("div", { class: "row" }, tb, tl)), t.taskEl),
     h("div", { class: "two" },
-      h("div", { class: "stack" }, ta, h("div", { class: "spread" }, counter, h("div", { class: "row" }, checkBtn, stopBtn, modelBtn, genBtn, skip)),
+      h("div", { class: "stack" }, writeSheet(t, ta), h("div", { class: "spread" }, counter, h("div", { class: "row" }, checkBtn, stopBtn, modelBtn, genBtn, skip)),
         noAiNote("Проверка письма через Claude недоступна в этом просмотре. Сравните текст с образцом и пройдитесь по Redemittel."), models, genBox),
       h("div", { class: "card sticky" }, rm)),
     fb);
@@ -148,49 +158,67 @@ function rForum(it, mode, ctx) {
     onDone: ctx.onWriteDone, onSkip: ctx.onSkip });
 }
 
-/* ---------- Telefonnotiz ---------- */
+/* ---------- Telefonnotiz: Antwortbogen page 6 (41 Grund für den Anruf, 42 Namen, 43 Kontakt, 44 Weitere Informationen, 45 Zu erledigen) ---------- */
+const GRUND = [["a", "Angebot"], ["b", "Bestellung/Buchung"], ["c", "Beschwerde"]];
+const grundOf = (type) => /beschwerde/i.test(type) ? "c" : /bestell|buchung/i.test(type) ? "b" : "a";
 function rNotiz(it, mode, ctx) {
   const segs = [{ who: it.who, t: it.text, g: it.g }];
   const tr = transcript(segs, mode === "learn");
-  const pl = makePlayer(segs, { title: "Telefonnachricht", once: mode === "exam", onLine: (i) => tr.highlight(i) });
-  const f = {
-    name: h("input", { class: "in", id: `n-${it.id}-name`, autocomplete: "off" }),
-    phone: h("input", { class: "in", id: `n-${it.id}-phone`, autocomplete: "off", inputmode: "tel" }),
-    info: h("textarea", { class: "in", id: `n-${it.id}-info`, rows: 5, placeholder: "• …\n• …" }),
-    todo: h("input", { class: "in", id: `n-${it.id}-todo`, autocomplete: "off" }),
-  };
-  const out = h("div", { class: "stack" });
-  const typeSel = h("span", { class: "chip" }, it.type);
-  if (mode === "learn") { f.name.value = it.name; f.phone.value = it.phone; f.info.value = it.info.map(i => "• " + i.t).join("\n"); f.todo.value = it.todo; }
+  const pl = makePlayer(segs, { title: "Telefonische Mitteilung", once: mode === "exam", onLine: (i) => tr.highlight(i) });
+  const line = (id, extra) => h("input", { class: "tn-in", id, autocomplete: "off", ...extra });
+  const grund = GRUND.map(([v, l]) => h("label", { class: "tn-opt" }, h("small", null, v), h("input", { type: "radio", name: "g-" + it.id, value: v }), h("span", null, l)));
+  const f = { name: line(`n-${it.id}-name`), firma: line(`n-${it.id}-firma`), phone: line(`n-${it.id}-phone`, { inputmode: "tel" }),
+    info: [0, 1, 2, 3, 4].map(i => line(`n-${it.id}-info${i}`)), todo: [0, 1].map(i => line(`n-${it.id}-todo${i}`)) };
+  const pick = () => { const r = grund.map(l => l.querySelector("input")).find(x => x.checked); return r ? r.value : null; };
+  if (mode === "learn") {
+    grund.forEach(l => { const x = l.querySelector("input"); x.checked = x.value === grundOf(it.type); });
+    f.name.value = it.name; f.phone.value = it.phone; it.info.slice(0, 5).forEach((i, n) => { f.info[n].value = i.t; }); f.todo[0].value = it.todo;
+  }
+  const mk = {}; const markEl = (k) => (mk[k] = h("span", { class: "tn-mark", title: "Nur für die Bewertung" }, h("i", null, "+"), h("i", null, "–")));
+  const setMark = (k, ok) => { const [p, m] = mk[k].children; p.classList.toggle("on", ok); m.classList.toggle("on", !ok); };
   const has = (txt, kw) => kw.every(g => g.split("|").some(a => norm(txt).includes(norm(a))));
+  const out = h("div", { class: "stack" });
   const checkBtn = h("button", { class: "btn primary", onclick: () => {
+    const info = f.info.map(x => x.value).join("\n"), todo = f.todo.map(x => x.value).join(" ");
+    const g = grundOf(it.type);
     const res = [
-      { l: "Name: " + it.name, ok: norm(f.name.value).includes(norm(it.name)), n: 42 },
-      { l: "Telefon: " + it.phone, ok: f.phone.value.replace(/\D/g, "") === it.phone.replace(/\D/g, ""), n: 43 },
-      ...it.info.map(i => ({ l: i.t, ok: has(f.info.value, i.kw), n: 44 })),
-      { l: "Zu erledigen: " + it.todo, ok: has(f.todo.value + " " + f.info.value, it.todo_kw), n: 45 },
+      { l: "Grund für den Anruf: " + GRUND.find(x => x[0] === g).join(" "), ok: pick() === g, n: 41, k: "g" },
+      { l: "Name: " + it.name, ok: norm(f.name.value).includes(norm(it.name)), n: 42, k: "name" },
+      { l: "Telefon: " + it.phone, ok: f.phone.value.replace(/\D/g, "") === it.phone.replace(/\D/g, ""), n: 43, k: "phone" },
+      ...it.info.map(i => ({ l: i.t, ok: has(info, i.kw), n: 44, k: "info" })),
+      { l: "Zu erledigen: " + it.todo, ok: has(todo + " " + info, it.todo_kw), n: 45, k: "todo" },
     ];
+    const infos = res.filter(r => r.k === "info");
+    ["g", "name", "phone", "todo"].forEach(k => setMark(k, res.find(r => r.k === k).ok));
+    setMark("info", infos.filter(r => r.ok).length * 2 >= infos.length);
+    // official points: 41 = 3 (Hören); 42 = 0.5, 43 = 0.5, 44 = 4, 45 = 1 (Schreiben)
+    const ok = (k) => res.find(r => r.k === k).ok;
+    const pts = { h: ok("g") ? 3 : 0, s: (ok("name") ? .5 : 0) + (ok("phone") ? .5 : 0) + 4 * infos.filter(r => r.ok).length / Math.max(infos.length, 1) + (ok("todo") ? 1 : 0) };
+    pts.s = Math.round(pts.s * 10) / 10;
     const sc = res.filter(r => r.ok).length;
     saveRes(it.id, sc, res.length);
     trackItems(res.map((r, i) => ({ key: `${it.id}:${i}`, n: r.n, ok: r.ok, vid: it.id, sec: "n" })));
     const pct = sc / res.length;
-    out.replaceChildren(h("div", { class: "result" }, h("span", { class: "big" }, `${sc}/${res.length}`), h("span", { class: "chip " + (pct >= .6 ? "ok" : pct >= .4 ? "warn" : "bad") }, Math.round(pct * 100) + "%"),
+    out.replaceChildren(h("div", { class: "result" }, h("span", { class: "big" }, `${sc}/${res.length}`), h("span", { class: "chip " + (pct >= .6 ? "ok" : pct >= .4 ? "warn" : "bad") }, `Hören ${pts.h}/3 · Schreiben ${pts.s}/6`),
       h("span", { class: "small muted", style: "flex:1;min-width:200px" }, "Проверка по ключевым словам и цифрам. Формулировка может быть своей, главное — смысл и числа."),
       h("button", { class: "btn", onclick: () => render() }, "↻ Заново")),
-      h("div", { class: "card stack" }, h("div", { class: "eyebrow" }, "Правильная записка · " + it.type), res.map(r => h("div", { class: "check " + (r.ok ? "ok" : "no") }, h("span", { class: "m" }, r.ok ? "✓" : "✗"), h("span", null, r.l)))),
+      h("div", { class: "card stack" }, h("div", { class: "eyebrow" }, "Правильная записка · " + it.type), res.map(r => h("div", { class: "check " + (r.ok ? "ok" : "no") }, h("span", { class: "m" }, r.ok ? "✓" : "✗"), h("span", null, `${r.n} · ${r.l}`)))),
       ...(mode === "exam" ? [h("div", { class: "row" }, tr.btn), tr.box] : []));
     checkBtn.disabled = true;
-    ctx.onDone && ctx.onDone(sc, res.length);
+    ctx.onDone && ctx.onDone(sc, res.length, pts);
   } }, "Проверить записку");
+  const row = (n, label, sub, field, k) => h("div", { class: "tn-row" }, h("div", { class: "tn-l" }, h("b", null, n), h("span", null, label, sub ? h("small", null, sub) : null)), h("div", { class: "tn-f" }, field), k ? markEl(k) : h("span"));
+  const form = h("div", { class: "tn" },
+    h("div", { class: "tn-hd" }, h("span", { class: "tn-ico" }, icon("pencil")), h("div", null, h("b", null, "Hören und Schreiben"), h("div", { class: "tn-t" }, "Telefonnotiz")), h("span", { class: "tn-nur" }, "Nur für die Bewertung")),
+    row("41", "Grund für den Anruf", null, h("div", { class: "tn-opts" }, grund), "g"),
+    row("42", "Namen", null, h("div", { class: "tn-grid" }, h("label", { for: f.name.id }, "Frau/Herr"), f.name, h("label", { for: f.firma.id }, "Firma"), f.firma), "name"),
+    row("43", "Kontakt", "Telefon", f.phone, "phone"),
+    row("44", "Weitere Informationen", null, h("div", { class: "tn-lines" }, f.info.map(x => h("div", { class: "tn-li" }, x))), "info"),
+    row("45", "Zu erledigen", null, h("div", { class: "tn-lines" }, f.todo.map((x, i) => h("div", { class: "tn-li" + (i ? " nob" : "") }, x))), "todo"));
   return h("div", { class: "stack" },
     srcNote(it.src),
     pl, mode === "exam" ? null : h("div", { class: "row" }, tr.btn), tr.box,
-    h("div", { class: "notiz" },
-      h("div", { class: "full spread" }, h("b", null, "Telefonnotiz"), typeSel),
-      h("label", { for: f.name.id }, "Name"), f.name,
-      h("label", { for: f.phone.id }, "Telefonnummer"), f.phone,
-      h("label", { for: f.info.id, class: "full" }, "Weitere Informationen"), h("div", { class: "full" }, f.info),
-      h("label", { for: f.todo.id }, "Zu erledigen"), f.todo),
+    form,
     h("div", { class: "row" }, checkBtn), out);
 }
 
@@ -276,6 +304,15 @@ function chatPartner(cfg) {
 const rmCard = (key) => h("div", { class: "card sticky stack" }, h("div", { class: "eyebrow" }, "Redemittel"), SP_REDE[key].map((g, i) => h("details", { class: "rm", open: i < 2 }, h("summary", null, g.h), h("ul", null, g.items.map(s => h("li", null, s))))));
 const RULES_COMMON = "Antworte immer nur auf Deutsch, in 2–4 kurzen Sätzen, natürlich gesprochen auf B2-Niveau. Keine Korrekturen, keine Erklärungen, keine Aufzählungen, nur das Gespräch.";
 
+// strip in the style of the "Aufgabenblätter" of the oral exam (pair exam, about 16 minutes, no preparation time)
+const SP_HEAD = {
+  sp1: [["Teil 1A", "Über ein Thema sprechen", "ca. 2 Minuten pro Person"], ["Teil 1B", "Fragen der Prüferin / des Prüfers beantworten", ""], ["Teil 1C", "Einen Aspekt aus dem Beitrag der Partnerin / des Partners erläutern", ""]],
+  sp2: [["Teil 2", "Mit Kolleginnen und Kollegen sprechen", "ca. 3 Minuten"]],
+  sp3: [["Teil 3", "Lösungswege diskutieren", "ca. 4 Minuten"]],
+};
+const spHead = (k) => h("div", { class: "sp-head" }, h("span", { class: "sp-ico" }, icon("talk")),
+  h("div", null, h("div", { class: "sp-k" }, "Mündliche Prüfung · Sprechen · Paarprüfung, ca. 16 Minuten · keine Vorbereitungszeit"),
+    SP_HEAD[k].map(([t, d, m]) => h("div", { class: "sp-p" }, h("b", null, t), " " + d, m ? h("span", null, ` (${m})`) : null))));
 function rSprechen3(it) {
   const m = modelBlock(it.model, "Образец диалога", "A — это вы, B — ваш партнёр. Это один из возможных вариантов: берите структуру и фразы, но говорите своими словами.");
   const chat = chatPartner({
@@ -284,11 +321,11 @@ function rSprechen3(it) {
     start: "Beginne du das Gespräch: Begrüße mich kurz, beschreibe das Problem in 2 Sätzen und frage mich, was wir tun sollen.",
     rateIntro: `Bewerte meine Beiträge in einem Übungsgespräch für telc DTB B2 Beruf, Sprechen Teil 3 (gemeinsam Lösungen finden, 10 Punkte). Situation: ${it.text}. Stichpunkte: ${it.points.join("; ")}. Kriterien: alle Stichpunkte behandelt, eigene Vorschläge, auf die Partnerin eingehen, Einigung erzielen, Sprache.`,
   });
-  return h("div", { class: "two" },
+  return h("div", { class: "stack" }, spHead("sp3"), h("div", { class: "two" },
     h("div", { class: "stack" },
       h("div", { class: "card stack" }, h("div", { class: "eyebrow" }, "Situation " + it.n), h("p", { class: "qt", style: "margin:0" }, it.text), h("div", { class: "eyebrow" }, "Diese Stichpunkte helfen Ihnen"), h("ul", { style: "margin:0;padding-left:20px" }, it.points.map(p => h("li", null, p))),
         h("div", { class: "row" }, m.btn)), m.box, chat),
-    rmCard("sp3"));
+    rmCard("sp3")));
 }
 
 function rSprechen2(it) {
@@ -299,11 +336,11 @@ function rSprechen2(it) {
     start: "Beginne du das Gespräch mit einem natürlichen Einstieg zum Thema.",
     rateIntro: `Bewerte meine Beiträge in einem Smalltalk-Übungsgespräch für telc DTB B2 Beruf, Sprechen Teil 2 (8 Punkte). Thema: ${it.title}. Kriterien: auf den Partner eingehen, Gespräch am Laufen halten, Fragen stellen, eigene Erfahrungen erzählen, Wortschatz und Grammatik.`,
   });
-  return h("div", { class: "two" },
+  return h("div", { class: "stack" }, spHead("sp2"), h("div", { class: "two" },
     h("div", { class: "stack" },
       h("div", { class: "card stack" }, h("div", { class: "eyebrow" }, "Thema " + it.n + " · " + it.title), h("p", { class: "qt", style: "margin:0" }, it.situation), h("ul", { style: "margin:0;padding-left:20px" }, it.points.map(p => h("li", null, p))),
         h("div", { class: "row" }, m.btn)), m.box, chat),
-    rmCard("sp2"));
+    rmCard("sp2")));
 }
 
 function rSprechen1(it, mode, ctx) {
@@ -323,5 +360,5 @@ function rSprechen1(it, mode, ctx) {
     rateIntro: `Bewerte meine Antworten auf die Fragen nach einer Präsentation (telc DTB B2 Beruf, Sprechen Teil 1, Thema: ${it.title}). Kriterien: Frage beantwortet, Begründung und Beispiele, flüssig und verständlich, Wortschatz und Grammatik.`,
   });
   const audio = h("div", { class: "stack" }, h("div", { class: "row" }, m.btn), m.box);
-  return h("div", { class: "stack" }, write, audio, qa);
+  return h("div", { class: "stack" }, spHead("sp1"), write, audio, qa);
 }

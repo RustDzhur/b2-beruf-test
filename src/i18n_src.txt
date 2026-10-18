@@ -235,9 +235,9 @@
 250|Tasks|Aufgaben
 251|Points|Punkte
 252|1–20, 3 points each|1–20, je 3 Punkte
-253|22–41, 3 points each, everything plays once|22–41, je 3 Punkte, alles wird einmal gespielt
-254|reply letter 21, Notiz 42–45, Sprachbausteine 46–57, forum 58|Antwortbrief 21, Notiz 42–45, Sprachbausteine 46–57, Forum 58
-255|3 oral parts|3 mündliche Teile
+253|22–40 and 41 (reason for the call), 3 points each, everything plays once|22–40 und 41 (Grund für den Anruf), je 3 Punkte, alles wird einmal gehört
+254|reply letter 21 (7), Notiz 42–45 (6), Sprachbausteine 46–57 (6), forum 58 (14) and the language of all texts (27)|Antwortbrief 21 (7), Notiz 42–45 (6), Sprachbausteine 46–57 (6), Forum 58 (14) und die Sprache aller Texte (27)
+255|Teil 1A/1B/1C, Teil 2, Teil 3, about 16 minutes in pairs|Teil 1A/1B/1C, Teil 2, Teil 3, ca. 16 Minuten als Paarprüfung
 256|To pass you need at least 144 of 240 points (60%). In each part 36 of 60 is desirable; one part may be 24 to 36.|Zum Bestehen brauchen Sie insgesamt mindestens 144 von 240 Punkten (60 %). In jedem Teil sind 36 von 60 wünschenswert; ein Teil darf 24 bis 36 haben.
 257|new topic|neues Thema
 258|reconstruction|Rekonstruktion
@@ -275,7 +275,7 @@
 294|: not rated|: nicht bewertet
 295|A random variant of each part, as in the real exam: answers are checked at the end of the part, each audio plays once, the transcript is hidden. Claude checks the letters; if you have no time, you can skip a letter.|Eine zufällige Variante jedes Teils wie in der echten Prüfung: Die Antworten werden am Ende des Teils geprüft, jedes Audio läuft einmal, das Transkript ist verborgen. Die Briefe prüft Claude; wenn Sie keine Zeit haben, können Sie einen Brief überspringen.
 296|Exam time|Prüfungszeit
-297|Lesen + Beschwerde: 90 minutes · Hören + Notiz: about 30 minutes · Sprachbausteine + forum: 55 minutes. Here you can take breaks between parts.|Lesen + Beschwerde: 90 Minuten · Hören + Notiz: etwa 30 Minuten · Sprachbausteine + Forum: 55 Minuten. Hier können Sie zwischen den Teilen Pausen machen.
+297|Lesen + Lesen und Schreiben: 65 minutes · Hören + Hören und Schreiben: 25 minutes · Sprachbausteine + Schreiben: 35 minutes. 125 minutes in total. Each block's timer starts with its first part; you can take a break between blocks.|Lesen + Lesen und Schreiben: 65 Minuten · Hören + Hören und Schreiben: 25 Minuten · Sprachbausteine + Schreiben: 35 Minuten. Insgesamt 125 Minuten. Der Timer eines Blocks startet mit seinem ersten Teil; zwischen den Blöcken können Sie eine Pause machen.
 298|Start the exam|Prüfung starten
 299|🎲 Other variants|🎲 Andere Varianten
 300|See the result →|Ergebnis ansehen →
@@ -289,6 +289,7 @@
 312|Sprechen (another 60 points) is not counted here: practise it in the Sprechen section with Claude.|Sprechen (weitere 60 Punkte) wird hier nicht gezählt: Üben Sie es im Bereich Sprechen mit Claude.
 313|New mock exam|Neue Probeprüfung
 314|My mistakes|Meine Fehler
+315|Like in the exam: before you start, fill in your details on the answer sheet. They will appear in the header of every answer-sheet page.|Wie in der Prüfung: Füllen Sie vor Beginn Ihre Daten auf dem Antwortbogen aus. Sie erscheinen im Kopf jeder Seite des Antwortbogens.
 x0|Speech error:|Fehler bei der Sprachausgabe:
 x1|The browser could not read the text aloud. Open the "Voice" section and check the German voices.|Der Browser konnte den Text nicht vorlesen. Öffnen Sie den Bereich „Stimme“ und prüfen Sie die deutschen Stimmen.
 x2|Reply to a complaint|Antwort auf eine Beschwerde

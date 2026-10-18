@@ -270,18 +270,12 @@ table.score th { font-size: 12px; color: var(--muted); font-weight: 600; }
   --paper: #fff; --ink: #111; --line: #222; --muted: #444; --soft: #f1f1f1; --accent: #111; --accent-soft: #e6e6e6; --accent-ink: #fff;
   --ok: #111; --ok-soft: #e9f5ec; --bad: #b00020; --bad-soft: #fde8ea; --marker: #fff2a8; --r: 0px;
   --f-read: Arial, "Helvetica Neue", Helvetica, sans-serif; --f-ui: Arial, "Helvetica Neue", Helvetica, sans-serif;
-  background: #fff; color: #111; border: 1px solid #000; box-shadow: 0 2px 10px rgba(0,0,0,.18);
-  padding: clamp(14px, 3vw, 34px); display: flex; flex-direction: column; gap: 16px; font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; color-scheme: light;
+  color: #111; font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; color-scheme: light;
+  display: grid; gap: 18px; align-items: start;
 }
-.sheet .sh-top { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-bottom: 2px solid #000; padding-bottom: 6px; font-size: 13px; }
-.sheet .sh-brand { font-weight: 700; letter-spacing: .02em; }
-.sheet .sh-nr i { font-style: normal; letter-spacing: .15em; border: 1px solid #000; padding: 1px 8px; }
-.sheet .sh-title { display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap; font-size: 20px; }
-.sheet .sh-title span { font-size: 16px; }
-.sheet .sh-nums { margin-left: auto; border: 1.5px solid #000; padding: 1px 8px; font-size: 13px !important; }
-.sheet .sh-inst { border: 1px solid #000; padding: 10px 12px; font-size: 14px; line-height: 1.5; background: #f7f7f7; }
-.sheet .sh-foot { font-size: 11.5px; color: #555; border-top: 1px solid #bbb; padding-top: 6px; }
-.sheet .card, .sheet .doc, .sheet .mail, .sheet .ad, .sheet .q, .sheet .transcript, .sheet .player, .sheet .result, .sheet .notiz, .sheet .letterview, .sheet .err { border-radius: 0; border-color: #000; box-shadow: none; }
+.sheet.desk { grid-template-columns: minmax(0, 1fr) minmax(250px, 300px); }
+@media (max-width: 900px) { .sheet.desk { grid-template-columns: 1fr; } }
+.bk .card, .bk .doc, .bk .mail, .sheet .ad, .sheet .q, .sheet .transcript, .sheet .player, .sheet .result, .sheet .notiz, .sheet .letterview, .sheet .err { border-radius: 0; border-color: #000; box-shadow: none; }
 .sheet .doc, .sheet .mail, .sheet .ad { font-size: 14.5px; }
 .sheet .q { border-width: 1px; padding: 10px 12px; }
 .sheet .qn, .sheet .gap .gn { border-radius: 0; border-width: 1.5px; }
@@ -315,3 +309,107 @@ table.score th { font-size: 12px; color: var(--muted); font-weight: 600; }
 [dir="rtl"] textarea, [dir="rtl"] input[type="text"], [dir="rtl"] .letterview, [dir="rtl"] .brand, [dir="rtl"] .sheet .de, [dir="rtl"] .ltr { direction: ltr; text-align: left; }
 [dir="rtl"] .eyebrow, [dir="rtl"] .lead, [dir="rtl"] .note { text-align: right; }
 [dir="rtl"] .num, [dir="rtl"] .langsw { direction: ltr; unicode-bidi: isolate; }
+
+/* task booklet (Aufgabenheft S10): grey side tab with the subtest, minutes in the header, italic instructions */
+.bk { background: #fff; border: 1px solid #cfcfcf; box-shadow: 0 2px 10px rgba(0,0,0,.16); display: grid; grid-template-columns: 46px minmax(0, 1fr); min-width: 0; }
+.bk-side { background: #ececec; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 12px 0; }
+.bk-side .ico { width: 26px; height: 26px; color: #7a7a7a; }
+.bk-vert { writing-mode: vertical-rl; transform: rotate(180deg); font-weight: 700; letter-spacing: .18em; font-size: 14px; color: #222; white-space: nowrap; }
+.bk-main { padding: 14px clamp(14px, 3vw, 34px) 16px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.bk-head { text-align: right; border-bottom: 1.5px solid #aaa; padding-bottom: 5px; font-size: 13px; letter-spacing: .06em; }
+.bk-head span { color: #888; font-weight: 700; } .bk-head b { color: #111; }
+.bk-big { font-size: clamp(26px, 4vw, 40px); color: #a3a3a3; letter-spacing: .06em; font-weight: 400; }
+.bk-title { margin: 0; font: 700 21px/1.2 Arial, sans-serif; } .bk-title span { color: #8c8c8c; }
+.bk-inst { font-style: italic; font-size: 15px; line-height: 1.5; }
+.bk-foot { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; border-top: 1px solid #ddd; padding-top: 8px; font-size: 11.5px; color: #666; }
+.bk-foot b { letter-spacing: .14em; font-weight: 400; color: #222; font-size: 13px; }
+.bk .mail { background: #d9ecf6; border: 0; } .bk .mail .mh { background: transparent; border: 0; color: #333; }
+.ico { display: inline-flex; } .ico svg { width: 100%; height: 100%; }
+
+/* Antwortbogen S30: pink panels with red frames, oval bubbles, number on both sides of a row */
+.bogen, .tn, .ws, .cover { --bg-red: #d7192d; --bg-pink: #f9d9d1; --bg-pink2: #f4c3b6; color: #111; font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; color-scheme: light; }
+.bogen { background: #fff; border: 1px solid #cfcfcf; box-shadow: 0 2px 10px rgba(0,0,0,.16); padding: 12px; display: flex; flex-direction: column; gap: 10px; position: sticky; top: 76px; }
+@media (max-width: 900px) { .bogen { position: static; } }
+.bg-top { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; flex-wrap: wrap; border-left: 3px solid #111; border-top: 3px solid #111; padding: 4px 0 0 6px; }
+.bg-top b { font-size: 15px; } .bg-pg { font-size: 11px; color: #555; }
+.bg-data { background: var(--bg-pink); border: 1.5px solid var(--bg-red); padding: 6px; display: grid; gap: 4px; }
+.bg-data small { display: block; font-size: 8.5px; color: #333; margin-top: 1px; }
+.bx { display: flex; } .bx i { flex: 1; height: 15px; border: 1px solid var(--bg-red); margin-left: -1px; background: #fff; font: 700 10px/14px Arial, sans-serif; text-align: center; font-style: normal; overflow: hidden; }
+.bg-sub { font-weight: 700; font-size: 16px; }
+.bg-panel { background: var(--bg-pink); border: 1.5px solid var(--bg-red); padding: 10px 10px 12px; position: relative; }
+.bg-ico { position: absolute; left: -1.5px; top: -1.5px; transform: translateX(-100%); width: 30px; height: 30px; border: 1.5px solid var(--bg-red); border-right: 0; border-radius: 0 0 0 8px; background: var(--bg-pink); display: grid; place-items: center; }
+@media (max-width: 1180px) { .bg-ico { position: static; transform: none; float: right; border-right: 1.5px solid var(--bg-red); } }
+.bg-ico .ico { width: 20px; height: 20px; color: #7a7a7a; }
+.bg-ttl { font-weight: 700; font-size: 15px; margin-bottom: 6px; } .bg-teil { font-size: 15px; margin-bottom: 2px; }
+.bg-row { display: grid; grid-template-columns: 22px 1fr 22px; align-items: center; gap: 4px; padding: 2px 3px; }
+.bg-row.alt { background: var(--bg-pink2); }
+.bg-row > b { font: 900 16px/1 Arial, sans-serif; text-align: center; }
+.bubs { display: flex; flex-wrap: wrap; gap: 2px 3px; justify-content: center; }
+.bub { border: 0; background: none; padding: 1px; display: flex; flex-direction: column; align-items: center; cursor: pointer; color: #111; font: 11px/1.1 Arial, sans-serif; min-width: 18px; }
+.bub i { width: 17px; height: 9px; border: 1.2px solid #111; border-radius: 50%; background: #fff; display: block; }
+.bub.wide { min-width: 44px; }
+.bub:hover:not(:disabled) i { background: #ffe9e4; }
+.bub.on i { background: #111; }
+.bub.good i { border-color: #137333; box-shadow: 0 0 0 2px #137333; } .bub.good.on i { background: #137333; }
+.bub.badc i { background: #b00020; border-color: #b00020; }
+.bub:disabled { cursor: default; }
+.bub:focus-visible { outline: 2px solid var(--bg-red); outline-offset: 1px; }
+
+/* mock-exam cover (Antwortbogen S30 data fields) and block timer */
+.cover { background: var(--bg-pink); border: 1.5px solid var(--bg-red); padding: 12px 14px; display: grid; gap: 8px; }
+.cv-head { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline; } .cv-head b { font-size: 20px; } .cv-head span { font-weight: 700; }
+.cv-f { display: grid; gap: 2px; } .cv-f .in { border: 1.5px solid var(--bg-red); border-radius: 0; background: #fff; color: #111; font: 700 15px Arial, sans-serif; letter-spacing: .2em; text-transform: uppercase; }
+.cv-f small { font-size: 11px; color: #333; }
+.examtimer { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center; border: 1px solid var(--line); border-radius: var(--r); padding: 8px 12px; background: var(--paper); font-size: 14px; }
+.examtimer .mono { font-size: 18px; font-weight: 700; }
+.examtimer.soon .mono { color: var(--warn, #b26a00); } .examtimer.over .mono { color: var(--bad); }
+
+/* Telefonnotiz (Antwortbogen page 6) */
+.tn { background: var(--bg-pink); border: 1.5px solid var(--bg-red); padding: 12px 14px; display: flex; flex-direction: column; }
+.tn-hd { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: start; border-bottom: 1.5px solid #111; padding-bottom: 8px; }
+.tn-ico .ico, .ws-ico .ico { width: 22px; height: 22px; color: #7a7a7a; }
+.tn-t { font-size: 22px; font-weight: 700; margin-top: 4px; }
+.tn-nur, .ws-nur { font-size: 10px; text-align: center; width: 64px; line-height: 1.2; color: #333; }
+.tn-row { display: grid; grid-template-columns: minmax(120px, 190px) minmax(0, 1fr) 64px; gap: 10px; align-items: start; padding: 10px 0; border-bottom: 1.5px solid #111; }
+.tn-row:last-child { border-bottom: 0; }
+@media (max-width: 620px) { .tn-row { grid-template-columns: 1fr 52px; } .tn-row .tn-f { grid-column: 1 / -1; grid-row: 2; } }
+.tn-l { display: flex; gap: 8px; font-weight: 700; font-size: 15.5px; } .tn-l small { display: block; font-weight: 400; font-size: 12px; }
+.tn-opts { display: grid; gap: 4px; }
+.tn-opt { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 15.5px; }
+.tn-opt small { width: 10px; font-weight: 700; font-size: 11px; }
+.tn-opt input { appearance: none; width: 19px; height: 11px; border: 1.2px solid #111; border-radius: 50%; background: #fff; margin: 0; cursor: pointer; }
+.tn-opt input:checked { background: #111; }
+.tn-grid { display: grid; grid-template-columns: auto 1fr; gap: 8px 10px; align-items: center; font-size: 15px; }
+.tn-in { width: 100%; border: 1.5px solid var(--bg-red); background: #fff; color: #111; padding: 7px 9px; font: 15px Arial, sans-serif; border-radius: 0; }
+.tn-lines { background: #fff; border: 1.5px solid var(--bg-red); }
+.tn-li { display: flex; align-items: center; gap: 6px; padding-left: 10px; border-bottom: 1px solid #ddd; }
+.tn-li:last-child { border-bottom: 0; }
+.tn-li::before { content: ""; width: 5px; height: 5px; background: #111; flex: none; } .tn-li.nob::before { visibility: hidden; }
+.tn-li .tn-in { border: 0; padding: 8px 6px; }
+.tn-mark { display: flex; gap: 6px; justify-content: center; padding-top: 4px; }
+.tn-mark i { font-style: normal; font-size: 11px; display: flex; flex-direction: column; align-items: center; color: #333; }
+.tn-mark i::after { content: ""; width: 15px; height: 8px; border: 1.2px solid #111; border-radius: 50%; background: #fff; margin-top: 1px; }
+.tn-mark i.on::after { background: #111; }
+.tn-mark i:first-child.on::after { background: #137333; border-color: #137333; } .tn-mark i:last-child.on::after { background: #b00020; border-color: #b00020; }
+
+/* writing sheets: 21 (e-mail form) and 58 (lined paper) */
+.ws { background: var(--bg-pink); border: 1.5px solid var(--bg-red); }
+.ws-hd { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 8px 10px; border-bottom: 2px solid #fff; }
+.ws-hd b { font-size: 16px; white-space: pre; }
+.ws-body { display: grid; grid-template-columns: minmax(0, 1fr) 64px; gap: 6px; padding: 8px; }
+.ws-side { background: #fff; }
+.ws-paper { background: #fff; display: flex; flex-direction: column; min-width: 0; }
+.ws-mail { display: grid; grid-template-columns: auto 1fr; gap: 8px; background: #ececec; padding: 6px 8px; }
+.ws-send { display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid #bbb; background: #f8f8f8; padding: 4px 8px; font-size: 16px; color: #555; }
+.ws-send small { font-size: 9px; }
+.ws-fields { display: grid; gap: 3px; } .ws-fields label { display: grid; grid-template-columns: 52px 1fr; gap: 6px; align-items: center; font-size: 10.5px; }
+.ws-fields label span { border: 1px solid #bbb; background: #f8f8f8; padding: 1px 4px; text-align: center; }
+.ws-in { border: 1px solid #bbb; background: #fff; color: #111; padding: 3px 6px; font: 13px Arial, sans-serif; border-radius: 0; }
+.ws textarea.letter { border: 0; border-radius: 0; background: #fff repeating-linear-gradient(#fff 0 31px, #f2c6bb 31px 32px); line-height: 32px; padding: 0 10px; font: 16px/32px Arial, sans-serif; color: #111; min-height: 520px; box-shadow: none; }
+@media (max-width: 620px) { .ws-body { grid-template-columns: 1fr; } .ws-side { display: none; } }
+
+/* oral exam strip (Aufgabenblätter) */
+.sp-head { display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: start; background: var(--soft); border-left: 4px solid #8c8c8c; padding: 10px 14px; }
+.sp-ico .ico { width: 28px; height: 28px; color: #7a7a7a; }
+.sp-k { font-size: 12.5px; color: var(--muted); letter-spacing: .02em; margin-bottom: 4px; }
+.sp-p { font-size: 15px; } .sp-p span { color: var(--muted); }
