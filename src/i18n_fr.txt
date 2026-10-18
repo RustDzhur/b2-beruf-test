@@ -328,3 +328,5 @@ r28|{~1} : non évalué
 317|Commencer l’entraînement
 318|Enregistrer
 319|Changer de participant
+320|Veuillez indiquer votre nom et votre prénom.
+321|Données du candidat

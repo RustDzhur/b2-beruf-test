@@ -415,5 +415,31 @@ table.score th { font-size: 12px; color: var(--muted); font-weight: 600; }
 .sp-p { font-size: 15px; } .sp-p span { color: var(--muted); }
 
 /* signed-in participant chip in the header */
-.top-in .user { font-size: 12.5px; padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink); text-decoration: none; background: var(--paper); max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cover .row { margin-top: 6px; }
+/* candidate form: cover page of the Antwortbogen S30 */
+.s30 { --bg-red: #d7192d; --bg-pink: #f9d9d1; background: #fff linear-gradient(160deg, #fff 40%, #f3f3f3); color: #111; color-scheme: light; font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+  border: 1px solid #cfcfcf; box-shadow: 0 2px 10px rgba(0,0,0,.16); padding: clamp(14px, 4vw, 34px); display: flex; flex-direction: column; gap: 16px; }
+.s30-top { display: flex; justify-content: flex-end; gap: 10px; align-items: center; }
+.s30-code { border: 1.5px solid var(--bg-red); padding: 2px 8px; font-weight: 700; letter-spacing: .2em; }
+.s30-bar { width: 120px; height: 34px; background: repeating-linear-gradient(90deg, #111 0 2px, #fff 2px 4px, #111 4px 5px, #fff 5px 8px, #111 8px 11px, #fff 11px 12px); }
+.s30-title { font-family: "Arial Narrow", "Roboto Condensed", Arial, sans-serif; font-stretch: condensed; font-size: clamp(30px, 7vw, 58px); font-weight: 300; letter-spacing: -.01em; line-height: 1.05; }
+.s30-ver { background: var(--bg-pink); border: 1.5px solid var(--bg-red); padding: 10px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.s30-ver b { font-size: 20px; } .s30-ver small { flex-basis: 100%; font-size: 11px; }
+.boxes4, .boxes6 { height: 30px; border: 1.5px solid var(--bg-red); background: #fff repeating-linear-gradient(90deg, #fff 0 22px, var(--bg-red) 22px 23.5px); }
+.boxes4 { width: 92px; } .boxes6 { width: 139px; }
+.s30-data { background: var(--bg-pink); border: 1.5px solid var(--bg-red); padding: 12px; display: grid; gap: 12px; }
+.cv-row { display: grid; gap: 3px; min-width: 0; }
+.cv-row small { font-size: 11px; color: #333; line-height: 1.3; }
+.boxin { width: min(100%, calc(var(--n) * 23.5px + 2px)); height: 32px; border: 1.5px solid var(--bg-red); border-radius: 0; padding: 0 0 0 7px; color: #111;
+  background: #fff repeating-linear-gradient(90deg, #fff 0 22px, var(--bg-red) 22px 23.5px); font: 700 15px/32px "Courier New", monospace; letter-spacing: 14.5px; text-transform: uppercase; }
+.boxin:focus, .datein:focus { outline: 2px solid #111; outline-offset: 1px; }
+.datein { width: max-content; max-width: 100%; height: 34px; border: 1.5px solid var(--bg-red); border-radius: 0; background: #fff; color: #111; font: 15px Arial, sans-serif; padding: 0 8px; }
+.cv-sexes { display: grid; gap: 4px; background: #fbe9e5; border: 1px solid var(--bg-red); padding: 6px 8px; }
+.cv-sex { display: flex; gap: 8px; align-items: center; font-size: 13px; }
+.cv-sex input { appearance: none; width: 14px; height: 14px; border: 1.5px solid var(--bg-red); background: #fff; margin: 0; flex: none; }
+.cv-sex input:checked { background: #111; box-shadow: inset 0 0 0 2px #fff; }
+.cv-err { margin: 0; color: #b00020; font-weight: 700; }
+.s30-foot { display: flex; justify-content: space-between; align-items: baseline; border-top: 2px solid #111; padding-top: 8px; } .s30-foot b { font-size: 22px; } .s30-foot span { color: #888; font-weight: 700; }
+.who { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border: 1px solid var(--line); border-radius: 999px; font-size: 13.5px; color: var(--ink); text-decoration: none; max-width: 220px; }
+.who span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.who:hover { background: var(--soft); }

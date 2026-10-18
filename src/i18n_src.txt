@@ -328,3 +328,5 @@ r28|{~1}: not rated|{~1}: nicht bewertet
 317|Start practising|Mit dem Üben beginnen
 318|Save|Speichern
 319|Change participant|Teilnehmer wechseln
+320|Please enter your surname and first name.|Bitte geben Sie Familienname und Vorname ein.
+321|Candidate details|Teilnehmerdaten

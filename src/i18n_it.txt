@@ -328,3 +328,5 @@ r28|{~1}: non valutato
 317|Inizia ad allenarti
 318|Salva
 319|Cambia partecipante
+320|Inserisci cognome e nome.
+321|Dati del candidato

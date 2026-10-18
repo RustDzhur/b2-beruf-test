@@ -328,3 +328,5 @@ r28|{~1}: değerlendirilmedi
 317|Çalışmaya başla
 318|Kaydet
 319|Katılımcıyı değiştir
+320|Lütfen soyadınızı ve adınızı girin.
+321|Katılımcı bilgileri

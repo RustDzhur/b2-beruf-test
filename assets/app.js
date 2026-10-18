@@ -1274,7 +1274,6 @@ const PAPER_DE = {
 };
 // candidate data from the cover page of the Antwortbogen S30 (mock exam), shown in each sheet header
 const cand = () => store.get("cand", { fam: "", vor: "" });
-const candName = () => { const c = cand(); return c.done ? `${c.vor || ""} ${c.fam || ""}`.trim() : ""; };
 function bogenHead() {
   const c = cand();
   const boxes = (v, n) => h("span", { class: "bx" }, Array.from({ length: n }, (_, i) => h("i", null, (v || "")[i] || "")));
@@ -1418,36 +1417,6 @@ function blockTimer(E, sec) {
   const iv = setInterval(tick, 1000); tick();
   return box;
 }
-// first visit: the candidate data form of the Antwortbogen S30; data stays in this browser (localStorage), nothing is sent anywhere
-function viewProfile(first) {
-  const c = cand();
-  const F = [["fam", "Familienname", 20, "family-name"], ["vor", "Vorname", 20, "given-name"], ["geb", "Geburtsdatum (TT.MM.JJJJ)", 10, "bday"], ["str", "Straße und Hausnummer", 40, "street-address"], ["ort", "Postleitzahl und Ort", 30, "postal-code"]];
-  const inp = {};
-  const fields = F.map(([k, l, m, ac]) => { inp[k] = h("input", { class: "in", value: c[k] || "", maxlength: m, autocomplete: ac, "aria-label": l }); return h("label", { class: "cv-f" }, inp[k], h("small", null, l)); });
-  const err = h("div", { class: "small", style: "color:var(--bad)" });
-  const save = () => {
-    if (!inp.fam.value.trim() || !inp.vor.value.trim()) { err.textContent = "Bitte Familienname und Vorname eintragen."; (inp.fam.value.trim() ? inp.vor : inp.fam).focus(); return; }
-    const x = { done: true }; F.forEach(([k]) => { x[k] = inp[k].value.trim(); });
-    store.set("cand", x);
-    if ((location.hash || "#home") === "#home") render(); else location.hash = "#home";
-  };
-  const reset = () => { store.set("cand", { fam: "", vor: "" }); render(); };
-  return h("div", { class: "wrap narrow" },
-    h("div", { class: "cover" },
-      h("div", { class: "cv-head" }, h("b", null, "Deutsch-Test für den Beruf B2"), h("span", null, "Antwortbogen S30 · Teilnehmerdaten")),
-      h("p", { class: "small", style: "margin:0" }, "Как на экзамене: заполните данные участника. Они хранятся только в этом браузере, на сервер ничего не отправляется."),
-      fields, err,
-      h("div", { class: "row" }, h("button", { class: "btn primary", onclick: save }, first ? "Начать тренировку" : "Сохранить"),
-        !first && c.done ? h("button", { class: "btn", onclick: reset }, "Сменить участника") : null)));
-}
-function paintUser() {
-  const top = document.querySelector(".top-in"); if (!top) return;
-  let a = top.querySelector(".user");
-  const n = candName();
-  if (!n) { if (a) a.remove(); return; }
-  if (!a) { a = h("a", { class: "user", href: "#profile" }); top.append(a); }
-  a.textContent = "Teilnehmer/in: " + n;
-}
 // cover page of the Antwortbogen S30: before the exam the candidate fills in the data fields
 function coverEl() {
   const c = cand();
@@ -1526,6 +1495,63 @@ function updateNav() {
   if (!c) { c = h("span", { class: "cnt" }); a.append(c); }
   c.textContent = n;
 }
+/* ---------- candidate data: the cover page of the Antwortbogen S30, filled in on the first visit ----------
+   Stored only in this browser (localStorage), never sent anywhere. */
+const LANG_CODES = [["001", "Deutsch"], ["002", "English"], ["003", "Français"], ["004", "Español"], ["005", "Italiano"], ["006", "Português"], ["007", "Magyar"],
+  ["008", "Polski"], ["009", "Русский язык"], ["010", "Český jazyk"], ["011", "Türkçe"], ["012", "عربي"], ["013", "汉语"], ["000", "andere/other"]];
+const L7 = (de, en, fr, it, tr, ru) => [de, en, fr, it, tr, ru].join(" · ");
+function viewProfile(first) {
+  const c = cand();
+  const dm = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.exec(c.geb || ""); // older entries were typed as TT.MM.JJJJ
+  if (dm) c.geb = `${dm[3]}-${dm[2].padStart(2, "0")}-${dm[1].padStart(2, "0")}`;
+  const boxIn = (k, label, n, extra) => h("label", { class: "cv-row" }, h("input", { class: "boxin", name: k, value: c[k] || "", maxlength: n, autocomplete: "off", spellcheck: "false", style: `--n:${n}`, ...extra }), h("small", null, label));
+  const dateIn = (k, label) => h("label", { class: "cv-row" }, h("input", { class: "datein", type: "date", name: k, value: c[k] || "" }), h("small", null, label));
+  const lang = h("select", { class: "datein", name: "sprache" }, h("option", { value: "" }, "—"), LANG_CODES.map(([v, l]) => h("option", { value: v, selected: c.sprache === v }, `${v} - ${l}`)));
+  const sex = ["m", "w"].map(v => h("label", { class: "cv-sex" }, h("input", { type: "radio", name: "geschl", value: v, checked: c.geschl === v }),
+    v === "m" ? L7("männlich", "male", "masculin", "maschile", "erkek", "мужской") : L7("weiblich", "female", "féminin", "femminile", "kadın", "женский")));
+  const err = h("p", { class: "cv-err", hidden: true }, "Укажите фамилию и имя.");
+  const form = h("form", { class: "s30", autocomplete: "off" },
+    h("div", { class: "s30-top" }, h("span", { class: "s30-code" }, "1 0 1 3"), h("span", { class: "s30-bar", "aria-hidden": "true" })),
+    h("div", { class: "s30-title" }, "Deutsch-Test für den Beruf"),
+    h("div", { class: "s30-ver" }, h("span", { class: "boxes4" }), h("b", null, "-S10-"), h("span", { class: "boxes6" }), h("small", null, L7("Testversion", "Test Version", "Version d'examen", "Versione d'esame", "Sınav sürümü", "Тестовая версия"))),
+    h("div", { class: "s30-data" },
+      boxIn("fam", L7("Familienname", "Surname", "Nom", "Cognome", "Soyadı", "Фамилия"), 30, { required: true }),
+      boxIn("vor", L7("Vorname", "First Name", "Prénom", "Nome", "Adı", "Имя"), 30, { required: true }),
+      dateIn("geb", L7("Geburtsdatum", "Date of Birth", "Date de naissance", "Data di nascita", "Doğum tarihi", "Дата рождения")),
+      boxIn("gort", L7("Geburtsort", "Place of Birth", "Lieu de naissance", "Luogo di nascita", "Doğum yeri", "Место рождения"), 30),
+      h("label", { class: "cv-row" }, lang, h("small", null, L7("Erstsprache", "First Language", "Langue maternelle", "Madrelingua", "Anadili", "Родной язык"))),
+      h("div", { class: "cv-row" }, h("div", { class: "cv-sexes" }, sex), h("small", null, L7("Geschlecht", "Sex", "Sexe", "Sesso", "Cinsiyeti", "Пол"))),
+      boxIn("str", L7("Straße und Hausnummer", "Street and number", "Rue et numéro", "Via e numero civico", "Sokak ve numara", "Улица и дом"), 30),
+      boxIn("ort", L7("Postleitzahl und Ort", "Postcode and town", "Code postal et ville", "CAP e città", "Posta kodu ve şehir", "Индекс и город"), 30),
+      boxIn("zentrum", L7("Prüfungszentrum", "Examination Centre", "Centre d'examen", "Centro d'esame", "Sınav merkezi", "Экзаменационное учреждение"), 30),
+      dateIn("datum", L7("Prüfungsdatum", "Date of Examination", "Date d'examen", "Data dell'esame", "Sınav tarihi", "Дата экзамена"))),
+    err,
+    h("div", { class: "s30-foot" }, h("b", null, "Antwortbogen S30"), h("span", null, "www.telc.net")));
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    const fd = new FormData(form), x = {};
+    for (const [k, v] of fd.entries()) x[k] = String(v).trim();
+    if (!x.fam || !x.vor) { err.hidden = false; return; }
+    store.set("cand", { ...x, done: true });
+    location.hash = first ? (location.hash && location.hash !== "#profile" ? location.hash : "#home") : "#home";
+    render();
+  };
+  const del = first ? null : h("button", { type: "button", class: "btn ghost", onclick: () => { store.set("cand", { fam: "", vor: "" }); render(); } }, "Сменить участника");
+  return h("div", { class: "wrap narrow" },
+    first ? null : crumbs(h("a", { href: "#home" }, "Главная"), "Данные участника"),
+    h("p", { class: "lead", style: "margin:0" }, "Как на экзамене: заполните данные участника. Они хранятся только в этом браузере, на сервер ничего не отправляется."),
+    form,
+    h("div", { class: "row" }, h("button", { class: "btn primary", onclick: () => form.requestSubmit() }, first ? "Начать тренировку" : "Сохранить"), del));
+}
+// header badge: who is signed in on this device
+function updateWho() {
+  const top = document.querySelector(".top-in"); if (!top) return;
+  let a = top.querySelector(".who");
+  const c = cand();
+  if (!c.done) { if (a) a.remove(); return; }
+  if (!a) { a = h("a", { class: "who", href: "#profile", title: "Данные участника" }); top.insertBefore(a, top.querySelector(".langsw")); }
+  a.replaceChildren(h("span", { class: "who-ico", "aria-hidden": "true" }, "👤"), h("span", null, `${c.vor} ${c.fam}`));
+}
 function render() {
   stopAll();
   const r = (location.hash || "#home").slice(1);
@@ -1542,7 +1568,7 @@ function render() {
   app().replaceChildren(v);
   const top = ["home", "review", "exam", "voice", "learn"].includes(sec) ? sec : "home";
   document.querySelectorAll(".nav a").forEach(a => a.classList.toggle("on", a.getAttribute("href") === "#" + (SEC[sec] ? "" : top)));
-  refreshAI(); updateNav(); paintUser();
+  refreshAI(); updateNav(); updateWho();
 }
 let lastHash = location.hash;
 window.addEventListener("hashchange", () => { render(); if (location.hash !== lastHash) window.scrollTo(0, 0); lastHash = location.hash; });
