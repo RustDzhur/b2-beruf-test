@@ -330,3 +330,21 @@ r28|{~1}: değerlendirilmedi
 319|Katılımcıyı değiştir
 320|Lütfen soyadınızı ve adınızı girin.
 321|Katılımcı bilgileri
+322|İlerleme senkronizasyonu
+323|Senkronizasyon açık:
+324|Son senkronizasyon:
+325|Şimdi senkronize et
+326|Çıkış yap
+327|Giriş bağlantısı gönder
+328|İlerlemenizin (sonuçlar, hatalar, taslaklar) telefonda ve bilgisayarda aynı olması için e-posta ile giriş yapın. Ad ve adres bilgilerinizin olduğu form yalnızca bu cihazda kalır.
+329|İlerlemeyi indir (dosya)
+330|Dosyadan yükle
+331|Bu dosya uygun değil.
+332|E-posta adresinizi girin.
+333|Bağlantı gönderildi. E-postayı bu cihazda açın ve bağlantıya dokunun.
+334|Bağlantının gönderildiği e-postayı onaylayın:
+335|Firebase'de bağlantıyla giriş etkin değil (Authentication → Sign-in method → Email link).
+336|Bu site adresi Firebase'e eklenmemiş (Authentication → Settings → Authorized domains).
+337|Firestore veritabanı henüz oluşturulmadı veya erişim kuralları yayımlanmadı.
+338|Giriş bağlantısının süresi doldu veya zaten kullanıldı. Yenisini isteyin.
+339|Senkronizasyon başarısız. İnternet bağlantınızı kontrol edip tekrar deneyin.

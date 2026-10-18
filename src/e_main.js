@@ -425,7 +425,8 @@ function viewProfile(first) {
     first ? null : crumbs(h("a", { href: "#home" }, "Главная"), "Данные участника"),
     h("p", { class: "lead", style: "margin:0" }, "Как на экзамене: заполните данные участника. Они хранятся только в этом браузере, на сервер ничего не отправляется."),
     form,
-    h("div", { class: "row" }, h("button", { class: "btn primary", onclick: () => form.requestSubmit() }, first ? "Начать тренировку" : "Сохранить"), del));
+    h("div", { class: "row" }, h("button", { class: "btn primary", onclick: () => form.requestSubmit() }, first ? "Начать тренировку" : "Сохранить"), del),
+    first ? null : syncCard());
 }
 // header badge: who is signed in on this device
 function updateWho() {
@@ -434,7 +435,7 @@ function updateWho() {
   const c = cand();
   if (!c.done) { if (a) a.remove(); return; }
   if (!a) { a = h("a", { class: "who", href: "#profile", title: "Данные участника" }); top.insertBefore(a, top.querySelector(".langsw")); }
-  a.replaceChildren(h("span", { class: "who-ico", "aria-hidden": "true" }, "👤"), h("span", null, `${c.vor} ${c.fam}`));
+  a.replaceChildren(h("span", { class: "who-ico", "aria-hidden": "true" }, "👤"), h("span", null, `${c.vor} ${c.fam}`), SYNC.user ? h("span", { class: "who-sync", title: SYNC.user.email || "" }, "☁") : null);
 }
 function render() {
   stopAll();
@@ -458,4 +459,5 @@ let lastHash = location.hash;
 window.addEventListener("hashchange", () => { render(); if (location.hash !== lastHash) window.scrollTo(0, 0); lastHash = location.hash; });
 initLang();
 audioReady.then(render);
+initSync();
 })();

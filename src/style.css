@@ -443,3 +443,5 @@ table.score th { font-size: 12px; color: var(--muted); font-weight: 600; }
 .who { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border: 1px solid var(--line); border-radius: 999px; font-size: 13.5px; color: var(--ink); text-decoration: none; max-width: 220px; }
 .who span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .who:hover { background: var(--soft); }
+.who-sync { color: var(--accent); font-size: 14px; }
+.sync .in[type="email"] { flex: 1 1 220px; }

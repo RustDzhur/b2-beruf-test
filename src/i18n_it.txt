@@ -330,3 +330,21 @@ r28|{~1}: non valutato
 319|Cambia partecipante
 320|Inserisci cognome e nome.
 321|Dati del candidato
+322|Sincronizzazione dei progressi
+323|Sincronizzazione attiva:
+324|Ultima sincronizzazione:
+325|Sincronizza ora
+326|Esci
+327|Invia link di accesso
+328|Accedi con l'e-mail perché i tuoi progressi (risultati, errori, bozze) siano uguali su telefono e computer. Il modulo con nome e indirizzo resta solo su questo dispositivo.
+329|Scarica i progressi (file)
+330|Carica da file
+331|Questo file non è adatto.
+332|Inserisci l'e-mail.
+333|Link inviato. Apri l'e-mail su questo dispositivo e tocca il link.
+334|Conferma l'e-mail a cui è arrivato il link:
+335|L'accesso tramite link non è attivo in Firebase (Authentication → Sign-in method → Email link).
+336|L'indirizzo di questo sito non è aggiunto in Firebase (Authentication → Settings → Authorized domains).
+337|Il database Firestore non è ancora creato o le regole di accesso non sono pubblicate.
+338|Il link di accesso è scaduto o è già stato usato. Richiedine uno nuovo.
+339|Sincronizzazione non riuscita. Controlla la connessione e riprova.

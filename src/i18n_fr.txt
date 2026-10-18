@@ -330,3 +330,21 @@ r28|{~1} : non évalué
 319|Changer de participant
 320|Veuillez indiquer votre nom et votre prénom.
 321|Données du candidat
+322|Synchronisation de la progression
+323|Synchronisation activée :
+324|Dernière synchronisation :
+325|Synchroniser maintenant
+326|Se déconnecter
+327|Envoyer le lien de connexion
+328|Connectez-vous par e-mail pour que votre progression (résultats, erreurs, brouillons) soit la même sur téléphone et ordinateur. Le formulaire avec votre nom et votre adresse reste uniquement sur cet appareil.
+329|Télécharger la progression (fichier)
+330|Charger depuis un fichier
+331|Ce fichier ne convient pas.
+332|Saisissez votre e-mail.
+333|Lien envoyé. Ouvrez l'e-mail sur cet appareil et appuyez sur le lien.
+334|Confirmez l'e-mail auquel le lien a été envoyé :
+335|La connexion par lien n'est pas activée dans Firebase (Authentication → Sign-in method → Email link).
+336|L'adresse de ce site n'est pas ajoutée dans Firebase (Authentication → Settings → Authorized domains).
+337|La base Firestore n'est pas encore créée ou les règles d'accès ne sont pas publiées.
+338|Le lien de connexion a expiré ou a déjà été utilisé. Demandez-en un nouveau.
+339|La synchronisation a échoué. Vérifiez votre connexion internet et réessayez.

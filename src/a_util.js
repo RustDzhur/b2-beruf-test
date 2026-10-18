@@ -23,9 +23,10 @@ const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) {
 const rnd = (a) => a[Math.floor(Math.random() * a.length)];
 const norm = (s) => String(s || "").toLowerCase().replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss").replace(/\s+/g, " ").trim();
 
+const STORE_HOOKS = []; // called after every store.set (progress sync listens here)
 const store = {
   get(k, d) { try { const v = localStorage.getItem("dtb." + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
-  set(k, v) { try { localStorage.setItem("dtb." + k, JSON.stringify(v)); } catch {} }
+  set(k, v) { try { localStorage.setItem("dtb." + k, JSON.stringify(v)); } catch {} STORE_HOOKS.forEach(f => f(k)); }
 };
 function markActive() { const d = store.get("days", []); if (!d.includes(today())) { d.push(today()); store.set("days", d.slice(-400)); } }
 function saveRes(vid, score, max) {
