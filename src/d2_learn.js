@@ -64,7 +64,7 @@ function viewLearn() {
 
   const sp3 = sec("sp3", "Sprechen Teil 3: решение проблемы",
     "Диалоги A и B даны как образец. Это один из многих возможных вариантов.",
-    DB.SP3.map(s => acc(`Ситуация ${s.n}`, h("p", { style: "margin:0" }, s.text), h("ul", { class: "small", style: "margin:0;padding-left:20px" }, s.points.map(p => h("li", null, p))), learnDialog("Ситуация " + s.n, s.model))));
+    DB.SP3.map(s => acc(`Ситуация ${s.n}`, SRC_CLAUDE(), h("p", { style: "margin:0" }, s.text), h("ul", { class: "small", style: "margin:0;padding-left:20px" }, s.points.map(p => h("li", null, p))), learnDialog("Ситуация " + s.n, s.model))));
 
   return h("div", { class: "wrap narrow" },
     crumbs(h("a", { href: "#home" }, "Главная"), "Учить наизусть"),
