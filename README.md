@@ -34,12 +34,21 @@ OPENAI_API_KEY=sk-... npm start
 
 ### Vercel (продакшен)
 
-1. Firebase Console → ⚙ Project settings → Service accounts → **Generate new private key**. Скачается JSON. Ключ должен быть от того же проекта, что и тренажёр (`prufung-6e9b1`).
+1. Откройте [Firebase Console → Project settings → Service accounts](https://console.firebase.google.com/project/prufung-6e9b1/settings/serviceaccounts/adminsdk) → **Generate new private key**. Браузер скачает файл вида `prufung-6e9b1-firebase-adminsdk-xxxxx-xxxxxxxxxx.json`. Ключ должен быть от того же проекта, что и тренажёр (`prufung-6e9b1`).
 2. Vercel → Project → Settings → Environment Variables:
-   - `ADMIN_PASSWORD` — пароль для входа в `/admin`;
-   - `FIREBASE_SERVICE_ACCOUNT` — содержимое JSON-ключа (можно одной строкой; также поддерживается base64 в `FIREBASE_SERVICE_ACCOUNT_B64`);
+   - `ADMIN_PASSWORD` — пароль для входа в `/admin` (придумайте сами, это не пароль Firebase);
+   - `FIREBASE_SERVICE_ACCOUNT` — содержимое JSON-ключа целиком (можно одной строкой; также поддерживается base64 в `FIREBASE_SERVICE_ACCOUNT_B64`);
    - по желанию `ADMIN_SECRET` — стабильный ключ подписи cookie (иначе выводится из пароля).
 3. Redeploy и откройте `https://b2-beruf-test.vercel.app/admin`.
+
+Если Vercel не принимает многострочный JSON, положите ключ в base64:
+
+```bash
+base64 -i ~/Downloads/prufung-6e9b1-firebase-adminsdk-xxxxx-xxxxxxxxxx.json | tr -d '\n'
+# вывод целиком -> FIREBASE_SERVICE_ACCOUNT_B64
+```
+
+Файл ключа не коммитьте: шаблоны `*-firebase-adminsdk-*.json`, `*adminsdk*.json`, `*service-account*.json` уже в `.gitignore`.
 
 ### Локально
 

@@ -8,3 +8,7 @@ public/
 
 firebase-service-account*.json
 *service-account*.json
+*-firebase-adminsdk-*.json
+*adminsdk*.json
+serviceAccountKey*.json
+key.json
