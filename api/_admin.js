@@ -132,18 +132,54 @@ function clearLoginHits(ip) { loginHits.delete(String(ip || "x")); }
 
 let saCache = { raw: "", value: null };
 
+// Vercel/dashboard copy-paste often turns real line breaks into literal \n, and some tools
+// wrap the key in an extra JSON string. Repair only the structural escapes, never escapes
+// inside quoted values (private_key must keep its \n escapes until JSON.parse).
+function repairJsonText(text) {
+  let out = "", inString = false, escaped = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inString) {
+      out += c;
+      if (escaped) escaped = false;
+      else if (c === "\\") escaped = true;
+      else if (c === '"') inString = false;
+      continue;
+    }
+    if (c === '"') { inString = true; out += c; continue; }
+    if (c === "\\" && i + 1 < text.length) {
+      const n = text[i + 1];
+      if (n === "n" || n === "r") { out += "\n"; i++; continue; }
+      if (n === "t") { out += "\t"; i++; continue; }
+      if (n === '"') { out += '"'; i++; continue; }
+      if (n === "\\") { out += "\\"; i++; continue; }
+    }
+    out += c;
+  }
+  return out;
+}
+
+function parseServiceAccount(text) {
+  let t = String(text || "").trim();
+  if (t.startsWith('"') && t.endsWith('"') && t.slice(1, -1).trimStart().startsWith("{")) {
+    t = t.slice(1, -1);
+  }
+  if (!t.startsWith("{")) {
+    try { t = Buffer.from(t, "base64").toString("utf8").trim(); }
+    catch { throw adminError("service_account_invalid", 500, "FIREBASE_SERVICE_ACCOUNT не читается как base64."); }
+  }
+  try { return JSON.parse(t); }
+  catch {
+    try { return JSON.parse(repairJsonText(t)); }
+    catch { throw adminError("service_account_invalid", 500, "FIREBASE_SERVICE_ACCOUNT не читается как JSON. Скопируйте файл ключа целиком."); }
+  }
+}
+
 function serviceAccount() {
   const raw = env("FIREBASE_SERVICE_ACCOUNT") || env("FIREBASE_SERVICE_ACCOUNT_B64");
   if (!raw) return null;
   if (saCache.raw === raw) return saCache.value;
-  let text = raw.trim();
-  if (!text.startsWith("{")) {
-    try { text = Buffer.from(text, "base64").toString("utf8"); }
-    catch { throw adminError("service_account_invalid", 500, "FIREBASE_SERVICE_ACCOUNT не читается как base64."); }
-  }
-  let json;
-  try { json = JSON.parse(text); }
-  catch { throw adminError("service_account_invalid", 500, "FIREBASE_SERVICE_ACCOUNT не читается как JSON."); }
+  const json = parseServiceAccount(raw);
   if (!json.client_email || !json.private_key) {
     throw adminError("service_account_invalid", 500, "В ключе нет client_email/private_key.");
   }
@@ -620,6 +656,8 @@ module.exports = {
   dashboard,
   buildDashboard,
   partOf,
+  parseServiceAccount,
+  repairJsonText,
   streakOf,
   lastDays,
 };

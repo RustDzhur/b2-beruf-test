@@ -154,3 +154,22 @@ test("loadUsers signs a service-account JWT and parses Firestore documents", asy
     delete process.env.FIREBASE_SERVICE_ACCOUNT;
   }
 });
+
+test("service-account parser tolerates literal \\n and an extra JSON-string wrapper", () => {
+  const sa = {
+    type: "service_account",
+    project_id: "prufung-6e9b1",
+    private_key: "-----BEGIN PRIVATE KEY-----\nABC\nDEF\n-----END PRIVATE KEY-----\n",
+    client_email: "firebase-adminsdk@example.iam.gserviceaccount.com",
+  };
+  const pretty = JSON.stringify(sa, null, 2);
+  const broken = pretty.replace(/\n/g, "\\n");
+  const a = admin.parseServiceAccount(broken);
+  assert.equal(a.project_id, "prufung-6e9b1");
+  assert.ok(a.private_key.includes("\n"));
+
+  const quoted = JSON.stringify(pretty);
+  const b = admin.parseServiceAccount(quoted);
+  assert.equal(b.client_email, sa.client_email);
+  assert.ok(b.private_key.includes("\n"));
+});
