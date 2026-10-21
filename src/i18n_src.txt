@@ -423,3 +423,13 @@ r28|{~1}: not rated|{~1}: nicht bewertet
 412|80%+ in Hören|80 %+ in Hören
 413|80%+ in Schreiben|80 %+ in Schreiben
 414|Correct answers|Richtige Antworten
+415|These points will help you|Diese Stichpunkte helfen Ihnen
+416|Talk about a topic|Über ein Thema sprechen
+417|Answer the examiner’s questions|Fragen der Prüferin / des Prüfers beantworten
+418|Explain an aspect of your partner’s presentation|Einen Aspekt aus dem Beitrag der Partnerin / des Partners erläutern
+419|Talking with colleagues|Mit Kolleginnen und Kollegen sprechen
+420|Discuss possible solutions|Lösungswege diskutieren
+421|about 2 minutes per person|ca. 2 Minuten pro Person
+422|about 3 minutes|ca. 3 Minuten
+423|about 4 minutes|ca. 4 Minuten
+424|Oral exam · Sprechen · in pairs, about 16 minutes · no preparation time|Mündliche Prüfung · Sprechen · Paarprüfung, ca. 16 Minuten · keine Vorbereitungszeit

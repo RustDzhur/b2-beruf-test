@@ -423,3 +423,13 @@ r28|{~1}: non valutato
 412|80%+ in Hören
 413|80%+ in Schreiben
 414|Risposte corrette
+415|Questi punti ti aiuteranno
+416|Parlare di un argomento
+417|Rispondere alle domande dell’esaminatore
+418|Spiegare un aspetto della presentazione del partner
+419|Parlare con i colleghi
+420|Discutere possibili soluzioni
+421|circa 2 minuti a persona
+422|circa 3 minuti
+423|circa 4 minuti
+424|Esame orale · Sprechen · in coppia, circa 16 minuti · senza preparazione

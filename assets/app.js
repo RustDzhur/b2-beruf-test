@@ -993,13 +993,13 @@ const RULES_COMMON = "Antworte immer nur auf Deutsch, in 2–4 kurzen Sätzen, n
 
 // strip in the style of the "Aufgabenblätter" of the oral exam (pair exam, about 16 minutes, no preparation time)
 const SP_HEAD = {
-  sp1: [["Teil 1A", "Über ein Thema sprechen", "ca. 2 Minuten pro Person"], ["Teil 1B", "Fragen der Prüferin / des Prüfers beantworten", ""], ["Teil 1C", "Einen Aspekt aus dem Beitrag der Partnerin / des Partners erläutern", ""]],
-  sp2: [["Teil 2", "Mit Kolleginnen und Kollegen sprechen", "ca. 3 Minuten"]],
-  sp3: [["Teil 3", "Lösungswege diskutieren", "ca. 4 Minuten"]],
+  sp1: [["Teil 1A", "Говорить на тему", "около 2 минут на человека"], ["Teil 1B", "Отвечать на вопросы экзаменатора", ""], ["Teil 1C", "Пояснить аспект из выступления партнёра", ""]],
+  sp2: [["Teil 2", "Разговор с коллегами", "около 3 минут"]],
+  sp3: [["Teil 3", "Обсуждать пути решения", "около 4 минут"]],
 };
 const spHead = (k) => h("div", { class: "sp-head" }, h("span", { class: "sp-ico" }, icon("talk")),
-  h("div", null, h("div", { class: "sp-k" }, "Mündliche Prüfung · Sprechen · Paarprüfung, ca. 16 Minuten · keine Vorbereitungszeit"),
-    SP_HEAD[k].map(([t, d, m]) => h("div", { class: "sp-p" }, h("b", null, t), " " + d, m ? h("span", null, ` (${m})`) : null))));
+  h("div", null, h("div", { class: "sp-k" }, T("Устный экзамен · Sprechen · в паре, около 16 минут · без подготовки")),
+    SP_HEAD[k].map(([t, d, m]) => h("div", { class: "sp-p" }, h("b", null, t), " " + T(d), m ? h("span", null, ` (${T(m)})`) : null))));
 function rSprechen3(it) {
   const m = modelBlock(it.model, "Образец диалога", "A — это вы, B — ваш партнёр. Это один из возможных вариантов: берите структуру и фразы, но говорите своими словами.");
   const chat = chatPartner({
@@ -1010,7 +1010,7 @@ function rSprechen3(it) {
   });
   return h("div", { class: "stack" }, spHead("sp3"), h("div", { class: "two" },
     h("div", { class: "stack" },
-      h("div", { class: "card stack" }, h("div", { class: "eyebrow" }, "Situation " + it.n), h("p", { class: "qt", style: "margin:0" }, it.text), h("div", { class: "eyebrow" }, "Diese Stichpunkte helfen Ihnen"), h("ul", { style: "margin:0;padding-left:20px" }, it.points.map(p => h("li", null, p))),
+      h("div", { class: "card stack" }, h("div", { class: "eyebrow" }, T("Ситуация") + " " + it.n), h("p", { class: "qt", style: "margin:0" }, it.text), h("div", { class: "eyebrow" }, T("Эти пункты помогут вам")), h("ul", { style: "margin:0;padding-left:20px" }, it.points.map(p => h("li", null, p))),
         h("div", { class: "row" }, m.btn)), m.box, chat),
     rmCard("sp3")));
 }
@@ -1025,7 +1025,7 @@ function rSprechen2(it) {
   });
   return h("div", { class: "stack" }, spHead("sp2"), h("div", { class: "two" },
     h("div", { class: "stack" },
-      h("div", { class: "card stack" }, h("div", { class: "eyebrow" }, "Thema " + it.n + " · " + it.title), h("p", { class: "qt", style: "margin:0" }, it.situation), h("ul", { style: "margin:0;padding-left:20px" }, it.points.map(p => h("li", null, p))),
+      h("div", { class: "card stack" }, h("div", { class: "eyebrow" }, T("Тема") + " " + it.n + " · " + it.title), h("p", { class: "qt", style: "margin:0" }, it.situation), h("ul", { style: "margin:0;padding-left:20px" }, it.points.map(p => h("li", null, p))),
         h("div", { class: "row" }, m.btn)), m.box, chat),
     rmCard("sp2")));
 }

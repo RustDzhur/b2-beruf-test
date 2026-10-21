@@ -423,3 +423,13 @@ r28|{~1}: değerlendirilmedi
 412|Hören'de %80+
 413|Schreiben'de %80+
 414|Doğru cevaplar
+415|Bu noktalar size yardımcı olacak
+416|Bir konu hakkında konuşmak
+417|Sınav görevlisinin sorularını yanıtlamak
+418|Partnerin sunumundan bir yönü açıklamak
+419|Meslektaşlarla konuşmak
+420|Çözüm yollarını tartışmak
+421|kişi başı yaklaşık 2 dakika
+422|yaklaşık 3 dakika
+423|yaklaşık 4 dakika
+424|Sözlü sınav · Sprechen · ikili, yaklaşık 16 dakika · hazırlık süresi yok

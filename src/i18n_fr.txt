@@ -423,3 +423,13 @@ r28|{~1} : non évalué
 412|80 %+ en Hören
 413|80 %+ en Schreiben
 414|Réponses correctes
+415|Ces points vous aideront
+416|Parler d’un thème
+417|Répondre aux questions de l’examinateur
+418|Expliquer un aspect de l’exposé du partenaire
+419|Parler avec des collègues
+420|Discuter des solutions
+421|environ 2 minutes par personne
+422|environ 3 minutes
+423|environ 4 minutes
+424|Examen oral · Sprechen · en binôme, environ 16 minutes · sans préparation
