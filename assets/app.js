@@ -27,6 +27,12 @@ const store = {
   get(k, d) { try { const v = localStorage.getItem("dtb." + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
   set(k, v) { try { localStorage.setItem("dtb." + k, JSON.stringify(v)); } catch {} if (store.onSet) store.onSet(k); }
 };
+// Test mode is a per-tab, temporary choice. A stored "learn" must never turn
+// every later test into a non-interactive answer sheet.
+const modeStore = {
+  get() { try { const v = sessionStorage.getItem("dtb.mode"); return ["train", "exam", "learn"].includes(v) ? v : "train"; } catch { return "train"; } },
+  set(v) { try { sessionStorage.setItem("dtb.mode", v); } catch {} }
+};
 function markActive() { const d = store.get("days", []); if (!d.includes(today())) { d.push(today()); store.set("days", d.slice(-400)); } }
 function saveRes(vid, score, max) {
   const r = store.get("res", {});
@@ -441,7 +447,8 @@ ${it.kind === "mc" ? it.opts.map((o, i) => `${LET[i]}) ${o}`).join("\n") : it.ki
 function modeSwitch(cur, onPick) {
   return h("div", { class: "row" },
     h("div", { class: "seg", role: "tablist" }, Object.entries(MODES).map(([k, v]) => h("button", { class: k === cur ? "on" : "", role: "tab", "aria-selected": k === cur ? "true" : "false", onclick: () => onPick(k) }, v))),
-    h("span", { class: "modehint" }, MODE_HINT[cur]));
+    h("span", { class: "modehint" }, MODE_HINT[cur]),
+    cur === "learn" ? h("button", { class: "btn small primary", onclick: () => onPick("train") }, "▶ ", MODES.train) : null);
 }
 const srcNote = () => null;
 
@@ -1850,7 +1857,7 @@ function variantPicker(sec, idx) {
 function viewItem(sec, idx) {
   const s = SEC[sec]; const list = s.list(); const it = list[idx - 1];
   if (!it) return viewSec(sec);
-  const mode = store.get("mode", "train");
+  const mode = modeStore.get();
   const next = idx < list.length ? `#${sec}.${idx + 1}` : null;
   const ctx = { restart: () => render(), next };
   LAST_QZ = null;
@@ -1862,7 +1869,7 @@ function viewItem(sec, idx) {
       h("div", { class: "row" }, idx > 1 ? h("a", { class: "btn small", href: `#${sec}.${idx - 1}` }, "←") : null, next ? h("a", { class: "btn small", href: next }, "→") : null)),
     variantPicker(sec, idx),
     h("p", { class: "lead", style: "margin:0" }, s.task),
-    NO_MODE[sec] ? null : modeSwitch(mode, (m) => { store.set("mode", m); render(); }),
+    NO_MODE[sec] ? null : modeSwitch(mode, (m) => { modeStore.set(m); render(); }),
     PAPER_SECS.includes(sec) ? h("label", { class: "row small" }, h("input", { type: "checkbox", checked: store.get("paper", true), onchange: (e) => { store.set("paper", e.target.checked); render(); } }), "Бланк как на экзамене") : null,
     NO_MODE[sec] ? null : srcNote(it.src),
     paperOn(sec) ? sheetEl(sec, s, it, body, qz) : body);
@@ -2215,6 +2222,7 @@ function render() {
 }
 let lastHash = location.hash;
 window.addEventListener("hashchange", () => { render(); if (location.hash !== lastHash) window.scrollTo(0, 0); lastHash = location.hash; });
+try { localStorage.removeItem("dtb.mode"); } catch {}
 initTheme();
 initLang();
 cloudBoot(() => render());

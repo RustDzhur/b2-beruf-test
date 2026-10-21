@@ -104,7 +104,7 @@ function variantPicker(sec, idx) {
 function viewItem(sec, idx) {
   const s = SEC[sec]; const list = s.list(); const it = list[idx - 1];
   if (!it) return viewSec(sec);
-  const mode = store.get("mode", "train");
+  const mode = modeStore.get();
   const next = idx < list.length ? `#${sec}.${idx + 1}` : null;
   const ctx = { restart: () => render(), next };
   LAST_QZ = null;
@@ -116,7 +116,7 @@ function viewItem(sec, idx) {
       h("div", { class: "row" }, idx > 1 ? h("a", { class: "btn small", href: `#${sec}.${idx - 1}` }, "←") : null, next ? h("a", { class: "btn small", href: next }, "→") : null)),
     variantPicker(sec, idx),
     h("p", { class: "lead", style: "margin:0" }, s.task),
-    NO_MODE[sec] ? null : modeSwitch(mode, (m) => { store.set("mode", m); render(); }),
+    NO_MODE[sec] ? null : modeSwitch(mode, (m) => { modeStore.set(m); render(); }),
     PAPER_SECS.includes(sec) ? h("label", { class: "row small" }, h("input", { type: "checkbox", checked: store.get("paper", true), onchange: (e) => { store.set("paper", e.target.checked); render(); } }), "Бланк как на экзамене") : null,
     NO_MODE[sec] ? null : srcNote(it.src),
     paperOn(sec) ? sheetEl(sec, s, it, body, qz) : body);
@@ -469,6 +469,7 @@ function render() {
 }
 let lastHash = location.hash;
 window.addEventListener("hashchange", () => { render(); if (location.hash !== lastHash) window.scrollTo(0, 0); lastHash = location.hash; });
+try { localStorage.removeItem("dtb.mode"); } catch {}
 initTheme();
 initLang();
 cloudBoot(() => render());

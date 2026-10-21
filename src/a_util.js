@@ -27,6 +27,12 @@ const store = {
   get(k, d) { try { const v = localStorage.getItem("dtb." + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
   set(k, v) { try { localStorage.setItem("dtb." + k, JSON.stringify(v)); } catch {} if (store.onSet) store.onSet(k); }
 };
+// Test mode is a per-tab, temporary choice. A stored "learn" must never turn
+// every later test into a non-interactive answer sheet.
+const modeStore = {
+  get() { try { const v = sessionStorage.getItem("dtb.mode"); return ["train", "exam", "learn"].includes(v) ? v : "train"; } catch { return "train"; } },
+  set(v) { try { sessionStorage.setItem("dtb.mode", v); } catch {} }
+};
 function markActive() { const d = store.get("days", []); if (!d.includes(today())) { d.push(today()); store.set("days", d.slice(-400)); } }
 function saveRes(vid, score, max) {
   const r = store.get("res", {});

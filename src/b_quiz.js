@@ -162,6 +162,7 @@ ${it.kind === "mc" ? it.opts.map((o, i) => `${LET[i]}) ${o}`).join("\n") : it.ki
 function modeSwitch(cur, onPick) {
   return h("div", { class: "row" },
     h("div", { class: "seg", role: "tablist" }, Object.entries(MODES).map(([k, v]) => h("button", { class: k === cur ? "on" : "", role: "tab", "aria-selected": k === cur ? "true" : "false", onclick: () => onPick(k) }, v))),
-    h("span", { class: "modehint" }, MODE_HINT[cur]));
+    h("span", { class: "modehint" }, MODE_HINT[cur]),
+    cur === "learn" ? h("button", { class: "btn small primary", onclick: () => onPick("train") }, "▶ ", MODES.train) : null);
 }
 const srcNote = () => null;
