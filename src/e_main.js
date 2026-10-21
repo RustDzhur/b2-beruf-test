@@ -114,7 +114,7 @@ function viewItem(sec, idx) {
   const qz = LAST_QZ;
   return h("div", { class: "wrap" },
     crumbs(h("a", { href: "#home" }, "Главная"), h("a", { href: "#" + sec }, s.t), s.label(it)),
-    h("div", { class: "spread" }, h("div", { class: "stack", style: "gap:4px" }, h("div", { class: "eyebrow" }, `${s.grp} · задания ${s.nums}`), h("h1", null, s.t + " · " + s.label(it))),
+    h("div", { class: "spread" }, h("div", { class: "stack", style: "gap:4px" }, h("div", { class: "eyebrow" }, `${s.grp} · задания ${s.nums} · ${T("Попыток")}: ${(resOf(vid)?.n || 0) + 1}`), h("h1", null, s.t + " · " + s.label(it))),
       h("div", { class: "row" }, idx > 1 ? h("a", { class: "btn small", href: `#${sec}.${idx - 1}` }, "←") : null, next ? h("a", { class: "btn small", href: next }, "→") : null)),
     variantPicker(sec, idx),
     h("p", { class: "lead", style: "margin:0" }, s.task),

@@ -178,7 +178,7 @@ function pgData() {
     else if (a.id === "schreiben") earned = (sections.schreiben.pct || 0) >= 80 && sections.schreiben.tasks >= 2;
     return Object.assign({}, a, { earned });
   });
-  return { days: days.length, firstDay: days[0] || null, tasks, attempts, answers, scorePct, bestPct, success, mid, fail, failures: wrongArr.length, sections, parts, weak, recentWrong: wrongArr.slice(0, 5), activity, trend, streak: st, achievements, earned: achievements.filter(a => a.earned).length };
+  return { days: days.length, firstDay: days[0] || null, tasks, attempts, answers, scorePct, bestPct, success, mid, fail, failures: wrongArr.length, sections, parts, weak, recentWrong: wrongArr.slice(0, 20), activity, trend, streak: st, achievements, earned: achievements.filter(a => a.earned).length };
 }
 
 /* --------------------------------------------------------------- charts --- */

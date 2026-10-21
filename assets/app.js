@@ -1507,7 +1507,7 @@ function pgData() {
     else if (a.id === "schreiben") earned = (sections.schreiben.pct || 0) >= 80 && sections.schreiben.tasks >= 2;
     return Object.assign({}, a, { earned });
   });
-  return { days: days.length, firstDay: days[0] || null, tasks, attempts, answers, scorePct, bestPct, success, mid, fail, failures: wrongArr.length, sections, parts, weak, recentWrong: wrongArr.slice(0, 5), activity, trend, streak: st, achievements, earned: achievements.filter(a => a.earned).length };
+  return { days: days.length, firstDay: days[0] || null, tasks, attempts, answers, scorePct, bestPct, success, mid, fail, failures: wrongArr.length, sections, parts, weak, recentWrong: wrongArr.slice(0, 20), activity, trend, streak: st, achievements, earned: achievements.filter(a => a.earned).length };
 }
 
 /* --------------------------------------------------------------- charts --- */
@@ -1958,7 +1958,7 @@ function viewItem(sec, idx) {
   const qz = LAST_QZ;
   return h("div", { class: "wrap" },
     crumbs(h("a", { href: "#home" }, "Главная"), h("a", { href: "#" + sec }, s.t), s.label(it)),
-    h("div", { class: "spread" }, h("div", { class: "stack", style: "gap:4px" }, h("div", { class: "eyebrow" }, `${s.grp} · задания ${s.nums}`), h("h1", null, s.t + " · " + s.label(it))),
+    h("div", { class: "spread" }, h("div", { class: "stack", style: "gap:4px" }, h("div", { class: "eyebrow" }, `${s.grp} · задания ${s.nums} · ${T("Попыток")}: ${(resOf(vid)?.n || 0) + 1}`), h("h1", null, s.t + " · " + s.label(it))),
       h("div", { class: "row" }, idx > 1 ? h("a", { class: "btn small", href: `#${sec}.${idx - 1}` }, "←") : null, next ? h("a", { class: "btn small", href: next }, "→") : null)),
     variantPicker(sec, idx),
     h("p", { class: "lead", style: "margin:0" }, s.task),
