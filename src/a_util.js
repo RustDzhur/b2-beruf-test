@@ -33,6 +33,9 @@ function saveRes(vid, score, max) {
   const o = r[vid] || { best: 0, n: 0 };
   o.last = score; o.max = max; o.n++; o.ts = Date.now(); o.best = Math.max(o.best || 0, score);
   r[vid] = o; store.set("res", r); markActive();
+  // compact activity log for the teacher cabinet (last 2000 attempts); synced to Firestore
+  const log = store.get("log", []);
+  if (Array.isArray(log)) { log.push({ t: o.ts, vid, sc: score, mx: max }); store.set("log", log.slice(-2000)); }
 }
 const resOf = (vid) => store.get("res", {})[vid];
 function trackItems(list) { // list: [{key, n, ok, vid, sec}]

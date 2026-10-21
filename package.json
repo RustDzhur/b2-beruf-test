@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "build": "python3 src/build_web.py",
-    "audio": "python3 src/gen_audio.py"
+    "audio": "python3 src/gen_audio.py",
+    "test": "node --test tests/admin.test.js"
   },
   "license": "UNLICENSED"
 }

@@ -33,6 +33,9 @@ function saveRes(vid, score, max) {
   const o = r[vid] || { best: 0, n: 0 };
   o.last = score; o.max = max; o.n++; o.ts = Date.now(); o.best = Math.max(o.best || 0, score);
   r[vid] = o; store.set("res", r); markActive();
+  // compact activity log for the teacher cabinet (last 2000 attempts); synced to Firestore
+  const log = store.get("log", []);
+  if (Array.isArray(log)) { log.push({ t: o.ts, vid, sc: score, mx: max }); store.set("log", log.slice(-2000)); }
 }
 const resOf = (vid) => store.get("res", {})[vid];
 function trackItems(list) { // list: [{key, n, ok, vid, sec}]
@@ -1126,10 +1129,10 @@ function initLang() {
 
 /* ---------- optional cloud sync of progress (Firebase Auth + Firestore over REST, no SDK, no own server) ----------
    Called from: e_main.js (viewProfile submit -> cloudConnect, boot -> cloudBoot, updateWho -> cloudOn) and build_web.py (concat before e_main.js).
-   Reads/writes: localStorage keys dtb.{res,wrong,nstat,days,drafts,feedback,cand} + dtb.cloud (session), dtb.syncts; Firestore doc users/{uid} = {data: JSON string, updated: ms}.
+   Reads/writes: localStorage keys dtb.{res,wrong,nstat,days,drafts,feedback,cand,log} + dtb.cloud (session), dtb.syncts; Firestore doc users/{uid} = {data: JSON string, updated: ms}.
    The web apiKey is public by design; access is protected by Firestore rules (uid == doc id). Without a password everything stays local. */
 const FB = { key: "AIzaSyA5_PmCPlHg-9P1OD9LQFHXXF4Svj6Vajo", project: "prufung-6e9b1" };
-const SYNC_KEYS = ["res", "wrong", "nstat", "days", "drafts", "feedback", "cand"];
+const SYNC_KEYS = ["res", "wrong", "nstat", "days", "drafts", "feedback", "cand", "log"];
 const cloud = { s: store.get("cloud", null), timer: null, state: "" };
 const cloudOn = () => !!cloud.s;
 
@@ -1170,8 +1173,13 @@ function mergeCloud(cd, cupd) {
     if (!SYNC_KEYS.includes(k)) return;
     const loc = store.get(k, null);
     if (loc == null) { store.set(k, cd[k]); return; }
-    if (k === "days") store.set(k, [...new Set([...(loc || []), ...cd[k]])].sort().slice(-400));
-    else if (k === "res") { const m = { ...loc }; Object.entries(cd[k]).forEach(([v, o]) => { if (!m[v] || (o.ts || 0) > (m[v].ts || 0)) m[v] = o; }); store.set(k, m); }
+    if (k === "days") store.set(k, [...new Set([...(loc || []), ...(cd[k] || [])])].sort().slice(-400));
+    else if (k === "res") { const m = { ...loc }; Object.entries(cd[k] || {}).forEach(([v, o]) => { if (!m[v] || (o.ts || 0) > (m[v].ts || 0)) m[v] = o; }); store.set(k, m); }
+    else if (k === "log") {
+      const byKey = new Map();
+      [...(Array.isArray(loc) ? loc : []), ...(Array.isArray(cd[k]) ? cd[k] : [])].forEach(x => { if (x && x.t) byKey.set(x.t + "|" + x.vid, x); });
+      store.set(k, [...byKey.values()].sort((a, b) => a.t - b.t).slice(-2000));
+    }
     else if (pickCloud) store.set(k, cd[k]);
   });
 }

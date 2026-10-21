@@ -11,6 +11,9 @@ with open(os.path.join(OUT, 'assets', 'data.js'), 'a', encoding='utf-8') as f:
     f.write(open(os.path.join(H, 'i18n.js'), encoding='utf-8').read())
 js = ''.join(open(os.path.join(H, f), encoding='utf-8').read() for f in ['a_util.js', 'b_quiz.js', 'c_parts.js', 'd_pages.js', 'd2_learn.js', 'd3_i18n.js', 'd5_cloud.js', 'e_main.js'])
 open(os.path.join(OUT, 'assets', 'app.js'), 'w', encoding='utf-8').write(js)
+# teacher cabinet: standalone page at /admin (server.js rewrite locally, vercel.json in production)
+shutil.copy(os.path.join(H, 'admin.css'), os.path.join(OUT, 'assets', 'admin.css'))
+shutil.copy(os.path.join(H, 'admin.js'), os.path.join(OUT, 'assets', 'admin.js'))
 html = '''<!doctype html>
 <html lang="ru">
 <head>
@@ -44,4 +47,25 @@ html = '''<!doctype html>
 </html>
 '''
 open(os.path.join(OUT, 'index.html'), 'w', encoding='utf-8').write(html)
+admin = '''<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Кабинет преподавателя · DTB B2 Beruf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Onest:wght@400;600;700&family=Unbounded:wght@500;600&subset=cyrillic,latin-ext&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/style.css">
+<link rel="stylesheet" href="/assets/admin.css">
+</head>
+<body class="adm">
+<div id="admin-root"></div>
+<noscript><p style="padding:24px;font-family:system-ui">Для кабинета нужен JavaScript.</p></noscript>
+<script src="/assets/admin.js"></script>
+</body>
+</html>
+'''
+open(os.path.join(OUT, 'admin.html'), 'w', encoding='utf-8').write(admin)
 print('web built')
