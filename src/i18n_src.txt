@@ -330,3 +330,95 @@ r28|{~1}: not rated|{~1}: nicht bewertet
 319|Change participant|Teilnehmer wechseln
 320|Please enter your surname and first name.|Bitte geben Sie Familienname und Vorname ein.
 321|Candidate details|Teilnehmerdaten
+322|Progress|Fortschritt
+323|Leaderboard|Rangliste
+324|My progress|Mein Fortschritt
+325|Days studied, results by exam part, mistakes and achievements — all in one place.|Lerntage, Ergebnisse nach Prüfungsteilen, Fehler und Erfolge — alles an einem Ort.
+326|Continue training|Weiter üben
+327|Days studied|Lerntage
+328|since|seit
+329|Tasks solved|Gelöste Aufgaben
+330|of|von
+331|Attempts|Versuche
+332|Average result|Durchschnitt
+333|Best|Bester
+334|Mistakes to review|Fehler zum Wiederholen
+335|Streak|Serie
+336|Record|Rekord
+337|No data yet|Noch keine Daten
+338|Start with any task; charts, results and achievements will appear here.|Beginnen Sie mit einer Aufgabe; hier erscheinen Diagramme, Ergebnisse und Erfolge.
+339|Activity over 30 days|Aktivität der letzten 30 Tage
+340|Tasks solved per day|Aufgaben pro Tag
+341|Activity|Aktivität
+342|Successes and failures|Erfolge und Fehler
+343|By the best result of each task|Nach dem besten Ergebnis jeder Aufgabe
+344|Successful|Erfolgreich
+345|Medium|Mittel
+346|Weak|Schwach
+347|By exam part|Nach Prüfungsteilen
+348|Average result across your tasks|Durchschnitt Ihrer Aufgaben
+349|Weak spots|Schwache Stellen
+350|What to review first|Was zuerst wiederholen
+351|No mistakes — great job!|Keine Fehler — super!
+352|Achievements|Erfolge
+353|Earned|Erreicht
+354|Recent results|Letzte Ergebnisse
+355|Latest saved attempts|Zuletzt gespeicherte Versuche
+356|Recent mistakes|Letzte Fehler
+357|Questions worth reviewing|Fragen zum Wiederholen
+358|No data for this period yet.|Noch keine Daten für diesen Zeitraum.
+359|No results yet.|Noch keine Ergebnisse.
+360|Today|Heute
+361|Yesterday|Gestern
+362|days ago|Tage her
+363|Other|Sonstiges
+364|Letter · Beschwerde|Brief · Beschwerde
+365|First step|Erster Schritt
+366|10 tasks|10 Aufgaben
+367|50 tasks|50 Aufgaben
+368|100 attempts|100 Versuche
+369|7-day streak|7 Tage in Folge
+370|30 study days|30 Lerntage
+371|No mistakes|Ohne Fehler
+372|Top student|Einser-Schüler
+373|Hören pro|Hören-Profi
+374|Writing pro|Schreiben-Profi
+375|Period|Zeitraum
+376|This week|Diese Woche
+377|All time|Gesamt
+378|Student leaderboard|Schüler-Rangliste
+379|Who is doing best this week. Students with cloud progress take part.|Wer diese Woche am besten lernt. Teilnehmende mit Cloud-Fortschritt.
+380|Loading…|Wird geladen…
+381|Weekly leaderboard|Wochenrangliste
+382|Who is doing best this week|Wer diese Woche am besten lernt
+383|View full leaderboard|Ganze Rangliste
+384|No participants yet|Noch keine Teilnehmer
+385|Leaderboard unavailable. Try again later.|Rangliste nicht verfügbar. Später erneut versuchen.
+386|Refresh|Aktualisieren
+387|Gold|Gold
+388|Silver|Silber
+389|Bronze|Bronze
+390|Points|Punkte
+391|Your place|Dein Platz
+392|Days|Tage
+393|Average|Durchschnitt
+394|Student|Schüler
+395|To join the leaderboard, save progress in the cloud: profile → password of 6+ characters.|Um teilzunehmen, Fortschritt in der Cloud speichern: Profil → Passwort ab 6 Zeichen.
+396|Fill in profile|Profil ausfüllen
+397|Only first name and surname initial are shown.|Nur Vorname und Anfangsbuchstabe des Nachnamens.
+398|Students with cloud progress take part.|Teilnehmende mit Cloud-Fortschritt.
+399|Participants|Teilnehmer
+400|Study days, results and mistakes|Lerntage, Ergebnisse und Fehler
+401|Open progress|Fortschritt öffnen
+402|Switch to dark theme|Dunkles Design
+403|Switch to light theme|Helles Design
+404|solve your first task|erste Aufgabe lösen
+405|10 different tasks|10 verschiedene Aufgaben
+406|50 different tasks|50 verschiedene Aufgaben
+407|100 attempts|100 Versuche
+408|a week without gaps|eine Woche ohne Lücken
+409|30 active days|30 aktive Tage
+410|100% on a task|100 % für eine Aufgabe
+411|85%+ on 10 tasks|85 %+ bei 10 Aufgaben
+412|80%+ in Hören|80 %+ in Hören
+413|80%+ in Schreiben|80 %+ in Schreiben

@@ -67,11 +67,58 @@ const ICONS = {
   spark: ["M12 2v4", "M12 18v4", "M2 12h4", "M18 12h4", "M4.9 4.9l2.8 2.8", "M16.3 16.3l2.8 2.8", "M4.9 19.1l2.8-2.8", "M16.3 7.7l2.8-2.8"],
   db: ["M12 8c4.97 0 9-1.34 9-3s-4.03-3-9-3-9 1.34-9 3 4.03 3 9 3z", "M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5", "M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"],
   lock: ["M5 11h14a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2z", "M7 11V7a5 5 0 0 1 10 0v4"],
+  sun: ["M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z", "M12 2v2", "M12 20v2", "M4.93 4.93l1.41 1.41", "M17.66 17.66l1.41 1.41", "M2 12h2", "M20 12h2", "M4.93 19.07l1.41-1.41", "M17.66 6.34l1.41-1.41"],
+  moon: ["M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"],
 };
 function icon(name, size = 18) {
   const box = svgEl("svg", { viewBox: "0 0 24 24", width: size, height: size, fill: "none", stroke: "currentColor", "stroke-width": 1.8, "stroke-linecap": "round", "stroke-linejoin": "round", "aria-hidden": "true" });
   for (const d of ICONS[name] || []) box.append(svgEl("path", { d }));
   return box;
+}
+
+/* ---------------------------------------------------------- theme + locale */
+function adminTheme() {
+  return document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
+}
+function themeButton() {
+  return el("button", { class: "adm-icon-btn adm-theme-btn", type: "button", onclick: toggleAdminTheme });
+}
+function paintAdminTheme() {
+  const light = adminTheme() === "light";
+  const label = light ? "Тёмная тема" : "Светлая тема";
+  document.querySelectorAll(".adm-theme-btn").forEach(b => {
+    b.replaceChildren(icon(light ? "moon" : "sun"));
+    b.title = label;
+    b.setAttribute("aria-label", label);
+    if (typeof applyAdminLang === "function") applyAdminLang(b);
+  });
+  document.documentElement.style.colorScheme = light ? "light" : "dark";
+}
+function toggleAdminTheme() {
+  const next = adminTheme() === "light" ? "dark" : "light";
+  document.documentElement.setAttribute("data-theme", next);
+  try { localStorage.setItem("dtb.theme", JSON.stringify(next)); } catch {}
+  paintAdminTheme();
+}
+function initAdminTheme() {
+  const root = document.documentElement;
+  if (!root.getAttribute("data-theme")) {
+    let saved = "dark";
+    try { const raw = localStorage.getItem("dtb.theme"); saved = raw ? JSON.parse(raw) : "dark"; } catch { saved = "dark"; }
+    root.setAttribute("data-theme", saved === "light" ? "light" : "dark");
+  }
+  document.documentElement.style.colorScheme = adminTheme();
+  paintAdminTheme();
+}
+function langSelect() {
+  const sel = el("select", { class: "adm-lang", "aria-label": "Язык", title: "Язык" },
+    Object.keys(ADM_LANGS).map(code => el("option", { value: code, selected: code === ADM_LANG, title: ADM_LANG_TITLE[code] }, ADM_LANGS[code])));
+  sel.value = ADM_LANG;
+  sel.onchange = () => {
+    setAdminLang(sel.value);
+    document.title = admTr(S.me && S.me.ok ? "Кабинет преподавателя · DTB B2 Beruf" : "Вход · Кабинет преподавателя");
+  };
+  return sel;
 }
 
 /* --------------------------------------------------------------- format ---- */
@@ -343,7 +390,7 @@ function filteredStudents() {
 
 /* ------------------------------------------------------------------ login -- */
 function renderLogin() {
-  document.title = "Вход · Кабинет преподавателя";
+  document.title = typeof admTr === "function" ? admTr("Вход · Кабинет преподавателя") : "Вход · Кабинет преподавателя";
   const input = el("input", { class: "adm-input", type: "password", name: "password", autocomplete: "current-password", placeholder: "Пароль", required: true, "aria-label": "Пароль" });
   const err = el("p", { class: "adm-login-error", role: "alert", hidden: !S.loginError }, S.loginError);
   const btn = el("button", { class: "adm-btn primary adm-block", type: "submit" }, S.loginBusy ? "Проверяем…" : "Войти", icon("lock", 16));
@@ -357,12 +404,15 @@ function renderLogin() {
     : el("p", { class: "adm-login-hint" }, "Пароль проверяется на сервере, в браузере он не сохраняется. Сессия живёт 8 часов.");
   ROOT.replaceChildren(el("div", { class: "adm-login" },
     el("div", { class: "adm-login-card" },
-      el("div", { class: "adm-brand-mark" }, "DTB"),
+      el("div", { class: "adm-login-top" },
+        el("div", { class: "adm-brand-mark" }, "DTB"),
+        el("div", { class: "adm-login-tools" }, langSelect(), themeButton())),
       el("h1", null, "Кабинет преподавателя"),
       el("p", { class: "adm-sub" }, "Прогресс учеников DTB B2 Beruf: дни занятий, решённые задания, ошибки и достижения — в одном месте."),
       form,
       hint,
       el("p", { class: "adm-login-foot" }, "Данные читаются из Firebase. Доступ только по паролю."))));
+  paintAdminTheme();
   requestAnimationFrame(() => input.focus());
 }
 
@@ -389,6 +439,7 @@ async function submitLogin(e) {
 
 /* ---------------------------------------------------------------- loading -- */
 function renderLoading() {
+  document.title = typeof admTr === "function" ? admTr("Кабинет преподавателя · DTB B2 Beruf") : "Кабинет преподавателя · DTB B2 Beruf";
   ROOT.replaceChildren(el("div", { class: "adm-loading" }, el("div", { class: "adm-spinner" }), "Загружаем прогресс учеников…"));
 }
 
@@ -443,6 +494,8 @@ function topBar() {
       el("div", { class: "adm-top-right" },
         el("span", { class: "adm-source" + (badSource ? " test" : "") }, source),
         el("span", { class: "adm-updated", id: "adm-updated" }, updatedText()),
+        langSelect(),
+        themeButton(),
         el("button", { class: "adm-icon-btn", title: "Обновить данные", "aria-label": "Обновить данные", onclick: () => loadDashboard() }, icon("refresh")),
         el("button", { class: "adm-icon-btn", title: "Выйти", "aria-label": "Выйти", onclick: logout }, icon("logout")))));
 }
@@ -454,7 +507,7 @@ function updatedText() {
 }
 
 function renderDashboard() {
-  document.title = "Кабинет преподавателя · DTB B2 Beruf";
+  document.title = typeof admTr === "function" ? admTr("Кабинет преподавателя · DTB B2 Beruf") : "Кабинет преподавателя · DTB B2 Beruf";
   const d = S.data;
   const t = d.totals;
   const counts = filterCounts();
@@ -532,6 +585,7 @@ function renderDashboard() {
 
   main.append(el("p", { class: "adm-foot" }, "Показаны только имя, прогресс и активность. Дата рождения, адрес и другие поля анкеты не читаются. Данные обновляются, когда ученик сохраняет прогресс в облаке."));
   ROOT.replaceChildren(topBar(), main);
+  paintAdminTheme();
   applyWidths();
   syncStudentCount(students.length);
   const m = /^#student=(.+)$/.exec(location.hash);
@@ -632,6 +686,7 @@ function applyWidths(root) {
 
 /* ----------------------------------------------------------------- funnel --- */
 function renderFatal() {
+  document.title = typeof admTr === "function" ? admTr("Кабинет преподавателя · DTB B2 Beruf") : "Кабинет преподавателя · DTB B2 Beruf";
   const e = S.error || {};
   const box = el("div", { class: "adm-main" });
   const card = el("section", { class: "adm-card", style: "margin-top:20px" });
@@ -647,6 +702,7 @@ function renderFatal() {
   }
   box.append(card);
   ROOT.replaceChildren(topBar(), box);
+  paintAdminTheme();
 }
 
 function setupSteps() {
@@ -755,7 +811,7 @@ function csvCell(v) {
 function exportCsv() {
   const rows = filteredStudents();
   if (!rows.length) return;
-  const head = ["Фамилия", "Имя", "Дней", "Заданий", "Попыток", "Средний %", "Лучший %", "Успешных", "Ошибок", "Серия", "Последняя активность", "Достижения"];
+  const head = ["Фамилия", "Имя", "Дней", "Заданий", "Попыток", "Средний %", "Лучший %", "Успешных", "Ошибок", "Серия", "Последняя активность", "Достижения"].map(h => (typeof admTr === "function" ? admTr(h) : h));
   const lines = [head].concat(rows.map(s => [
     s.fam, s.vor, s.days, s.tasks, s.attempts,
     s.scorePct == null ? "" : Math.round(s.scorePct),
@@ -787,5 +843,6 @@ window.addEventListener("hashchange", () => {
 
 setInterval(updateUpdated, 30000);
 
+initAdminTheme();
 if (ROOT) boot();
 })();

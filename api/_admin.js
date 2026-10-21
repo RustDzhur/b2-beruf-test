@@ -583,6 +583,98 @@ async function buildDashboard() {
   return out;
 }
 
+/* ------------------------------------------------------------- leaderboard */
+
+function leaderboardStats(raw, period, now) {
+  const d = (raw && raw.data) || {};
+  const log = Array.isArray(d.log) ? d.log.filter(x => x && num(x.t)) : [];
+  const res = d.res && typeof d.res === "object" ? d.res : {};
+  const days = Array.isArray(d.days) ? [...new Set(d.days.filter(isDay))] : [];
+  if (period === "week") {
+    const cutoff = now - 7 * DAY;
+    let points = 0, tests = 0, sum = 0;
+    if (log.length) {
+      for (const x of log) {
+        if (num(x.t) < cutoff) continue;
+        const mx = num(x.mx);
+        if (!mx) continue;
+        const p = clampPct(num(x.sc) / mx * 100);
+        points += Math.round(p); tests++; sum += p;
+      }
+    } else {
+      for (const o of Object.values(res)) {
+        if (!o || num(o.ts) < cutoff || !num(o.max)) continue;
+        const p = clampPct(num(o.best) / num(o.max) * 100);
+        points += Math.round(p); tests++; sum += p;
+      }
+    }
+    return { points, tests, avg: tests ? round1(sum / tests) : null, days: days.filter(d => dayStart(d) >= cutoff).length };
+  }
+  let points = 0;
+  for (const o of Object.values(res)) {
+    const mx = num(o && o.max);
+    if (!mx) continue;
+    points += Math.round(clampPct(num(o.best) / mx * 100));
+  }
+  return { points, tests: 0, avg: null, days: days.length };
+}
+
+function leaderboardRows(users, period, now) {
+  const rows = [];
+  for (const raw of users || []) {
+    const s = computeStudent(raw, now);
+    if (!s.hasName) continue;
+    const st = leaderboardStats(raw, period, now);
+    const tests = period === "week" ? st.tests : s.attempts;
+    const avg = period === "week" ? st.avg : s.scorePct;
+    const days = period === "week" ? st.days : s.days;
+    if (!st.points && !tests && !days) continue;
+    const name = s.vor
+      ? s.vor + (s.fam ? " " + s.fam[0].toUpperCase() + "." : "")
+      : (s.fam ? s.fam[0].toUpperCase() + "." : "Ученик");
+    rows.push({
+      uid: s.uid,
+      name,
+      initials: s.initials,
+      points: st.points,
+      tests,
+      days,
+      avg,
+      streak: s.streak.current,
+      medal: 0,
+    });
+  }
+  rows.sort((a, b) => b.points - a.points || b.tests - a.tests || (b.avg || 0) - (a.avg || 0) || a.name.localeCompare(b.name, "ru"));
+  return rows.map((r, i) => Object.assign(r, { rank: i + 1, medal: i < 3 ? i + 1 : 0 }));
+}
+
+let lbCache = { at: 0, week: null, all: null };
+
+async function buildLeaderboard(period = "week", uid = "", now = Date.now()) {
+  period = period === "all" ? "all" : "week";
+  if (!lbCache.week || now - lbCache.at > 60000) {
+    const { users } = await loadUsers();
+    lbCache = {
+      at: now,
+      week: leaderboardRows(users, "week", now),
+      all: leaderboardRows(users, "all", now),
+    };
+  }
+  const rows = lbCache[period] || [];
+  const pub = r => ({
+    rank: r.rank, name: r.name, initials: r.initials, points: r.points,
+    tests: r.tests, days: r.days, avg: r.avg, streak: r.streak, medal: r.medal,
+  });
+  const mine = uid ? rows.find(r => r.uid === uid) : null;
+  return {
+    period,
+    updatedAt: lbCache.at,
+    participants: rows.length,
+    entries: rows.slice(0, 50).map(r => Object.assign(pub(r), { isMe: !!uid && r.uid === uid })),
+    me: mine ? pub(mine) : null,
+  };
+}
+
 /* --------------------------------------------------------------- http glue */
 
 function clientIp(headers, fallback) {
@@ -655,6 +747,9 @@ module.exports = {
   computeStudent,
   dashboard,
   buildDashboard,
+  buildLeaderboard,
+  leaderboardStats,
+  leaderboardRows,
   partOf,
   parseServiceAccount,
   repairJsonText,

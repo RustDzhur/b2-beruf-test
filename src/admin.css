@@ -681,3 +681,30 @@ body.adm-lock { overflow: hidden; }
   body.adm { background: #fff; }
   .adm-card, .adm-kpi { box-shadow: none; break-inside: avoid; }
 }
+
+/* ---------------------------------------------------- theme + locale tools -- */
+.adm-login-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+.adm-login-tools { display: flex; align-items: center; gap: 7px; }
+.adm-lang {
+  height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--paper);
+  color: var(--ink);
+  padding: 0 7px;
+  font: 600 11px var(--f-mono);
+  cursor: pointer;
+}
+.adm-lang:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.adm-theme-btn { flex: none; }
+[dir="rtl"] .adm-drawer { right: auto; left: 0; border-left: 0; border-right: 1px solid var(--line); transform: translateX(-102%); }
+[dir="rtl"] .adm-drawer.on { transform: none; }
+[dir="rtl"] .adm-drawer-close { margin-left: 0; margin-right: auto; }
+[dir="rtl"] .adm-login-top, [dir="rtl"] .adm-card-head, [dir="rtl"] .adm-bar-top, [dir="rtl"] .adm-student, [dir="rtl"] .adm-toprow, [dir="rtl"] .adm-legend-row { direction: rtl; }
+[dir="rtl"] .adm-table th, [dir="rtl"] .adm-table td { text-align: right; }
+[dir="rtl"] .adm-table th:first-child, [dir="rtl"] .adm-table td:first-child { text-align: right; }
+[dir="rtl"] .adm-kpi::after { left: auto; right: 0; }
+[dir="rtl"] .adm-legend-row b { margin-left: 0; margin-right: auto; }
+[dir="rtl"] .adm-weak-row .adm-weak-count { text-align: left; }
+[dir="rtl"] .adm-progress b { text-align: left; }
+[dir="rtl"] .adm-login { direction: rtl; }

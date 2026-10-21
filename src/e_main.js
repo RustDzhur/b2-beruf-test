@@ -64,6 +64,7 @@ function viewHome() {
           h("span", null, h("i", { style: "background:var(--ok-soft)" }), "уверенно"), h("span", null, h("i", { style: "background:var(--warn-soft)" }), "бывает ошибка"),
           h("span", null, h("i", { style: "background:var(--bad-soft)" }), "слабое место"), h("span", null, h("i", { style: "border:1px solid var(--line)" }), "не решали")))),
     voiceWarn,
+    homeStrip(),
     h("div", { class: "groups" }, groups),
     h("div", { class: "card stack" }, h("h2", null, "Как устроен экзамен и сколько нужно"),
       h("div", { class: "tw" }, h("table", { class: "score" },
@@ -442,7 +443,9 @@ function updateWho() {
   const c = cand();
   if (!c.done) { if (a) a.remove(); return; }
   if (!a) { a = h("a", { class: "who", href: "#profile", title: "Данные участника" }); top.insertBefore(a, top.querySelector(".langsw")); }
-  a.replaceChildren(h("span", { class: "who-ico", "aria-hidden": "true" }, "👤"), h("span", null, `${c.vor} ${c.fam}`), cloudOn() ? h("span", { class: "who-ico", title: "Cloud", "aria-hidden": "true" }, "☁") : null);
+  const kids = [h("span", { class: "who-ico", "aria-hidden": "true" }, "👤"), h("span", null, `${c.vor} ${c.fam}`)];
+  if (cloudOn()) kids.push(h("span", { class: "who-ico", title: "Cloud", "aria-hidden": "true" }, "☁"));
+  a.replaceChildren(...kids);
 }
 function render() {
   stopAll();
@@ -455,15 +458,18 @@ function render() {
   else if (sec === "exam") v = viewExam();
   else if (sec === "voice") v = viewVoice();
   else if (sec === "learn") v = viewLearn();
+  else if (sec === "progress") v = viewProgress();
+  else if (sec === "leaderboard") v = viewLeaderboard();
   else if (SEC[sec]) v = idx ? viewItem(sec, +idx) : viewSec(sec);
   else v = viewHome();
   app().replaceChildren(v);
-  const top = ["home", "review", "exam", "voice", "learn"].includes(sec) ? sec : "home";
+  const top = ["home", "review", "exam", "voice", "learn", "progress", "leaderboard"].includes(sec) ? sec : "home";
   document.querySelectorAll(".nav a").forEach(a => a.classList.toggle("on", a.getAttribute("href") === "#" + (SEC[sec] ? "" : top)));
   refreshAI(); updateNav(); updateWho();
 }
 let lastHash = location.hash;
 window.addEventListener("hashchange", () => { render(); if (location.hash !== lastHash) window.scrollTo(0, 0); lastHash = location.hash; });
+initTheme();
 initLang();
 cloudBoot(() => render());
 audioReady.then(render);

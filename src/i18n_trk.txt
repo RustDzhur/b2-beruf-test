@@ -330,3 +330,95 @@ r28|{~1}: değerlendirilmedi
 319|Katılımcıyı değiştir
 320|Lütfen soyadınızı ve adınızı girin.
 321|Katılımcı bilgileri
+322|İlerleme
+323|Sıralama
+324|İlerlemem
+325|Çalışma günleri, sınav bölümlerine göre sonuçlar, hatalar ve başarılar — hepsi tek yerde.
+326|Devam et
+327|Çalışma günleri
+328|beri
+329|Çözülen görevler
+330|/
+331|Denemeler
+332|Ortalama sonuç
+333|En iyi
+334|Tekrar edilecek hatalar
+335|Seri
+336|Rekor
+337|Henüz veri yok
+338|Herhangi bir görevle başlayın; grafikler, sonuçlar ve başarılar burada görünecek.
+339|30 günlük etkinlik
+340|Günlük görev
+341|Etkinlik
+342|Başarılar ve hatalar
+343|Her görevin en iyi sonucuna göre
+344|Başarılı
+345|Orta
+346|Zayıf
+347|Sınav bölümlerine göre
+348|Görevlerinizin ortalaması
+349|Zayıf noktalar
+350|Önce neyi tekrar etmeli
+351|Hata yok — harika!
+352|Başarılar
+353|Kazanılan
+354|Son sonuçlar
+355|Son kaydedilen denemeler
+356|Son hatalar
+357|Tekrar edilecek sorular
+358|Bu dönem için henüz veri yok.
+359|Henüz sonuç yok.
+360|Bugün
+361|Dün
+362|gün önce
+363|Diğer
+364|Mektup · Beschwerde
+365|İlk adım
+366|10 görev
+367|50 görev
+368|100 deneme
+369|7 gün üst üste
+370|30 çalışma günü
+371|Hatasız
+372|Başarılı öğrenci
+373|Hören uzmanı
+374|Schreiben uzmanı
+375|Dönem
+376|Bu hafta
+377|Tüm zamanlar
+378|Öğrenci sıralaması
+379|Bu hafta en iyi kim çalışıyor. Bulut ilerlemesi olan öğrenciler katılır.
+380|Yükleniyor…
+381|Haftalık sıralama
+382|Bu hafta en iyi kim çalışıyor
+383|Tüm sıralamayı gör
+384|Henüz katılımcı yok
+385|Sıralama kullanılamıyor. Daha sonra deneyin.
+386|Yenile
+387|Altın
+388|Gümüş
+389|Bronz
+390|Puan
+391|Sıranız
+392|Gün
+393|Ortalama
+394|Öğrenci
+395|Katılmak için ilerlemeyi buluta kaydedin: profil → 6 karakterlik şifre.
+396|Profili doldur
+397|Yalnızca ad ve soyadın ilk harfi.
+398|Bulut ilerlemesi olan öğrenciler.
+399|Katılımcılar
+400|Günler, sonuçlar ve hatalar
+401|İlerlemeyi aç
+402|Koyu temaya geç
+403|Açık temaya geç
+404|ilk görevi çöz
+405|10 farklı görev
+406|50 farklı görev
+407|100 deneme
+408|ara vermeden bir hafta
+409|30 aktif gün
+410|bir görevde %100
+411|10 görevde %85+
+412|Hören'de %80+
+413|Schreiben'de %80+

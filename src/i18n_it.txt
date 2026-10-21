@@ -330,3 +330,95 @@ r28|{~1}: non valutato
 319|Cambia partecipante
 320|Inserisci cognome e nome.
 321|Dati del candidato
+322|Progressi
+323|Classifica
+324|I miei progressi
+325|Giorni di studio, risultati per parte d'esame, errori e successi — tutto in un posto.
+326|Continua
+327|Giorni di studio
+328|da
+329|Attività risolte
+330|di
+331|Tentativi
+332|Risultato medio
+333|Migliore
+334|Errori da ripassare
+335|Serie
+336|Record
+337|Nessun dato
+338|Inizia con un'attività: qui appariranno grafici, risultati e successi.
+339|Attività ultimi 30 giorni
+340|Attività al giorno
+341|Attività
+342|Successi ed errori
+343|In base al miglior risultato di ogni attività
+344|Riuscito
+345|Medio
+346|Debole
+347|Per parte d'esame
+348|Media delle tue attività
+349|Punti deboli
+350|Cosa ripassare prima
+351|Nessun errore — ottimo!
+352|Successi
+353|Ottenuti
+354|Ultimi risultati
+355|Ultimi tentativi salvati
+356|Ultimi errori
+357|Domande da ripassare
+358|Nessun dato per questo periodo.
+359|Nessun risultato.
+360|Oggi
+361|Ieri
+362|giorni fa
+363|Altro
+364|Lettera · Beschwerde
+365|Primo passo
+366|10 attività
+367|50 attività
+368|100 tentativi
+369|7 giorni di fila
+370|30 giorni di studio
+371|Senza errori
+372|Eccellente
+373|Esperto Hören
+374|Esperto Schreiben
+375|Periodo
+376|Questa settimana
+377|Tutto il tempo
+378|Classifica studenti
+379|Chi sta andando meglio questa settimana. Partecipano gli studenti con progresso cloud.
+380|Caricamento…
+381|Classifica settimanale
+382|Chi sta andando meglio questa settimana
+383|Vedi tutta la classifica
+384|Nessun partecipante
+385|Classifica non disponibile. Riprova più tardi.
+386|Aggiorna
+387|Oro
+388|Argento
+389|Bronzo
+390|Punti
+391|Il tuo posto
+392|Giorni
+393|Media
+394|Studente
+395|Per partecipare, salva i progressi nel cloud: profilo → password di 6 caratteri.
+396|Compila il profilo
+397|Solo nome e iniziale del cognome.
+398|Studenti con progresso cloud.
+399|Partecipanti
+400|Giorni, risultati ed errori
+401|Apri progressi
+402|Tema scuro
+403|Tema chiaro
+404|risolvi la prima attività
+405|10 attività diverse
+406|50 attività diverse
+407|100 tentativi
+408|una settimana senza pause
+409|30 giorni attivi
+410|100% in un'attività
+411|85%+ su 10 attività
+412|80%+ in Hören
+413|80%+ in Schreiben

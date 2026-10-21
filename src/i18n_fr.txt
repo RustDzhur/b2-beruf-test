@@ -330,3 +330,95 @@ r28|{~1} : non évalué
 319|Changer de participant
 320|Veuillez indiquer votre nom et votre prénom.
 321|Données du candidat
+322|Progrès
+323|Classement
+324|Mon progrès
+325|Jours d'étude, résultats par partie, erreurs et réussites — tout au même endroit.
+326|Continuer
+327|Jours d'étude
+328|depuis
+329|Tâches résolues
+330|sur
+331|Tentatives
+332|Résultat moyen
+333|Meilleur
+334|Erreurs à revoir
+335|Série
+336|Record
+337|Pas encore de données
+338|Commencez par une tâche : graphiques, résultats et réussites apparaîtront ici.
+339|Activité sur 30 jours
+340|Tâches par jour
+341|Activité
+342|Réussites et échecs
+343|Selon le meilleur résultat de chaque tâche
+344|Réussi
+345|Moyen
+346|Faible
+347|Par partie d'examen
+348|Moyenne de vos tâches
+349|Points faibles
+350|À revoir en priorité
+351|Aucune erreur — bravo !
+352|Réussites
+353|Obtenu
+354|Derniers résultats
+355|Dernières tentatives enregistrées
+356|Dernières erreurs
+357|Questions à revoir
+358|Pas encore de données pour cette période.
+359|Pas encore de résultats.
+360|Aujourd'hui
+361|Hier
+362|jours
+363|Autre
+364|Lettre · Beschwerde
+365|Premier pas
+366|10 tâches
+367|50 tâches
+368|100 tentatives
+369|7 jours d'affilée
+370|30 jours d'étude
+371|Sans erreur
+372|Excellent
+373|Pro Hören
+374|Pro Schreiben
+375|Période
+376|Cette semaine
+377|Tout le temps
+378|Classement des élèves
+379|Qui travaille le mieux cette semaine. Élèves avec progression cloud.
+380|Chargement…
+381|Classement de la semaine
+382|Qui travaille le mieux cette semaine
+383|Voir tout le classement
+384|Pas encore de participants
+385|Classement indisponible. Réessayez plus tard.
+386|Actualiser
+387|Or
+388|Argent
+389|Bronze
+390|Points
+391|Votre place
+392|Jours
+393|Moyenne
+394|Élève
+395|Pour participer, enregistrez la progression dans le cloud : profil → mot de passe de 6 caractères.
+396|Remplir le profil
+397|Prénom et initiale du nom uniquement.
+398|Élèves avec progression cloud.
+399|Participants
+400|Jours, résultats et erreurs
+401|Ouvrir le progrès
+402|Thème sombre
+403|Thème clair
+404|résoudre une première tâche
+405|10 tâches différentes
+406|50 tâches différentes
+407|100 tentatives
+408|une semaine sans pause
+409|30 jours actifs
+410|100 % sur une tâche
+411|85 %+ sur 10 tâches
+412|80 %+ en Hören
+413|80 %+ en Schreiben

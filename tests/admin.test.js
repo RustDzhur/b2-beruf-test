@@ -173,3 +173,16 @@ test("service-account parser tolerates literal \\n and an extra JSON-string wrap
   assert.equal(b.client_email, sa.client_email);
   assert.ok(b.private_key.includes("\n"));
 });
+
+test("leaderboard ranks by points for week and all time", () => {
+  const users = makeUsers(14);
+  const week = admin.leaderboardRows(users, "week", Date.now());
+  assert.ok(week.length > 0);
+  assert.ok(week.every((r, i) => r.rank === i + 1));
+  assert.ok(week[0].points >= week[week.length - 1].points);
+  assert.deepEqual(week.slice(0, 3).map(r => r.medal), [1, 2, 3]);
+  assert.ok(week.every(r => r.uid && r.name && !r.name.includes(" ") || /^[^ ]+ [A-ZА-Я]\.$/.test(r.name)));
+  const all = admin.leaderboardRows(users, "all", Date.now());
+  assert.ok(all.length > 0);
+  assert.ok(all[0].points >= all[all.length - 1].points);
+});

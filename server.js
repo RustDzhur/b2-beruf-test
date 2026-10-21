@@ -76,6 +76,14 @@ http.createServer((req, res) => {
   if (req.url === "/api/status") return json(res, 200, { ready: ai.ready() });
   if (req.url === "/api/ai" && req.method === "POST") return aiRoute(req, res);
   let p = decodeURIComponent(req.url.split("?")[0]);
+  if (p === "/api/leaderboard" && req.method === "GET") {
+    const q = new URL(req.url, "http://x").searchParams;
+    const period = q.get("period") === "all" ? "all" : "week";
+    const uid = String(q.get("uid") || "").slice(0, 128);
+    return admin.buildLeaderboard(period, uid)
+      .then(data => json(res, 200, data))
+      .catch(e => json(res, e.status || 500, { code: e.code || "error", message: e.message || "Рейтинг временно недоступен." }));
+  }
   if (p.startsWith("/api/admin/")) return adminRoute(req, res, p);
   if (p.startsWith("/api/")) { res.writeHead(404, { "Content-Type": "application/json; charset=utf-8" }); return res.end(JSON.stringify({ code: "not_found" })); }
   if (p === "/") p = "/index.html";
