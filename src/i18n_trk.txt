@@ -422,3 +422,4 @@ r28|{~1}: değerlendirilmedi
 411|10 görevde %85+
 412|Hören'de %80+
 413|Schreiben'de %80+
+414|Doğru cevaplar

@@ -355,6 +355,7 @@ function computeStudent(raw, now = Date.now()) {
   const wrong = d.wrong && typeof d.wrong === "object" ? d.wrong : {};
   const days = Array.isArray(d.days) ? [...new Set(d.days.filter(isDay))].sort() : [];
   const log = Array.isArray(d.log) ? d.log.filter(x => x && num(x.t)) : [];
+  const nstat = d.nstat && typeof d.nstat === "object" ? d.nstat : {};
 
   const items = [];
   for (const [vid, o] of Object.entries(res)) {
@@ -369,6 +370,16 @@ function computeStudent(raw, now = Date.now()) {
       max: num(o.max),
     });
   }
+
+  let answerCorrect = 0, answerTotal = 0;
+  for (const v of Object.values(nstat)) {
+    if (!Array.isArray(v)) continue;
+    const total = Math.max(0, num(v[1]));
+    if (!total) continue;
+    answerTotal += total;
+    answerCorrect += Math.max(0, Math.min(total, num(v[0])));
+  }
+  const answers = { correct: answerCorrect, total: answerTotal, pct: answerTotal ? round1(answerCorrect / answerTotal * 100) : null };
 
   const tasks = items.length;
   const attempts = items.reduce((a, x) => a + x.n, 0);
@@ -470,6 +481,7 @@ function computeStudent(raw, now = Date.now()) {
     days: days.length,
     tasks,
     attempts,
+    answers,
     scorePct,
     bestPct,
     successTasks,

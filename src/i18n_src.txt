@@ -422,3 +422,4 @@ r28|{~1}: not rated|{~1}: nicht bewertet
 411|85%+ on 10 tasks|85 %+ bei 10 Aufgaben
 412|80%+ in Hören|80 %+ in Hören
 413|80%+ in Schreiben|80 %+ in Schreiben
+414|Correct answers|Richtige Antworten

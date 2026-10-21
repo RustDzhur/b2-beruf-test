@@ -41,6 +41,7 @@ test("computeStudent derives names, percentages, mistakes and streaks", () => {
         "L1V1:4": { vid: "L1V1", sec: "l", n: 4, ts: now - 3600000 },
         "H1V1:2": { vid: "H1V1", sec: "h", n: 2, ts: now - 7200000 },
       },
+      nstat: { "2": [2, 2], "4": [1, 2], "10": [1, 1] },
       log: [
         { t: now - 3600000, vid: "L1V1", sc: 12, mx: 15 },
         { t: now - 7200000, vid: "H1V1", sc: 6, mx: 10 },
@@ -56,6 +57,7 @@ test("computeStudent derives names, percentages, mistakes and streaks", () => {
   assert.equal(s.scorePct, 71.7); // (80 + 60 + 75) / 3
   assert.equal(s.bestPct, 83.3); // (100 + 60 + 90) / 3
   assert.equal(s.failures, 2);
+  assert.deepEqual(s.answers, { correct: 4, total: 5, pct: 80 });
   assert.equal(s.successTasks, 2);
   assert.equal(s.failTasks, 0);
   assert.equal(s.streak.current, 3);

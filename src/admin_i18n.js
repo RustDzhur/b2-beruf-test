@@ -154,6 +154,7 @@ const ADM_I18N = {
   "Имя": ["First name", "Vorname", "Prénom", "Ad", "الاسم", "Nome"],
   "Заданий": ["Tasks", "Aufgaben", "Tâches", "Görevler", "المهام", "Attività"],
   "Попыток": ["Attempts", "Versuche", "Tentatives", "Denemeler", "المحاولات", "Tentativi"],
+  "Верных ответов": ["Correct answers", "Richtige Antworten", "Réponses correctes", "Doğru cevaplar", "إجابات صحيحة", "Risposte corrette"],
   "Средний %": ["Average %", "Durchschnitt %", "Moyenne %", "Ortalama %", "المتوسط %", "Media %"],
   "Лучший %": ["Best %", "Bestes %", "Meilleur %", "En iyi %", "الأفضل %", "Migliore %"],
   "Успешных": ["Successful", "Erfolgreich", "Réussies", "Başarılı", "ناجحة", "Riuscite"],

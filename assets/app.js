@@ -1428,6 +1428,7 @@ function pgData() {
   const rawDays = store.get("days", []);
   const days = Array.isArray(rawDays) ? [...new Set(rawDays.filter(x => /^\d{4}-\d{2}-\d{2}$/.test(x)))].sort() : [];
   const log = Array.isArray(store.get("log", [])) ? store.get("log", []).filter(x => x && pgNum(x.t)) : [];
+  const nstat = store.get("nstat", {}) || {};
   const items = [];
   for (const [vid, o] of Object.entries(res)) {
     if (!o || !pgNum(o.max)) continue;
@@ -1439,6 +1440,16 @@ function pgData() {
       n: Math.max(1, pgNum(o.n)), ts: pgNum(o.ts),
     });
   }
+  let answersCorrect = 0, answersTotal = 0;
+  for (const v of Object.values(nstat)) {
+    if (!Array.isArray(v)) continue;
+    const total = Math.max(0, pgNum(v[1]));
+    if (!total) continue;
+    answersTotal += total;
+    answersCorrect += Math.max(0, Math.min(total, pgNum(v[0])));
+  }
+  const answers = { correct: answersCorrect, total: answersTotal, pct: answersTotal ? Math.round(answersCorrect / answersTotal * 100) : null };
+
   const tasks = items.length;
   const attempts = items.reduce((a, x) => a + x.n, 0);
   const scorePct = pgRound(pgMean(items.map(x => x.cur)));
@@ -1496,7 +1507,7 @@ function pgData() {
     else if (a.id === "schreiben") earned = (sections.schreiben.pct || 0) >= 80 && sections.schreiben.tasks >= 2;
     return Object.assign({}, a, { earned });
   });
-  return { days: days.length, firstDay: days[0] || null, tasks, attempts, scorePct, bestPct, success, mid, fail, failures: wrongArr.length, sections, parts, weak, recentWrong: wrongArr.slice(0, 5), activity, trend, streak: st, achievements, earned: achievements.filter(a => a.earned).length };
+  return { days: days.length, firstDay: days[0] || null, tasks, attempts, answers, scorePct, bestPct, success, mid, fail, failures: wrongArr.length, sections, parts, weak, recentWrong: wrongArr.slice(0, 5), activity, trend, streak: st, achievements, earned: achievements.filter(a => a.earned).length };
 }
 
 /* --------------------------------------------------------------- charts --- */
@@ -1616,7 +1627,8 @@ function viewProgress() {
           h("div", { class: "pg-split-legend" },
             h("span", null, h("i", { style: "background:var(--ok)" }), T("Успешно") + " · " + d.success),
             h("span", null, h("i", { style: "background:var(--warn)" }), T("Средне") + " · " + d.mid),
-            h("span", null, h("i", { style: "background:var(--bad)" }), T("Слабо") + " · " + d.fail))))));
+            h("span", null, h("i", { style: "background:var(--bad)" }), T("Слабо") + " · " + d.fail))))),
+    d.answers.total ? h("p", { class: "sub", style: "margin:8px 0 0" }, T("Верных ответов") + ": " + d.answers.correct + " / " + d.answers.total + (d.answers.pct != null ? " · " + d.answers.pct + "%" : "")) : null);
   const sectionsCard = h("div", { class: "pg-card" },
     h("h2", null, T("По частям экзамена")),
     h("p", { class: "sub" }, T("Средний результат по вашим заданиям")),

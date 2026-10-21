@@ -769,6 +769,7 @@ function renderDrawerFor(uid) {
       stat(fmt(s.failures), "ошибок"),
       stat(fmt(s.streak.longest), "лучшая серия")),
     el("p", { class: "adm-drawer-note" }, "Лучший средний результат: " + pctText(s.bestPct) + " · успешных заданий: " + fmt(s.successTasks) + " из " + fmt(s.tasks) + " · ошибок к повтору: " + fmt(s.failures)),
+    s.answers && s.answers.total ? el("p", { class: "adm-drawer-note" }, el("span", null, "Верных ответов"), ": " + fmt(s.answers.correct) + " / " + fmt(s.answers.total) + (s.answers.pct != null ? " · " + pctText(s.answers.pct) : "")) : null,
     el("h3", null, "Достижения · " + s.earned + " из 10"),
     el("div", { class: "adm-achievements" }, s.achievements.map(a => el("div", { class: "adm-badge" + (a.earned ? " earned" : ""), title: a.hint }, el("b", null, a.icon), el("span", null, a.label)))),
     el("h3", null, "По частям экзамена"),
