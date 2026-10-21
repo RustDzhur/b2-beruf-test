@@ -106,9 +106,11 @@ function viewItem(sec, idx) {
   if (!it) return viewSec(sec);
   const mode = modeStore.get();
   const next = idx < list.length ? `#${sec}.${idx + 1}` : null;
-  const ctx = { restart: () => render(), next };
+  const vid = vidOf(sec, it);
+  const shown = NO_MODE[sec] ? it : shuffleForAttempt(sec, it, attemptSeed(vid));
+  const ctx = { restart: () => { resetAttempt(vid); render(); }, next };
   LAST_QZ = null;
-  const body = RENDER[sec](it, NO_MODE[sec] ? "train" : mode, ctx);
+  const body = RENDER[sec](shown, NO_MODE[sec] ? "train" : mode, ctx);
   const qz = LAST_QZ;
   return h("div", { class: "wrap" },
     crumbs(h("a", { href: "#home" }, "Главная"), h("a", { href: "#" + sec }, s.t), s.label(it)),
@@ -251,6 +253,7 @@ function viewVoice() {
 
 /* ---------- mock exam ---------- */
 function newExam() {
+  TRY_SEEDS.clear();
   const pick = (a) => a[Math.floor(Math.random() * a.length)];
   const bq = pick(DB.B.filter(b => b.qs.length));
   const steps = [
@@ -338,14 +341,15 @@ function viewExam() {
   const S = SEC[s.sec];
   const timer = blockTimer(E, s.sec);
   LAST_QZ = null;
-  const body = s.only ? rBeschwerde(s.it, "exam", ctx, s.only) : RENDER[s.sec](s.it, "exam", ctx);
+  const shown = shuffleForAttempt(s.sec, s.it, attemptSeed(vidOf(s.sec, s.it)));
+  const body = s.only ? rBeschwerde(shown, "exam", ctx, s.only) : RENDER[s.sec](shown, "exam", ctx);
   const qz = LAST_QZ;
   return h("div", { class: "wrap" },
     crumbs(h("a", { href: "#home" }, "Главная"), "Пробный экзамен", `часть ${E.i + 1} из ${E.steps.length}`),
     steps, timer,
     h("div", { class: "spread" }, h("div", { class: "stack", style: "gap:4px" }, h("div", { class: "eyebrow" }, `${S.grp} · задания ${s.only === "quiz" ? "19–20" : s.only === "write" ? "21" : S.nums}`), h("h1", null, s.t)), nexts[0]),
     h("p", { class: "lead", style: "margin:0" }, s.only === "quiz" ? "Прочитайте записку и письмо клиента и ответьте на вопросы 19–20. Письмо напишете на следующем шаге." : S.task),
-    paperOn(s.sec === "b" || !s.only ? s.sec : "x") ? sheetEl(s.sec, S, s.it, body, qz) : body,
+    paperOn(s.sec === "b" || !s.only ? s.sec : "x") ? sheetEl(s.sec, S, shown, body, qz) : body,
     h("div", { class: "row", style: "justify-content:flex-end" }, nexts[1]));
 }
 function examResult(E, steps) {

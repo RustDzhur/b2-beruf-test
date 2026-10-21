@@ -128,6 +128,7 @@ ${it.kind === "mc" ? it.opts.map((o, i) => `${LET[i]}) ${o}`).join("\n") : it.ki
   function score() { return items.reduce((n, it) => n + (st[it.key] && st[it.key].val === it.ans ? 1 : 0), 0); }
   function showResult() {
     finished = true;
+    resetAttempt(cfg.vid);
     const sc = score(), mx = items.length;
     const pct = Math.round(sc / mx * 100);
     saveRes(vid, sc, mx);

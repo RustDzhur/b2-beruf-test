@@ -33,6 +33,81 @@ const modeStore = {
   get() { try { const v = sessionStorage.getItem("dtb.mode"); return ["train", "exam", "learn"].includes(v) ? v : "train"; } catch { return "train"; } },
   set(v) { try { sessionStorage.setItem("dtb.mode", v); } catch {} }
 };
+// One stable shuffle per attempt. The seed is dropped on restart/reload, so a
+// retake gets fresh option and matching-card positions without moving between
+// mode/language re-renders of the same attempt.
+const TRY_SEEDS = new Map();
+function attemptSeed(vid) {
+  if (!TRY_SEEDS.has(vid)) TRY_SEEDS.set(vid, (Math.random() * 0xFFFFFFFF) >>> 0);
+  return TRY_SEEDS.get(vid);
+}
+function resetAttempt(vid) { TRY_SEEDS.delete(vid); }
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function shuffleArr(a, rand) {
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+function shuffleForAttempt(sec, it, seed) {
+  const rand = mulberry32(seed);
+  const d = JSON.parse(JSON.stringify(it));
+  if (sec === "l1" && Array.isArray(d.ads)) {
+    const order = shuffleArr(d.ads.slice(), rand), map = new Map();
+    order.forEach((a, i) => { const old = a.l; a.l = LET[i]; map.set(old, a.l); });
+    d.ads = order;
+    d.persons = d.persons.map(p => ({ ...p, ans: map.get(p.ans) || p.ans }));
+    return d;
+  }
+  if (sec === "l3" && Array.isArray(d.posts)) {
+    const order = shuffleArr(d.posts.slice(), rand), map = new Map();
+    order.forEach((a, i) => { const old = a.l; a.l = LET[i]; map.set(old, a.l); });
+    d.posts = order;
+    d.persons = d.persons.map(p => ({ ...p, ans: map.get(p.ans) || p.ans }));
+    return d;
+  }
+  if (sec === "h2" && Array.isArray(d.opts) && Array.isArray(d.ans)) {
+    const old = d.opts.slice();
+    const order = shuffleArr(d.opts.map((_, i) => i), rand);
+    const map = new Map(order.map((oldI, newI) => [LET[oldI], LET[newI]]));
+    d.opts = order.map(i => old[i]);
+    d.ans = d.ans.map(a => map.get(a) || a);
+    return d;
+  }
+  if (sec === "s1" && Array.isArray(d.opts) && Array.isArray(d.opts[0])) {
+    const old = d.opts.slice();
+    const order = shuffleArr(old.map((_, i) => i), rand);
+    const map = new Map(order.map((oldI, newI) => [LET[oldI], LET[newI]]));
+    d.opts = order.map((oldI, newI) => [LET[newI], old[oldI][1]]);
+    d.ans = d.ans.map(a => map.get(a) || a);
+    return d;
+  }
+  if (sec === "s2" && Array.isArray(d.opts) && Array.isArray(d.ans)) {
+    d.opts = d.opts.map((opts, gi) => {
+      const order = shuffleArr(opts.map((_, j) => j), rand);
+      const map = new Map(order.map((oldJ, newJ) => [LET[oldJ], LET[newJ]]));
+      d.ans[gi] = map.get(d.ans[gi]) || d.ans[gi];
+      return order.map(j => opts[j]);
+    });
+    return d;
+  }
+  if (Array.isArray(d.qs)) {
+    d.qs.forEach(q => {
+      if (q.type !== "mc" || !Array.isArray(q.opts)) return;
+      const oldIdx = LET.indexOf(q.ans);
+      if (oldIdx < 0) return;
+      const order = shuffleArr(q.opts.map((_, i) => i), rand);
+      q.opts = order.map(i => q.opts[i]);
+      q.ans = LET[order.indexOf(oldIdx)];
+    });
+  }
+  return d;
+}
 function markActive() { const d = store.get("days", []); if (!d.includes(today())) { d.push(today()); store.set("days", d.slice(-400)); } }
 function saveRes(vid, score, max) {
   const r = store.get("res", {});
@@ -413,6 +488,7 @@ ${it.kind === "mc" ? it.opts.map((o, i) => `${LET[i]}) ${o}`).join("\n") : it.ki
   function score() { return items.reduce((n, it) => n + (st[it.key] && st[it.key].val === it.ans ? 1 : 0), 0); }
   function showResult() {
     finished = true;
+    resetAttempt(cfg.vid);
     const sc = score(), mx = items.length;
     const pct = Math.round(sc / mx * 100);
     saveRes(vid, sc, mx);
@@ -1859,9 +1935,11 @@ function viewItem(sec, idx) {
   if (!it) return viewSec(sec);
   const mode = modeStore.get();
   const next = idx < list.length ? `#${sec}.${idx + 1}` : null;
-  const ctx = { restart: () => render(), next };
+  const vid = vidOf(sec, it);
+  const shown = NO_MODE[sec] ? it : shuffleForAttempt(sec, it, attemptSeed(vid));
+  const ctx = { restart: () => { resetAttempt(vid); render(); }, next };
   LAST_QZ = null;
-  const body = RENDER[sec](it, NO_MODE[sec] ? "train" : mode, ctx);
+  const body = RENDER[sec](shown, NO_MODE[sec] ? "train" : mode, ctx);
   const qz = LAST_QZ;
   return h("div", { class: "wrap" },
     crumbs(h("a", { href: "#home" }, "Главная"), h("a", { href: "#" + sec }, s.t), s.label(it)),
@@ -2004,6 +2082,7 @@ function viewVoice() {
 
 /* ---------- mock exam ---------- */
 function newExam() {
+  TRY_SEEDS.clear();
   const pick = (a) => a[Math.floor(Math.random() * a.length)];
   const bq = pick(DB.B.filter(b => b.qs.length));
   const steps = [
@@ -2091,14 +2170,15 @@ function viewExam() {
   const S = SEC[s.sec];
   const timer = blockTimer(E, s.sec);
   LAST_QZ = null;
-  const body = s.only ? rBeschwerde(s.it, "exam", ctx, s.only) : RENDER[s.sec](s.it, "exam", ctx);
+  const shown = shuffleForAttempt(s.sec, s.it, attemptSeed(vidOf(s.sec, s.it)));
+  const body = s.only ? rBeschwerde(shown, "exam", ctx, s.only) : RENDER[s.sec](shown, "exam", ctx);
   const qz = LAST_QZ;
   return h("div", { class: "wrap" },
     crumbs(h("a", { href: "#home" }, "Главная"), "Пробный экзамен", `часть ${E.i + 1} из ${E.steps.length}`),
     steps, timer,
     h("div", { class: "spread" }, h("div", { class: "stack", style: "gap:4px" }, h("div", { class: "eyebrow" }, `${S.grp} · задания ${s.only === "quiz" ? "19–20" : s.only === "write" ? "21" : S.nums}`), h("h1", null, s.t)), nexts[0]),
     h("p", { class: "lead", style: "margin:0" }, s.only === "quiz" ? "Прочитайте записку и письмо клиента и ответьте на вопросы 19–20. Письмо напишете на следующем шаге." : S.task),
-    paperOn(s.sec === "b" || !s.only ? s.sec : "x") ? sheetEl(s.sec, S, s.it, body, qz) : body,
+    paperOn(s.sec === "b" || !s.only ? s.sec : "x") ? sheetEl(s.sec, S, shown, body, qz) : body,
     h("div", { class: "row", style: "justify-content:flex-end" }, nexts[1]));
 }
 function examResult(E, steps) {
