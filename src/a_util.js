@@ -96,16 +96,19 @@ function shuffleForAttempt(sec, it, seed) {
     });
     return d;
   }
-  if (Array.isArray(d.qs)) {
-    d.qs.forEach(q => {
-      if (q.type !== "mc" || !Array.isArray(q.opts)) return;
-      const oldIdx = LET.indexOf(q.ans);
-      if (oldIdx < 0) return;
-      const order = shuffleArr(q.opts.map((_, i) => i), rand);
-      q.opts = order.map(i => q.opts[i]);
-      q.ans = LET[order.indexOf(oldIdx)];
-    });
+  const mixMC = (q) => {
+    if (!q || q.type !== "mc" || !Array.isArray(q.opts)) return;
+    const oldIdx = LET.indexOf(q.ans);
+    if (oldIdx < 0) return;
+    const order = shuffleArr(q.opts.map((_, i) => i), rand);
+    q.opts = order.map(i => q.opts[i]);
+    q.ans = LET[order.indexOf(oldIdx)];
+  };
+  if (sec === "h4" && Array.isArray(d.msgs)) {
+    d.msgs.forEach(m => mixMC(m.q));
+    return d;
   }
+  if (Array.isArray(d.qs)) d.qs.forEach(mixMC);
   return d;
 }
 function markActive() { const d = store.get("days", []); if (!d.includes(today())) { d.push(today()); store.set("days", d.slice(-400)); } }
