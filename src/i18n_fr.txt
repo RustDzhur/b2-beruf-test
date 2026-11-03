@@ -433,3 +433,26 @@ r28|{~1} : non évalué
 422|environ 3 minutes
 423|environ 4 minutes
 424|Examen oral · Sprechen · en binôme, environ 16 minutes · sans préparation
+x5|Comment les erreurs sont closes
+x6|Erreur définitivement corrigée : 3 bonnes réponses à des jours différents.
+x7|Répétition comptée.
+x8|Prochaine répétition à partir de :
+x9|Correct, mais ce n’est pas encore le moment : l’erreur reste dans la liste.
+x10|Sera comptée à partir de :
+x11|Erreur enregistrée. Revenez demain : il faut 3 bonnes réponses à des jours différents, 1, 3 et 7 jours après l’erreur.
+x12|aujourd’hui
+x13|demain
+x14|À répéter aujourd’hui
+x15|Une erreur ne disparaît pas après une seule bonne réponse : on peut avoir deviné. Elle est close quand vous avez répondu correctement 3 fois à cette question, à des jours différents.
+x16|Comment ça marche
+x17|1re répétition : 1 jour après l’erreur
+x18|2e répétition : 3 jours après l’erreur
+x19|3e répétition : 7 jours après l’erreur
+x20|Une réponse donnée avant la date compte comme entraînement, mais l’erreur reste dans la liste. Une mauvaise réponse relance le décompte.
+x21|La série ●○○ indique combien de répétitions sont déjà comptées.
+x22|Si vous voyez encore une erreur ici après une bonne réponse, ce n’est pas un bug : la date n’est pas encore venue, ou il faut répéter une fois de plus.
+x23|À répéter maintenant
+x24|En attente de leur jour
+x25|Au premier essai
+x26|Actuellement
+r29|À partir de {~1}

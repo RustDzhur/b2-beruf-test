@@ -100,13 +100,18 @@ function pgData() {
   const days = Array.isArray(rawDays) ? [...new Set(rawDays.filter(x => /^\d{4}-\d{2}-\d{2}$/.test(x)))].sort() : [];
   const log = Array.isArray(store.get("log", [])) ? store.get("log", []).filter(x => x && pgNum(x.t)) : [];
   const nstat = store.get("nstat", {}) || {};
+  // first attempt per task (the rating rule shared with the teacher cabinet): res.first, else the earliest log entry, else the last result
+  const firstLog = new Map();
+  for (const x of log) if (x.vid && pgNum(x.mx)) { const c = firstLog.get(x.vid); if (!c || pgNum(x.t) < c.t) firstLog.set(x.vid, { t: pgNum(x.t), pct: Math.max(0, Math.min(100, pgNum(x.sc) / pgNum(x.mx) * 100)) }); }
   const items = [];
   for (const [vid, o] of Object.entries(res)) {
     if (!o || !pgNum(o.max)) continue;
     const part = pgPart(vid);
+    const cur = Math.max(0, Math.min(100, pgNum(o.last) / pgNum(o.max) * 100));
     items.push({
       vid, part,
-      cur: Math.max(0, Math.min(100, pgNum(o.last) / pgNum(o.max) * 100)),
+      first: o.first != null ? Math.max(0, Math.min(100, pgNum(o.first) / pgNum(o.max) * 100)) : firstLog.has(vid) ? firstLog.get(vid).pct : cur,
+      cur,
       best: Math.max(0, Math.min(100, pgNum(o.best) / pgNum(o.max) * 100)),
       n: Math.max(1, pgNum(o.n)), ts: pgNum(o.ts),
     });
@@ -123,7 +128,8 @@ function pgData() {
 
   const tasks = items.length;
   const attempts = items.reduce((a, x) => a + x.n, 0);
-  const scorePct = pgRound(pgMean(items.map(x => x.cur)));
+  const scorePct = pgRound(pgMean(items.map(x => x.first)));
+  const currentPct = pgRound(pgMean(items.map(x => x.cur)));
   const bestPct = pgRound(pgMean(items.map(x => x.best)));
   const success = items.filter(x => x.best >= 80).length;
   const fail = items.filter(x => x.best < 50).length;
@@ -133,9 +139,9 @@ function pgData() {
   const partMap = new Map();
   for (const it of items) {
     const sec = sections[it.part.section];
-    if (sec) { sec.tasks++; sec.attempts += it.n; sec.sum += it.cur; }
+    if (sec) { sec.tasks++; sec.attempts += it.n; sec.sum += it.first; }
     const p = partMap.get(it.part.key) || { key: it.part.key, label: it.part.label, section: it.part.section, tasks: 0, attempts: 0, sum: 0 };
-    p.tasks++; p.attempts += it.n; p.sum += it.cur; partMap.set(it.part.key, p);
+    p.tasks++; p.attempts += it.n; p.sum += it.first; partMap.set(it.part.key, p);
   }
   for (const id of PG_SECTIONS) { const s = sections[id]; s.pct = s.tasks ? pgRound(s.sum / s.tasks) : null; delete s.sum; }
   const parts = [...partMap.values()].map(p => ({ key: p.key, label: p.label, section: p.section, tasks: p.tasks, attempts: p.attempts, pct: pgRound(p.sum / p.tasks) }))
@@ -178,7 +184,7 @@ function pgData() {
     else if (a.id === "schreiben") earned = (sections.schreiben.pct || 0) >= 80 && sections.schreiben.tasks >= 2;
     return Object.assign({}, a, { earned });
   });
-  return { days: days.length, firstDay: days[0] || null, tasks, attempts, answers, scorePct, bestPct, success, mid, fail, failures: wrongArr.length, sections, parts, weak, recentWrong: wrongArr.slice(0, 20), activity, trend, streak: st, achievements, earned: achievements.filter(a => a.earned).length };
+  return { days: days.length, firstDay: days[0] || null, tasks, attempts, answers, scorePct, currentPct, bestPct, success, mid, fail, failures: wrongArr.length, sections, parts, weak, recentWrong: wrongArr.slice(0, 20), activity, trend, streak: st, achievements, earned: achievements.filter(a => a.earned).length };
 }
 
 /* --------------------------------------------------------------- charts --- */
@@ -273,7 +279,7 @@ function viewProgress() {
       pgKpi(T("Дней занятий"), pgFmt(d.days), d.firstDay ? T("с") + " " + pgShort(d.firstDay) : "", "var(--accent)"),
       pgKpi(T("Заданий решено"), pgFmt(d.tasks), T("из") + " 58", "var(--c-lesen)"),
       pgKpi(T("Попыток"), pgFmt(d.attempts), "", "var(--c-sprechen)"),
-      pgKpi(T("Средний результат"), pgPct(d.scorePct), T("Лучший") + ": " + pgPct(d.bestPct), "var(--c-schreiben)"),
+      pgKpi(T("С первой попытки"), pgPct(d.scorePct), T("Сейчас") + ": " + pgPct(d.currentPct) + " · " + T("Лучший") + ": " + pgPct(d.bestPct), "var(--c-schreiben)"),
       pgKpi(T("Ошибок к повтору"), pgFmt(d.failures), d.weak.length ? d.weak[0].label : "", "var(--bad)"),
       pgKpi(T("Серия дней"), pgFmt(d.streak.current), T("Рекорд") + ": " + d.streak.longest, "var(--c-hoeren)")));
   if (empty) {
@@ -405,7 +411,7 @@ function homeProgressCard() {
     h("div", { class: "home-mini-stats" },
       h("div", null, h("div", { class: "v" }, d.days), h("div", { class: "l" }, T("Дней занятий"))),
       h("div", null, h("div", { class: "v" }, d.attempts), h("div", { class: "l" }, T("Попыток"))),
-      h("div", null, h("div", { class: "v" }, pgPct(d.scorePct)), h("div", { class: "l" }, T("Средний результат"))),
+      h("div", null, h("div", { class: "v" }, pgPct(d.scorePct)), h("div", { class: "l" }, T("С первой попытки"))),
       h("div", null, h("div", { class: "v" }, d.failures), h("div", { class: "l" }, T("Ошибок к повтору")))),
     h("div", { class: "row" }, pgSparkline(d.activity.map(x => x.tests)), h("a", { class: "btn small", href: "#progress" }, T("Открыть прогресс") + " →")));
   return card;
@@ -437,7 +443,7 @@ async function renderLeaderboardView(force) {
   } catch (e) {
     box.replaceChildren(h("div", { class: "pg-card" }, h("div", { class: "pg-empty" },
       h("h2", { style: "margin:0 0 6px" }, T("Рейтинг недоступен. Попробуйте позже.")),
-      h("p", { style: "margin:0 auto 12px" }, e.message || ""),
+      h("p", { style: "margin:0 auto 12px" }),
       h("button", { class: "btn", onclick: () => renderLeaderboardView(true) }, T("Обновить")))));
   }
 }

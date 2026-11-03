@@ -27,8 +27,8 @@ function viewHome() {
   const ns = store.get("nstat", {}), res = store.get("res", {}), wrong = Object.keys(store.get("wrong", {})).length;
   const days = store.get("days", []).length;
   const tried = Object.keys(res).length;
-  const pcts = Object.values(res).filter(r => r.max).map(r => r.last / r.max);
-  const avg = pcts.length ? Math.round(pcts.reduce((a, b) => a + b, 0) / pcts.length * 100) + "%" : "—";
+  const fp = pgData().scorePct; // first attempts, same number as in Progress and in the teacher cabinet
+  const avg = fp == null ? "—" : Math.round(fp) + "%";
   const cells = [];
   for (let n = 1; n <= 58; n++) {
     const s = ns[n]; let cls = "";
@@ -165,8 +165,8 @@ function bogenHead() {
   const c = cand();
   const boxes = (v, n) => h("span", { class: "bx" }, Array.from({ length: n }, (_, i) => h("i", null, (v || "")[i] || "")));
   return h("div", { class: "bg-data" },
-    h("div", null, boxes(c.fam.toUpperCase(), 20), h("small", null, "Familienname · Surname · Nom · Cognome · Soyadı · Фамилия")),
-    h("div", null, boxes(c.vor.toUpperCase(), 20), h("small", null, "Vorname · First Name · Prénom · Nome · Adı · Имя")));
+    h("div", null, boxes(c.fam.toUpperCase(), 20), h("small", null, L7("Familienname", "Surname", "Nom", "Cognome", "Soyadı", "Фамилия"))),
+    h("div", null, boxes(c.vor.toUpperCase(), 20), h("small", null, L7("Vorname", "First Name", "Prénom", "Nome", "Adı", "Имя"))));
 }
 // one Antwortbogen panel (Lesen / Hören / Sprachbausteine) with the rows of the current task
 function bogenPanel(sec, qz) {
@@ -194,23 +194,40 @@ function sheetEl(sec, s, it, body, qz) {
 }
 
 function viewReview() {
-  const w = store.get("wrong", {});
+  const w = store.get("wrong", {}), day = rpDay();
   const by = {};
-  Object.values(w).forEach(x => { if (!SEC[x.sec]) return; (by[x.vid] = by[x.vid] || { sec: x.sec, ns: new Set() }).ns.add(x.n); });
+  Object.values(w).forEach(x => { if (!SEC[x.sec]) return; const g = (by[x.vid] = by[x.vid] || { sec: x.sec, qs: [] }); g.qs.push(Object.assign({ n: x.n }, rpState(x))); });
   const entries = Object.entries(by).map(([vid, g]) => {
     const list = SEC[g.sec].list(); const i = list.findIndex(it => vidOf(g.sec, it) === vid);
-    return i < 0 ? null : { vid, sec: g.sec, idx: i + 1, it: list[i], ns: [...g.ns].sort((a, b) => a - b) };
-  }).filter(Boolean).sort((a, b) => SECS.indexOf(SEC[a.sec]) - SECS.indexOf(SEC[b.sec]));
+    if (i < 0) return null;
+    const qs = g.qs.sort((a, b) => a.n - b.n);
+    const due = qs.map(q => q.due).sort()[0];
+    return { vid, sec: g.sec, idx: i + 1, it: list[i], qs, due, ready: due <= day };
+  }).filter(Boolean).sort((a, b) => (a.due < b.due ? -1 : a.due > b.due ? 1 : 0) || SECS.indexOf(SEC[a.sec]) - SECS.indexOf(SEC[b.sec]));
   const weak = Object.entries(store.get("nstat", {})).filter(([, s]) => s[1] >= 2 && s[0] / s[1] < .5).map(([n]) => +n).sort((a, b) => a - b);
+  const dots = (q) => "●".repeat(q.ok) + "○".repeat(REPEAT_NEED - q.ok);
+  const row = (e) => h("a", { class: "li", href: `#${e.sec}.${e.idx}` }, h("span", { class: "num" }, SEC[e.sec].nums),
+    h("div", { class: "grow" }, h("div", { class: "pt" }, `${SEC[e.sec].t} · ${SEC[e.sec].label(e.it)}`),
+      h("div", { class: "ps small muted" }, e.qs.map(q => "№" + q.n + " " + dots(q)).join(" · "))),
+    h("span", { class: "chip " + (e.ready ? "bad" : "") }, e.ready ? "Повторить сегодня" : "Можно с " + rpPretty(e.due)));
+  const ready = entries.filter(e => e.ready), later = entries.filter(e => !e.ready);
   return h("div", { class: "wrap narrow" },
     crumbs(h("a", { href: "#home" }, "Главная"), "Ошибки"),
     h("h1", null, "Повторить ошибки"),
-    h("p", { class: "lead", style: "margin:0" }, "Здесь варианты, где вы последний раз ответили неверно. Когда ответите правильно, вопрос сам исчезнет из списка."),
+    h("p", { class: "lead", style: "margin:0" }, "Ошибка не исчезает после одного верного ответа: так легко угадать. Она закрывается, когда вы ответили на этот вопрос правильно 3 раза в разные дни."),
+    h("div", { class: "note info rp-how" }, h("b", null, "Как это работает"),
+      h("div", null, "1️⃣ ", h("span", null, "1-й повтор: через 1 день после ошибки")),
+      h("div", null, "2️⃣ ", h("span", null, "2-й повтор: через 3 дня после ошибки")),
+      h("div", null, "3️⃣ ", h("span", null, "3-й повтор: через 7 дней после ошибки")),
+      h("div", null, "Ответ раньше срока засчитывается как тренировка, но ошибка остаётся в списке. Неверный ответ начинает отсчёт заново."),
+      h("div", null, "Серия ●○○ показывает, сколько повторов уже засчитано."),
+      h("div", { class: "small muted" }, "Если вы видите ошибку здесь после верного ответа, это не сбой: ещё не наступил срок или нужно повторить ещё раз.")),
     weak.length ? h("div", { class: "note info" }, "Чаще всего ошибки в заданиях №", weak.join(", "), ". Начните с них.") : null,
-    entries.length ? h("div", { class: "card list" }, entries.map(e => h("a", { class: "li", href: `#${e.sec}.${e.idx}` }, h("span", { class: "num" }, SEC[e.sec].nums),
-      h("div", { class: "grow" }, h("div", { class: "pt" }, `${SEC[e.sec].t} · ${SEC[e.sec].label(e.it)}`), h("div", { class: "ps small muted" }, "Ошибки в №" + e.ns.join(", "))),
-      h("span", { class: "chip bad" }, e.ns.length))))
-      : h("div", { class: "card" }, h("p", { style: "margin:0" }, "Ошибок пока нет. Решите несколько вариантов, и здесь появятся вопросы для повторения."), h("p", null, h("a", { class: "btn primary", href: "#exam" }, "Пробный экзамен"))));
+    ready.length ? h("h3", null, "Пора повторить · " + ready.length) : null,
+    ready.length ? h("div", { class: "card list" }, ready.map(row)) : null,
+    later.length ? h("h3", null, "Ждут своего дня · " + later.length) : null,
+    later.length ? h("div", { class: "card list" }, later.map(row)) : null,
+    entries.length ? null : h("div", { class: "card" }, h("p", { style: "margin:0" }, "Ошибок пока нет. Решите несколько вариантов, и здесь появятся вопросы для повторения."), h("p", null, h("a", { class: "btn primary", href: "#exam" }, "Пробный экзамен"))));
 }
 
 function viewVoice() {
@@ -312,8 +329,8 @@ function coverEl() {
   return h("div", { class: "cover" },
     h("div", { class: "cv-head" }, h("b", null, "Deutsch-Test für den Beruf"), h("span", null, "Antwortbogen S30")),
     h("p", { class: "small", style: "margin:0" }, "Как на экзамене: перед началом заполните данные на бланке ответов. Они появятся в шапке каждой страницы бланка."),
-    inp("fam", "Familienname · Surname · Nom · Cognome · Soyadı · Фамилия"),
-    inp("vor", "Vorname · First Name · Prénom · Nome · Adı · Имя"));
+    inp("fam", L7("Familienname", "Surname", "Nom", "Cognome", "Soyadı", "Фамилия")),
+    inp("vor", L7("Vorname", "First Name", "Prénom", "Nome", "Adı", "Имя")));
 }
 function viewExam() {
   if (!EXAM) EXAM = newExam();
@@ -388,7 +405,10 @@ function updateNav() {
    Stored only in this browser (localStorage), never sent anywhere. */
 const LANG_CODES = [["001", "Deutsch"], ["002", "English"], ["003", "Français"], ["004", "Español"], ["005", "Italiano"], ["006", "Português"], ["007", "Magyar"],
   ["008", "Polski"], ["009", "Русский язык"], ["010", "Český jazyk"], ["011", "Türkçe"], ["012", "عربي"], ["013", "汉语"], ["000", "andere/other"]];
-const L7 = (de, en, fr, it, tr, ru) => [de, en, fr, it, tr, ru].join(" · ");
+// official German label plus its translation into the chosen interface language (none for German); Arabic is not on the printed form, so it is added here
+const L7_AR = { "männlich": "ذكر", "weiblich": "أنثى", "Testversion": "نسخة الاختبار", "Familienname": "اللقب", "Vorname": "الاسم الأول", "Geburtsdatum": "تاريخ الميلاد", "Geburtsort": "مكان الميلاد",
+  "Erstsprache": "اللغة الأولى", "Geschlecht": "الجنس", "Straße und Hausnummer": "الشارع ورقم المنزل", "Postleitzahl und Ort": "الرمز البريدي والمدينة", "Prüfungszentrum": "مركز الامتحان", "Prüfungsdatum": "تاريخ الامتحان" };
+const L7 = (de, en, fr, it, tr, ru) => { const t = { en, fr, it, tr, ru, ar: L7_AR[de] }[curLang()]; return t ? de + " · " + t : de; };
 function viewProfile(first) {
   const c = cand();
   const dm = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.exec(c.geb || ""); // older entries were typed as TT.MM.JJJJ

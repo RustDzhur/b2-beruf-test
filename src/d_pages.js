@@ -197,13 +197,14 @@ function rNotiz(it, mode, ctx) {
     pts.s = Math.round(pts.s * 10) / 10;
     const sc = res.filter(r => r.ok).length;
     saveRes(it.id, sc, res.length);
-    trackItems(res.map((r, i) => ({ key: `${it.id}:${i}`, n: r.n, ok: r.ok, vid: it.id, sec: "n" })));
+    const changes = trackItems(res.map((r, i) => ({ key: `${it.id}:${i}`, n: r.n, ok: r.ok, vid: it.id, sec: "n" })));
     const pct = sc / res.length;
     out.replaceChildren(h("div", { class: "result" }, h("span", { class: "big" }, `${sc}/${res.length}`), h("span", { class: "chip " + (pct >= .6 ? "ok" : pct >= .4 ? "warn" : "bad") }, `Hören ${pts.h}/3 · Schreiben ${pts.s}/6`),
       h("span", { class: "small muted", style: "flex:1;min-width:200px" }, "Проверка по ключевым словам и цифрам. Формулировка может быть своей, главное — смысл и числа."),
       h("button", { class: "btn", onclick: () => render() }, "↻ Заново")),
       h("div", { class: "card stack" }, h("div", { class: "eyebrow" }, "Правильная записка · " + it.type), res.map(r => h("div", { class: "check " + (r.ok ? "ok" : "no") }, h("span", { class: "m" }, r.ok ? "✓" : "✗"), h("span", null, `${r.n} · ${r.l}`)))),
       ...(mode === "exam" ? [h("div", { class: "row" }, tr.btn), tr.box] : []));
+    const rn = repeatNote(changes); if (rn) out.append(rn);
     checkBtn.disabled = true;
     ctx.onDone && ctx.onDone(sc, res.length, pts);
   } }, "Проверить записку");

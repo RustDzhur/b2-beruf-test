@@ -433,3 +433,26 @@ r28|{~1}: non valutato
 422|circa 3 minuti
 423|circa 4 minuti
 424|Esame orale · Sprechen · in coppia, circa 16 minuti · senza preparazione
+x5|Come si chiudono gli errori
+x6|Errore chiuso definitivamente: 3 risposte corrette in giorni diversi.
+x7|Ripasso conteggiato.
+x8|Prossimo ripasso da:
+x9|Corretto, ma non è ancora il momento, quindi l’errore resta nell’elenco.
+x10|Verrà conteggiato da:
+x11|Errore registrato. Torni domani: servono 3 risposte corrette in giorni diversi, dopo 1, 3 e 7 giorni dall’errore.
+x12|oggi
+x13|domani
+x14|Da ripassare oggi
+x15|Un errore non scompare dopo una sola risposta corretta: potrebbe essere un caso. Si chiude quando risponde correttamente a questa domanda 3 volte in giorni diversi.
+x16|Come funziona
+x17|1º ripasso: 1 giorno dopo l’errore
+x18|2º ripasso: 3 giorni dopo l’errore
+x19|3º ripasso: 7 giorni dopo l’errore
+x20|Una risposta prima della scadenza vale come esercizio, ma l’errore resta nell’elenco. Una risposta sbagliata fa ripartire il conteggio.
+x21|La serie ●○○ mostra quanti ripassi sono già conteggiati.
+x22|Se dopo una risposta corretta vede ancora un errore qui, non è un malfunzionamento: la data non è ancora arrivata oppure serve un altro ripasso.
+x23|È ora di ripassare
+x24|In attesa del loro giorno
+x25|Al primo tentativo
+x26|Ora
+r29|Da {~1}

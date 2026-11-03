@@ -1,3 +1,39 @@
+/* ---------- spaced repetition of mistakes (pure logic, unit-tested in tests/repeat.test.js) ----------
+   A mistake in localStorage "wrong" is {vid, sec, n, ts, ok, due}. It leaves the list only after REPEAT_NEED correct answers on
+   separate days: the first counts from day +1 after the mistake, the second 2 days later (day 3), the third 4 days later (day 7).
+   A wrong answer starts the cycle over. A correct answer before `due` is shown to the student but does not count.
+   Old entries without ok/due are treated as ok = 0, due = day after the mistake, so nothing stored earlier is lost. */
+const REPEAT_GAPS = [1, 2, 4];
+const REPEAT_NEED = REPEAT_GAPS.length;
+const rpPad = (n) => String(n).padStart(2, "0");
+const rpDay = (ts) => { const d = new Date(ts == null ? Date.now() : ts); return d.getFullYear() + "-" + rpPad(d.getMonth() + 1) + "-" + rpPad(d.getDate()); };
+function rpAddDays(day, n) {
+  const [y, m, d] = day.split("-").map(Number);
+  const t = new Date(Date.UTC(y, m - 1, d + n));
+  return t.getUTCFullYear() + "-" + rpPad(t.getUTCMonth() + 1) + "-" + rpPad(t.getUTCDate());
+}
+function rpState(w) {
+  const ok = Math.max(0, Math.min(REPEAT_NEED - 1, +(w && w.ok) || 0));
+  const due = w && /^\d{4}-\d{2}-\d{2}$/.test(w.due || "") ? w.due : rpAddDays(rpDay(w && w.ts), REPEAT_GAPS[0]);
+  return { ok, due };
+}
+/* One answer to a question. w: stored entry or undefined, day: today as YYYY-MM-DD, nowTs: Date.now(), q: {vid, sec, n}.
+   Returns {entry, status, ok, due}; entry === null means "remove from the list".
+   status: none (right, nothing to repeat) | wrong (new or restarted) | early (right, but not its day yet) | step (counted) | fixed (3 of 3) */
+function rpAnswer(w, correct, day, nowTs, q) {
+  if (!correct) {
+    const due = rpAddDays(day, REPEAT_GAPS[0]);
+    return { entry: { vid: q.vid, sec: q.sec, n: q.n, ts: nowTs, ok: 0, due }, status: "wrong", ok: 0, due };
+  }
+  if (!w) return { entry: null, status: "none", ok: 0, due: "" };
+  const s = rpState(w);
+  if (day < s.due) return { entry: Object.assign({}, w, { ok: s.ok, due: s.due }), status: "early", ok: s.ok, due: s.due };
+  const ok = s.ok + 1;
+  if (ok >= REPEAT_NEED) return { entry: null, status: "fixed", ok: REPEAT_NEED, due: "" };
+  const due = rpAddDays(day, REPEAT_GAPS[ok]);
+  return { entry: Object.assign({}, w, { ok, due }), status: "step", ok, due };
+}
+if (typeof module !== "undefined" && module.exports) module.exports = { REPEAT_GAPS, REPEAT_NEED, rpDay, rpAddDays, rpState, rpAnswer };
 (() => {
 "use strict";
 
@@ -115,6 +151,7 @@ function markActive() { const d = store.get("days", []); if (!d.includes(today()
 function saveRes(vid, score, max) {
   const r = store.get("res", {});
   const o = r[vid] || { best: 0, n: 0 };
+  if (!o.n && o.first == null) o.first = score; // first attempt is kept for the rating: retakes must not hide the original mistakes
   o.last = score; o.max = max; o.n++; o.ts = Date.now(); o.best = Math.max(o.best || 0, score);
   r[vid] = o; store.set("res", r); markActive();
   // compact activity log for the teacher cabinet (last 2000 attempts); synced to Firestore
@@ -122,13 +159,35 @@ function saveRes(vid, score, max) {
   if (Array.isArray(log)) { log.push({ t: o.ts, vid, sc: score, mx: max }); store.set("log", log.slice(-2000)); }
 }
 const resOf = (vid) => store.get("res", {})[vid];
+// A mistake leaves the list only after 3 correct answers on separate days (see a0_repeat.js).
+// Returns what happened to every question that has a mistake on record, so the result screen can explain it.
 function trackItems(list) { // list: [{key, n, ok, vid, sec}]
-  const w = store.get("wrong", {}), ns = store.get("nstat", {});
+  const w = store.get("wrong", {}), ns = store.get("nstat", {}), day = rpDay(), now = Date.now(), out = [];
   for (const it of list) {
-    if (it.ok) delete w[it.key]; else w[it.key] = { vid: it.vid, sec: it.sec, n: it.n, ts: Date.now() };
+    const r = rpAnswer(w[it.key], it.ok, day, now, it);
+    if (r.entry) w[it.key] = r.entry; else delete w[it.key];
+    if (r.status !== "none") out.push({ key: it.key, n: it.n, status: r.status, ok: r.ok, due: r.due });
     if (it.n) { const s = ns[it.n] || [0, 0]; s[0] += it.ok ? 1 : 0; s[1]++; ns[it.n] = s; }
   }
   store.set("wrong", w); store.set("nstat", ns); updateNav();
+  return out;
+}
+// Dates are shown as DD.MM. (same in every language); "today"/"tomorrow" stay Russian keys that the language pass translates.
+const rpPretty = (day) => { if (!day) return ""; if (day === rpDay()) return "сегодня"; if (day === rpAddDays(rpDay(), 1)) return "завтра"; const [, m, d] = day.split("-"); return d + "." + m + "."; };
+// Explanation under a result: why a mistake is still on the list after a correct answer and when to come back.
+// Every sentence is its own text node so the language pass can translate it (src/i18n_*.txt, ids x5...).
+function repeatNote(changes) {
+  const by = (st) => (changes || []).filter(c => c.status === st);
+  const nums = (list, withStep) => h("span", { class: "rp-n" }, list.map(c => "№" + c.n + (withStep ? " (" + c.ok + "/" + REPEAT_NEED + ")" : "")).join(", "));
+  const earliest = (list) => rpPretty(list.map(c => c.due).sort()[0]);
+  const line = (icon, list, text, withStep, dueLabel, due) => h("div", { class: "rp-line" }, icon + " ", nums(list, withStep), " — ", text, dueLabel ? [" ", h("span", null, dueLabel), " ", h("b", null, due)] : null);
+  const fixed = by("fixed"), step = by("step"), early = by("early"), bad = by("wrong");
+  const lines = [];
+  if (fixed.length) lines.push(line("✅", fixed, "Ошибка закрыта навсегда: 3 верных ответа в разные дни."));
+  if (step.length) lines.push(line("🔁", step, "Повторение засчитано.", true, "Следующее повторение с:", earliest(step)));
+  if (early.length) lines.push(line("⏳", early, "Верно, но срок ещё не наступил, поэтому ошибка остаётся в списке.", false, "Засчитается с:", earliest(early)));
+  if (bad.length) lines.push(line("❗", bad, "Ошибка записана. Вернитесь завтра: нужно 3 верных ответа в разные дни, через 1, 3 и 7 дней после ошибки."));
+  return lines.length ? h("div", { class: "note info repeat-note" }, h("b", null, "Как закрываются ошибки"), lines) : null;
 }
 
 /* ---------- ИИ (sample capability) ---------- */
@@ -495,7 +554,7 @@ ${it.kind === "mc" ? it.opts.map((o, i) => `${LET[i]}) ${o}`).join("\n") : it.ki
     const sc = score(), mx = items.length;
     const pct = Math.round(sc / mx * 100);
     saveRes(vid, sc, mx);
-    trackItems(items.map(it => ({ key: `${vid}:${it.key}`, n: it.n, ok: st[it.key].val === it.ans, vid, sec })));
+    const changes = trackItems(items.map(it => ({ key: `${vid}:${it.key}`, n: it.n, ok: st[it.key].val === it.ans, vid, sec })));
     const pts = Math.round(sc * per * 10) / 10, pmx = Math.round(mx * per * 10) / 10;
     resultBox.replaceChildren(h("div", { class: "result" },
       h("span", { class: "big" }, `${sc}/${mx}`),
@@ -503,6 +562,7 @@ ${it.kind === "mc" ? it.opts.map((o, i) => `${LET[i]}) ${o}`).join("\n") : it.ki
       h("span", { class: "small muted", style: "flex:1;min-width:200px" }, pct >= 60 ? "Это уровень сдачи (60% и выше)." : "Пока ниже 60%. Посмотрите ошибки и нажмите «Почему?»."),
       h("button", { class: "btn", onclick: () => cfg.restart && cfg.restart() }, "↻ Пройти заново"),
       cfg.next ? h("a", { class: "btn primary", href: cfg.next }, "Следующий вариант →") : null));
+    const rn = repeatNote(changes); if (rn) resultBox.append(rn);
     checkBtn.hidden = true;
     cfg.onDone && cfg.onDone(sc, mx);
   }
@@ -884,13 +944,14 @@ function rNotiz(it, mode, ctx) {
     pts.s = Math.round(pts.s * 10) / 10;
     const sc = res.filter(r => r.ok).length;
     saveRes(it.id, sc, res.length);
-    trackItems(res.map((r, i) => ({ key: `${it.id}:${i}`, n: r.n, ok: r.ok, vid: it.id, sec: "n" })));
+    const changes = trackItems(res.map((r, i) => ({ key: `${it.id}:${i}`, n: r.n, ok: r.ok, vid: it.id, sec: "n" })));
     const pct = sc / res.length;
     out.replaceChildren(h("div", { class: "result" }, h("span", { class: "big" }, `${sc}/${res.length}`), h("span", { class: "chip " + (pct >= .6 ? "ok" : pct >= .4 ? "warn" : "bad") }, `Hören ${pts.h}/3 · Schreiben ${pts.s}/6`),
       h("span", { class: "small muted", style: "flex:1;min-width:200px" }, "Проверка по ключевым словам и цифрам. Формулировка может быть своей, главное — смысл и числа."),
       h("button", { class: "btn", onclick: () => render() }, "↻ Заново")),
       h("div", { class: "card stack" }, h("div", { class: "eyebrow" }, "Правильная записка · " + it.type), res.map(r => h("div", { class: "check " + (r.ok ? "ok" : "no") }, h("span", { class: "m" }, r.ok ? "✓" : "✗"), h("span", null, `${r.n} · ${r.l}`)))),
       ...(mode === "exam" ? [h("div", { class: "row" }, tr.btn), tr.box] : []));
+    const rn = repeatNote(changes); if (rn) out.append(rn);
     checkBtn.disabled = true;
     ctx.onDone && ctx.onDone(sc, res.length, pts);
   } }, "Проверить записку");
@@ -1260,7 +1321,12 @@ function mergeCloud(cd, cupd) {
     const loc = store.get(k, null);
     if (loc == null) { store.set(k, cd[k]); return; }
     if (k === "days") store.set(k, [...new Set([...(loc || []), ...(cd[k] || [])])].sort().slice(-400));
-    else if (k === "res") { const m = { ...loc }; Object.entries(cd[k] || {}).forEach(([v, o]) => { if (!m[v] || (o.ts || 0) > (m[v].ts || 0)) m[v] = o; }); store.set(k, m); }
+    else if (k === "res") { const m = { ...loc }; Object.entries(cd[k] || {}).forEach(([v, o]) => {
+        const keep = m[v];
+        if (!keep || (o.ts || 0) > (keep.ts || 0)) m[v] = o;
+        const f = [keep && keep.first, o && o.first].filter(x => x != null);
+        if (f.length && m[v].first == null) m[v] = { ...m[v], first: f[0] };
+      }); store.set(k, m); }
     else if (k === "log") {
       const byKey = new Map();
       [...(Array.isArray(loc) ? loc : []), ...(Array.isArray(cd[k]) ? cd[k] : [])].forEach(x => { if (x && x.t) byKey.set(x.t + "|" + x.vid, x); });
@@ -1429,13 +1495,18 @@ function pgData() {
   const days = Array.isArray(rawDays) ? [...new Set(rawDays.filter(x => /^\d{4}-\d{2}-\d{2}$/.test(x)))].sort() : [];
   const log = Array.isArray(store.get("log", [])) ? store.get("log", []).filter(x => x && pgNum(x.t)) : [];
   const nstat = store.get("nstat", {}) || {};
+  // first attempt per task (the rating rule shared with the teacher cabinet): res.first, else the earliest log entry, else the last result
+  const firstLog = new Map();
+  for (const x of log) if (x.vid && pgNum(x.mx)) { const c = firstLog.get(x.vid); if (!c || pgNum(x.t) < c.t) firstLog.set(x.vid, { t: pgNum(x.t), pct: Math.max(0, Math.min(100, pgNum(x.sc) / pgNum(x.mx) * 100)) }); }
   const items = [];
   for (const [vid, o] of Object.entries(res)) {
     if (!o || !pgNum(o.max)) continue;
     const part = pgPart(vid);
+    const cur = Math.max(0, Math.min(100, pgNum(o.last) / pgNum(o.max) * 100));
     items.push({
       vid, part,
-      cur: Math.max(0, Math.min(100, pgNum(o.last) / pgNum(o.max) * 100)),
+      first: o.first != null ? Math.max(0, Math.min(100, pgNum(o.first) / pgNum(o.max) * 100)) : firstLog.has(vid) ? firstLog.get(vid).pct : cur,
+      cur,
       best: Math.max(0, Math.min(100, pgNum(o.best) / pgNum(o.max) * 100)),
       n: Math.max(1, pgNum(o.n)), ts: pgNum(o.ts),
     });
@@ -1452,7 +1523,8 @@ function pgData() {
 
   const tasks = items.length;
   const attempts = items.reduce((a, x) => a + x.n, 0);
-  const scorePct = pgRound(pgMean(items.map(x => x.cur)));
+  const scorePct = pgRound(pgMean(items.map(x => x.first)));
+  const currentPct = pgRound(pgMean(items.map(x => x.cur)));
   const bestPct = pgRound(pgMean(items.map(x => x.best)));
   const success = items.filter(x => x.best >= 80).length;
   const fail = items.filter(x => x.best < 50).length;
@@ -1462,9 +1534,9 @@ function pgData() {
   const partMap = new Map();
   for (const it of items) {
     const sec = sections[it.part.section];
-    if (sec) { sec.tasks++; sec.attempts += it.n; sec.sum += it.cur; }
+    if (sec) { sec.tasks++; sec.attempts += it.n; sec.sum += it.first; }
     const p = partMap.get(it.part.key) || { key: it.part.key, label: it.part.label, section: it.part.section, tasks: 0, attempts: 0, sum: 0 };
-    p.tasks++; p.attempts += it.n; p.sum += it.cur; partMap.set(it.part.key, p);
+    p.tasks++; p.attempts += it.n; p.sum += it.first; partMap.set(it.part.key, p);
   }
   for (const id of PG_SECTIONS) { const s = sections[id]; s.pct = s.tasks ? pgRound(s.sum / s.tasks) : null; delete s.sum; }
   const parts = [...partMap.values()].map(p => ({ key: p.key, label: p.label, section: p.section, tasks: p.tasks, attempts: p.attempts, pct: pgRound(p.sum / p.tasks) }))
@@ -1507,7 +1579,7 @@ function pgData() {
     else if (a.id === "schreiben") earned = (sections.schreiben.pct || 0) >= 80 && sections.schreiben.tasks >= 2;
     return Object.assign({}, a, { earned });
   });
-  return { days: days.length, firstDay: days[0] || null, tasks, attempts, answers, scorePct, bestPct, success, mid, fail, failures: wrongArr.length, sections, parts, weak, recentWrong: wrongArr.slice(0, 20), activity, trend, streak: st, achievements, earned: achievements.filter(a => a.earned).length };
+  return { days: days.length, firstDay: days[0] || null, tasks, attempts, answers, scorePct, currentPct, bestPct, success, mid, fail, failures: wrongArr.length, sections, parts, weak, recentWrong: wrongArr.slice(0, 20), activity, trend, streak: st, achievements, earned: achievements.filter(a => a.earned).length };
 }
 
 /* --------------------------------------------------------------- charts --- */
@@ -1602,7 +1674,7 @@ function viewProgress() {
       pgKpi(T("Дней занятий"), pgFmt(d.days), d.firstDay ? T("с") + " " + pgShort(d.firstDay) : "", "var(--accent)"),
       pgKpi(T("Заданий решено"), pgFmt(d.tasks), T("из") + " 58", "var(--c-lesen)"),
       pgKpi(T("Попыток"), pgFmt(d.attempts), "", "var(--c-sprechen)"),
-      pgKpi(T("Средний результат"), pgPct(d.scorePct), T("Лучший") + ": " + pgPct(d.bestPct), "var(--c-schreiben)"),
+      pgKpi(T("С первой попытки"), pgPct(d.scorePct), T("Сейчас") + ": " + pgPct(d.currentPct) + " · " + T("Лучший") + ": " + pgPct(d.bestPct), "var(--c-schreiben)"),
       pgKpi(T("Ошибок к повтору"), pgFmt(d.failures), d.weak.length ? d.weak[0].label : "", "var(--bad)"),
       pgKpi(T("Серия дней"), pgFmt(d.streak.current), T("Рекорд") + ": " + d.streak.longest, "var(--c-hoeren)")));
   if (empty) {
@@ -1734,7 +1806,7 @@ function homeProgressCard() {
     h("div", { class: "home-mini-stats" },
       h("div", null, h("div", { class: "v" }, d.days), h("div", { class: "l" }, T("Дней занятий"))),
       h("div", null, h("div", { class: "v" }, d.attempts), h("div", { class: "l" }, T("Попыток"))),
-      h("div", null, h("div", { class: "v" }, pgPct(d.scorePct)), h("div", { class: "l" }, T("Средний результат"))),
+      h("div", null, h("div", { class: "v" }, pgPct(d.scorePct)), h("div", { class: "l" }, T("С первой попытки"))),
       h("div", null, h("div", { class: "v" }, d.failures), h("div", { class: "l" }, T("Ошибок к повтору")))),
     h("div", { class: "row" }, pgSparkline(d.activity.map(x => x.tests)), h("a", { class: "btn small", href: "#progress" }, T("Открыть прогресс") + " →")));
   return card;
@@ -1766,7 +1838,7 @@ async function renderLeaderboardView(force) {
   } catch (e) {
     box.replaceChildren(h("div", { class: "pg-card" }, h("div", { class: "pg-empty" },
       h("h2", { style: "margin:0 0 6px" }, T("Рейтинг недоступен. Попробуйте позже.")),
-      h("p", { style: "margin:0 auto 12px" }, e.message || ""),
+      h("p", { style: "margin:0 auto 12px" }),
       h("button", { class: "btn", onclick: () => renderLeaderboardView(true) }, T("Обновить")))));
   }
 }
@@ -1871,8 +1943,8 @@ function viewHome() {
   const ns = store.get("nstat", {}), res = store.get("res", {}), wrong = Object.keys(store.get("wrong", {})).length;
   const days = store.get("days", []).length;
   const tried = Object.keys(res).length;
-  const pcts = Object.values(res).filter(r => r.max).map(r => r.last / r.max);
-  const avg = pcts.length ? Math.round(pcts.reduce((a, b) => a + b, 0) / pcts.length * 100) + "%" : "—";
+  const fp = pgData().scorePct; // first attempts, same number as in Progress and in the teacher cabinet
+  const avg = fp == null ? "—" : Math.round(fp) + "%";
   const cells = [];
   for (let n = 1; n <= 58; n++) {
     const s = ns[n]; let cls = "";
@@ -2009,8 +2081,8 @@ function bogenHead() {
   const c = cand();
   const boxes = (v, n) => h("span", { class: "bx" }, Array.from({ length: n }, (_, i) => h("i", null, (v || "")[i] || "")));
   return h("div", { class: "bg-data" },
-    h("div", null, boxes(c.fam.toUpperCase(), 20), h("small", null, "Familienname · Surname · Nom · Cognome · Soyadı · Фамилия")),
-    h("div", null, boxes(c.vor.toUpperCase(), 20), h("small", null, "Vorname · First Name · Prénom · Nome · Adı · Имя")));
+    h("div", null, boxes(c.fam.toUpperCase(), 20), h("small", null, L7("Familienname", "Surname", "Nom", "Cognome", "Soyadı", "Фамилия"))),
+    h("div", null, boxes(c.vor.toUpperCase(), 20), h("small", null, L7("Vorname", "First Name", "Prénom", "Nome", "Adı", "Имя"))));
 }
 // one Antwortbogen panel (Lesen / Hören / Sprachbausteine) with the rows of the current task
 function bogenPanel(sec, qz) {
@@ -2038,23 +2110,40 @@ function sheetEl(sec, s, it, body, qz) {
 }
 
 function viewReview() {
-  const w = store.get("wrong", {});
+  const w = store.get("wrong", {}), day = rpDay();
   const by = {};
-  Object.values(w).forEach(x => { if (!SEC[x.sec]) return; (by[x.vid] = by[x.vid] || { sec: x.sec, ns: new Set() }).ns.add(x.n); });
+  Object.values(w).forEach(x => { if (!SEC[x.sec]) return; const g = (by[x.vid] = by[x.vid] || { sec: x.sec, qs: [] }); g.qs.push(Object.assign({ n: x.n }, rpState(x))); });
   const entries = Object.entries(by).map(([vid, g]) => {
     const list = SEC[g.sec].list(); const i = list.findIndex(it => vidOf(g.sec, it) === vid);
-    return i < 0 ? null : { vid, sec: g.sec, idx: i + 1, it: list[i], ns: [...g.ns].sort((a, b) => a - b) };
-  }).filter(Boolean).sort((a, b) => SECS.indexOf(SEC[a.sec]) - SECS.indexOf(SEC[b.sec]));
+    if (i < 0) return null;
+    const qs = g.qs.sort((a, b) => a.n - b.n);
+    const due = qs.map(q => q.due).sort()[0];
+    return { vid, sec: g.sec, idx: i + 1, it: list[i], qs, due, ready: due <= day };
+  }).filter(Boolean).sort((a, b) => (a.due < b.due ? -1 : a.due > b.due ? 1 : 0) || SECS.indexOf(SEC[a.sec]) - SECS.indexOf(SEC[b.sec]));
   const weak = Object.entries(store.get("nstat", {})).filter(([, s]) => s[1] >= 2 && s[0] / s[1] < .5).map(([n]) => +n).sort((a, b) => a - b);
+  const dots = (q) => "●".repeat(q.ok) + "○".repeat(REPEAT_NEED - q.ok);
+  const row = (e) => h("a", { class: "li", href: `#${e.sec}.${e.idx}` }, h("span", { class: "num" }, SEC[e.sec].nums),
+    h("div", { class: "grow" }, h("div", { class: "pt" }, `${SEC[e.sec].t} · ${SEC[e.sec].label(e.it)}`),
+      h("div", { class: "ps small muted" }, e.qs.map(q => "№" + q.n + " " + dots(q)).join(" · "))),
+    h("span", { class: "chip " + (e.ready ? "bad" : "") }, e.ready ? "Повторить сегодня" : "Можно с " + rpPretty(e.due)));
+  const ready = entries.filter(e => e.ready), later = entries.filter(e => !e.ready);
   return h("div", { class: "wrap narrow" },
     crumbs(h("a", { href: "#home" }, "Главная"), "Ошибки"),
     h("h1", null, "Повторить ошибки"),
-    h("p", { class: "lead", style: "margin:0" }, "Здесь варианты, где вы последний раз ответили неверно. Когда ответите правильно, вопрос сам исчезнет из списка."),
+    h("p", { class: "lead", style: "margin:0" }, "Ошибка не исчезает после одного верного ответа: так легко угадать. Она закрывается, когда вы ответили на этот вопрос правильно 3 раза в разные дни."),
+    h("div", { class: "note info rp-how" }, h("b", null, "Как это работает"),
+      h("div", null, "1️⃣ ", h("span", null, "1-й повтор: через 1 день после ошибки")),
+      h("div", null, "2️⃣ ", h("span", null, "2-й повтор: через 3 дня после ошибки")),
+      h("div", null, "3️⃣ ", h("span", null, "3-й повтор: через 7 дней после ошибки")),
+      h("div", null, "Ответ раньше срока засчитывается как тренировка, но ошибка остаётся в списке. Неверный ответ начинает отсчёт заново."),
+      h("div", null, "Серия ●○○ показывает, сколько повторов уже засчитано."),
+      h("div", { class: "small muted" }, "Если вы видите ошибку здесь после верного ответа, это не сбой: ещё не наступил срок или нужно повторить ещё раз.")),
     weak.length ? h("div", { class: "note info" }, "Чаще всего ошибки в заданиях №", weak.join(", "), ". Начните с них.") : null,
-    entries.length ? h("div", { class: "card list" }, entries.map(e => h("a", { class: "li", href: `#${e.sec}.${e.idx}` }, h("span", { class: "num" }, SEC[e.sec].nums),
-      h("div", { class: "grow" }, h("div", { class: "pt" }, `${SEC[e.sec].t} · ${SEC[e.sec].label(e.it)}`), h("div", { class: "ps small muted" }, "Ошибки в №" + e.ns.join(", "))),
-      h("span", { class: "chip bad" }, e.ns.length))))
-      : h("div", { class: "card" }, h("p", { style: "margin:0" }, "Ошибок пока нет. Решите несколько вариантов, и здесь появятся вопросы для повторения."), h("p", null, h("a", { class: "btn primary", href: "#exam" }, "Пробный экзамен"))));
+    ready.length ? h("h3", null, "Пора повторить · " + ready.length) : null,
+    ready.length ? h("div", { class: "card list" }, ready.map(row)) : null,
+    later.length ? h("h3", null, "Ждут своего дня · " + later.length) : null,
+    later.length ? h("div", { class: "card list" }, later.map(row)) : null,
+    entries.length ? null : h("div", { class: "card" }, h("p", { style: "margin:0" }, "Ошибок пока нет. Решите несколько вариантов, и здесь появятся вопросы для повторения."), h("p", null, h("a", { class: "btn primary", href: "#exam" }, "Пробный экзамен"))));
 }
 
 function viewVoice() {
@@ -2156,8 +2245,8 @@ function coverEl() {
   return h("div", { class: "cover" },
     h("div", { class: "cv-head" }, h("b", null, "Deutsch-Test für den Beruf"), h("span", null, "Antwortbogen S30")),
     h("p", { class: "small", style: "margin:0" }, "Как на экзамене: перед началом заполните данные на бланке ответов. Они появятся в шапке каждой страницы бланка."),
-    inp("fam", "Familienname · Surname · Nom · Cognome · Soyadı · Фамилия"),
-    inp("vor", "Vorname · First Name · Prénom · Nome · Adı · Имя"));
+    inp("fam", L7("Familienname", "Surname", "Nom", "Cognome", "Soyadı", "Фамилия")),
+    inp("vor", L7("Vorname", "First Name", "Prénom", "Nome", "Adı", "Имя")));
 }
 function viewExam() {
   if (!EXAM) EXAM = newExam();
@@ -2232,7 +2321,10 @@ function updateNav() {
    Stored only in this browser (localStorage), never sent anywhere. */
 const LANG_CODES = [["001", "Deutsch"], ["002", "English"], ["003", "Français"], ["004", "Español"], ["005", "Italiano"], ["006", "Português"], ["007", "Magyar"],
   ["008", "Polski"], ["009", "Русский язык"], ["010", "Český jazyk"], ["011", "Türkçe"], ["012", "عربي"], ["013", "汉语"], ["000", "andere/other"]];
-const L7 = (de, en, fr, it, tr, ru) => [de, en, fr, it, tr, ru].join(" · ");
+// official German label plus its translation into the chosen interface language (none for German); Arabic is not on the printed form, so it is added here
+const L7_AR = { "männlich": "ذكر", "weiblich": "أنثى", "Testversion": "نسخة الاختبار", "Familienname": "اللقب", "Vorname": "الاسم الأول", "Geburtsdatum": "تاريخ الميلاد", "Geburtsort": "مكان الميلاد",
+  "Erstsprache": "اللغة الأولى", "Geschlecht": "الجنس", "Straße und Hausnummer": "الشارع ورقم المنزل", "Postleitzahl und Ort": "الرمز البريدي والمدينة", "Prüfungszentrum": "مركز الامتحان", "Prüfungsdatum": "تاريخ الامتحان" };
+const L7 = (de, en, fr, it, tr, ru) => { const t = { en, fr, it, tr, ru, ar: L7_AR[de] }[curLang()]; return t ? de + " · " + t : de; };
 function viewProfile(first) {
   const c = cand();
   const dm = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.exec(c.geb || ""); // older entries were typed as TT.MM.JJJJ

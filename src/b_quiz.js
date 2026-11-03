@@ -132,7 +132,7 @@ ${it.kind === "mc" ? it.opts.map((o, i) => `${LET[i]}) ${o}`).join("\n") : it.ki
     const sc = score(), mx = items.length;
     const pct = Math.round(sc / mx * 100);
     saveRes(vid, sc, mx);
-    trackItems(items.map(it => ({ key: `${vid}:${it.key}`, n: it.n, ok: st[it.key].val === it.ans, vid, sec })));
+    const changes = trackItems(items.map(it => ({ key: `${vid}:${it.key}`, n: it.n, ok: st[it.key].val === it.ans, vid, sec })));
     const pts = Math.round(sc * per * 10) / 10, pmx = Math.round(mx * per * 10) / 10;
     resultBox.replaceChildren(h("div", { class: "result" },
       h("span", { class: "big" }, `${sc}/${mx}`),
@@ -140,6 +140,7 @@ ${it.kind === "mc" ? it.opts.map((o, i) => `${LET[i]}) ${o}`).join("\n") : it.ki
       h("span", { class: "small muted", style: "flex:1;min-width:200px" }, pct >= 60 ? "Это уровень сдачи (60% и выше)." : "Пока ниже 60%. Посмотрите ошибки и нажмите «Почему?»."),
       h("button", { class: "btn", onclick: () => cfg.restart && cfg.restart() }, "↻ Пройти заново"),
       cfg.next ? h("a", { class: "btn primary", href: cfg.next }, "Следующий вариант →") : null));
+    const rn = repeatNote(changes); if (rn) resultBox.append(rn);
     checkBtn.hidden = true;
     cfg.onDone && cfg.onDone(sc, mx);
   }

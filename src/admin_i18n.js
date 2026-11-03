@@ -182,6 +182,24 @@ const ADM_I18N = {
   "Показаны только имя, прогресс и активность. Остальные поля анкеты не читаются.": ["Only name, progress and activity are shown. Other profile fields are not read.", "Nur Name, Fortschritt und Aktivität. Andere Felder werden nicht gelesen.", "Seuls nom, progression et activité. Les autres champs ne sont pas lus.", "Yalnızca ad, ilerleme ve etkinlik. Diğer alanlar okunmaz.", "يُعرض الاسم والتقدم والنشاط فقط. لا تُقرأ الحقول الأخرى.", "Solo nome, progresso e attività. Gli altri campi non vengono letti."],
   "облачный прогресс": ["cloud progress", "Cloud-Fortschritt", "progression cloud", "bulut ilerlemesi", "تقدم سحابي", "progresso cloud"],
 
+  "Лидеры недели": ["Leaders of the week", "Spitzenreiter der Woche", "Leaders de la semaine", "Haftanın liderleri", "متصدرو الأسبوع", "Leader della settimana"],
+  "Тот же рейтинг, что видят ученики: очки за неделю": ["The same ranking students see: points this week", "Dieselbe Rangliste wie bei den Schülern: Punkte der Woche", "Le même classement que celui des élèves : points de la semaine", "Öğrencilerin gördüğü sıralamayla aynı: haftalık puan", "الترتيب نفسه الذي يراه الطلاب: نقاط الأسبوع", "La stessa classifica che vedono gli studenti: punti della settimana"],
+  "с первой попытки": ["from first attempt", "beim ersten Versuch", "au premier essai", "ilk denemede", "من المحاولة الأولى", "al primo tentativo"],
+  "Средний успех (с первой попытки)": ["Average success (first attempt)", "Durchschnitt (erster Versuch)", "Réussite moyenne (premier essai)", "Ortalama başarı (ilk deneme)", "متوسط النجاح (المحاولة الأولى)", "Successo medio (primo tentativo)"],
+  "Рейтинг недели: —": ["Weekly rank: —", "Wochenrang: —", "Classement de la semaine : —", "Haftalık sıra: —", "ترتيب الأسبوع: —", "Posizione settimanale: —"],
+  "Язык": ["Language", "Sprache", "Langue", "Dil", "اللغة", "Lingua"],
+  "Распределение по успеваемости": ["Distribution by performance", "Verteilung nach Leistung", "Répartition par résultats", "Başarıya göre dağılım", "التوزيع حسب التحصيل", "Distribuzione per rendimento"],
+  "Динамика последних результатов": ["Trend of recent results", "Verlauf der letzten Ergebnisse", "Évolution des derniers résultats", "Son sonuçların seyri", "تطور آخر النتائج", "Andamento degli ultimi risultati"],
+  "решить первое задание": ["solve the first task", "die erste Aufgabe lösen", "résoudre la première tâche", "ilk görevi çöz", "حل أول مهمة", "risolvere la prima attività"],
+  "10 разных заданий": ["10 different tasks", "10 verschiedene Aufgaben", "10 tâches différentes", "10 farklı görev", "10 مهام مختلفة", "10 attività diverse"],
+  "50 разных заданий": ["50 different tasks", "50 verschiedene Aufgaben", "50 tâches différentes", "50 farklı görev", "50 مهمة مختلفة", "50 attività diverse"],
+  "100 попыток решения": ["100 solving attempts", "100 Lösungsversuche", "100 tentatives de résolution", "100 çözüm denemesi", "100 محاولة حل", "100 tentativi di risoluzione"],
+  "неделя без пропусков": ["a week without gaps", "eine Woche ohne Lücken", "une semaine sans interruption", "aralıksız bir hafta", "أسبوع بلا انقطاع", "una settimana senza pause"],
+  "30 активных дней": ["30 active days", "30 aktive Tage", "30 jours actifs", "30 aktif gün", "30 يومًا نشطًا", "30 giorni attivi"],
+  "100% за задание": ["100% on a task", "100 % bei einer Aufgabe", "100 % à une tâche", "bir görevde %100", "100% في مهمة", "100% in un'attività"],
+  "85%+ на 10 заданиях": ["85%+ on 10 tasks", "85 %+ bei 10 Aufgaben", "85 %+ sur 10 tâches", "10 görevde %85+", "85%+ في 10 مهام", "85%+ su 10 attività"],
+  "80%+ в Hören": ["80%+ in Hören", "80 %+ in Hören", "80 %+ en Hören", "Hören'de %80+", "80%+ في Hören", "80%+ in Hören"],
+  "80%+ в Schreiben": ["80%+ in Schreiben", "80 %+ in Schreiben", "80 %+ en Schreiben", "Schreiben'de %80+", "80%+ في Schreiben", "80%+ in Schreiben"],
 };
 
 const ADM_RULES = [
@@ -213,14 +231,29 @@ const ADM_RULES = [
   [/^последние (\d+) результатов$/, ["latest {0} results", "letzte {0} Ergebnisse", "{0} derniers résultats", "son {0} sonuç", "آخر {0} نتائج", "ultimi {0} risultati"]],
   [/^(\d+) (неделю|недели|недель) назад$/, ["{0} weeks ago", "vor {0} Wochen", "il y a {0} semaines", "{0} hafta önce", "قبل {0} أسابيع", "{0} settimane fa"]],
 
+  [/^(\d+) попыток · (\d+) дн\. · (.+) с первой попытки$/, ["{0} attempts · {1} d · {2} from first attempt", "{0} Versuche · {1} T · {2} beim ersten Versuch", "{0} tentatives · {1} j · {2} au premier essai", "{0} deneme · {1} g · {2} ilk denemede", "{0} محاولات · {1} ي · {2} من المحاولة الأولى", "{0} tentativi · {1} g · {2} al primo tentativo"]],
+  [/^Рейтинг недели: #(\d+) · (.+) очков$/, ["Weekly rank: #{0} · {1} points", "Wochenrang: #{0} · {1} Punkte", "Classement de la semaine : #{0} · {1} points", "Haftalık sıra: #{0} · {1} puan", "ترتيب الأسبوع: #{0} · {1} نقطة", "Posizione settimanale: #{0} · {1} punti"]],
+  [/^Сейчас \(с учётом пересдач\): (.+) · лучший: (.+) · успешных заданий: (.+) из (.+) · ошибок к повтору: (.+)$/, ["Now (including retakes): {0} · best: {1} · successful tasks: {2} of {3} · mistakes to review: {4}", "Aktuell (mit Wiederholungen): {0} · bestes: {1} · erfolgreiche Aufgaben: {2} von {3} · Fehler zum Wiederholen: {4}", "Actuellement (avec reprises) : {0} · meilleur : {1} · tâches réussies : {2} sur {3} · erreurs à revoir : {4}", "Şimdi (tekrarlar dahil): {0} · en iyi: {1} · başarılı görev: {2} / {3} · tekrar hataları: {4}", "الآن (مع الإعادات): {0} · الأفضل: {1} · مهام ناجحة: {2} من {3} · أخطاء للمراجعة: {4}", "Ora (con ripetizioni): {0} · migliore: {1} · attività riuscite: {2} su {3} · errori da ripassare: {4}"]],
+  [/^Активность: (\d+) дней$/, ["Activity: {0} days", "Aktivität: {0} Tage", "Activité : {0} jours", "Etkinlik: {0} gün", "النشاط: {0} يومًا", "Attività: {0} giorni"]],
+  [/^Успешно (\d+)%, средне (\d+)%, слабо (\d+)%$/, ["Successful {0}%, medium {1}%, weak {2}%", "Erfolgreich {0} %, mittel {1} %, schwach {2} %", "Réussi {0} %, moyen {1} %, faible {2} %", "Başarılı %{0}, orta %{1}, zayıf %{2}", "ناجح {0}%، متوسط {1}%، ضعيف {2}%", "Riuscito {0}%, medio {1}%, debole {2}%"]],
+  [/^Открыть профиль (.+)$/, ["Open profile {0}", "Profil öffnen: {0}", "Ouvrir le profil {0}", "Profili aç: {0}", "افتح ملف {0}", "Apri il profilo {0}"]],
+  [/^(\d+) попыток, (\d+) заданий$/, ["{0} attempts, {1} tasks", "{0} Versuche, {1} Aufgaben", "{0} tentatives, {1} tâches", "{0} deneme, {1} görev", "{0} محاولات، {1} مهام", "{0} tentativi, {1} attività"]],
+  [/^Текущий: (.+) · лучший: (.+)$/, ["Current: {0} · best: {1}", "Aktuell: {0} · bestes: {1}", "Actuel : {0} · meilleur : {1}", "Güncel: {0} · en iyi: {1}", "الحالي: {0} · الأفضل: {1}", "Attuale: {0} · migliore: {1}"]],
+  [/^Текущий результат: (.+)$/, ["Current result: {0}", "Aktuelles Ergebnis: {0}", "Résultat actuel : {0}", "Güncel sonuç: {0}", "النتيجة الحالية: {0}", "Risultato attuale: {0}"]],
+  [/^(\d{2}\.\d{2}\.\d{4}): (\d+) заданий, (\d+) учеников$/, ["{0}: {1} tasks, {2} students", "{0}: {1} Aufgaben, {2} Schüler", "{0} : {1} tâches, {2} élèves", "{0}: {1} görev, {2} öğrenci", "{0}: {1} مهام، {2} طلاب", "{0}: {1} attività, {2} studenti"]],
+  [/^(\d{2}\.\d{2}\.\d{4}) · (\d+) заданий · (\d+) учеников$/, ["{0} · {1} tasks · {2} students", "{0} · {1} Aufgaben · {2} Schüler", "{0} · {1} tâches · {2} élèves", "{0} · {1} görev · {2} öğrenci", "{0} · {1} مهام · {2} طلاب", "{0} · {1} attività · {2} studenti"]],
 ];
 
 function admFill(tpl, m) { return String(tpl || "").replace(/\{(\d)\}/g, (_, i) => m[+i + 1] ?? ""); }
+// Russian counts change the word form (1 ученик, 2 ученика, 5 учеников): reduce them to the form the rules are written for
+const ADM_PLURALS = [[/(\d) (?:ученика|ученик)(?![а-я])/g, "$1 учеников"], [/(\d) (?:задания|задание)(?![а-я])/g, "$1 заданий"], [/(\d) (?:попытки|попытка)(?![а-я])/g, "$1 попыток"],
+  [/(\d) (?:дня|день)(?![а-я])/g, "$1 дней"], [/(\d) активен(?![а-я])/g, "$1 активны"]];
+const admNorm = (c) => ADM_PLURALS.reduce((t, [rx, to]) => t.replace(rx, to), c);
 function admTr(s) {
   if (ADM_LANG === "ru" || !/[\u0400-\u04FF]/.test(s)) return s;
   const li = ADM_LANG_IDX[ADM_LANG];
   const lead = (s.match(/^\s*/) || [""])[0], trail = (s.match(/\s*$/) || [""])[0];
-  const core = s.trim();
+  const core = admNorm(s.trim());
   if (!core) return s;
   let out = null;
   const hit = ADM_I18N[core];

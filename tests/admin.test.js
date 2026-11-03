@@ -24,7 +24,7 @@ test("partOf maps every task family to the right exam section", () => {
 });
 
 test("computeStudent derives names, percentages, mistakes and streaks", () => {
-  const now = Date.parse("2026-10-21T12:00:00Z");
+  const now = Date.now(); // streaks are counted from the real current day
   const day = n => new Date(now - n * 86400000).toISOString().slice(0, 10);
   const user = {
     uid: "u1",
@@ -187,4 +187,22 @@ test("leaderboard ranks by points for week and all time", () => {
   const all = admin.leaderboardRows(users, "all", Date.now());
   assert.ok(all.length > 0);
   assert.ok(all[0].points >= all[all.length - 1].points);
+});
+
+test("rating uses the first attempt, so a retake to 100% does not hide the mistakes", () => {
+  const now = Date.now();
+  const user = { uid: "u9", updated: now, data: {
+    cand: { fam: "Test", vor: "Ira" }, days: [],
+    res: { L1V1: { best: 15, last: 15, max: 15, n: 2, ts: now - 1000 }, H1V1: { best: 10, last: 10, max: 10, n: 1, ts: now - 2000, first: 10 } },
+    log: [{ t: now - 90000, vid: "L1V1", sc: 6, mx: 15 }, { t: now - 1000, vid: "L1V1", sc: 15, mx: 15 }, { t: now - 2000, vid: "H1V1", sc: 10, mx: 10 }],
+  } };
+  const s = admin.computeStudent(user, now);
+  assert.equal(s.scorePct, 70); // (40 + 100) / 2, not 100
+  assert.equal(s.currentPct, 100);
+  const d = admin.dashboard([user], now);
+  assert.equal(d.top[0].uid, "u9");
+  assert.equal(d.top[0].avg, 70); // the teacher's leaders list shows the same number as the student's rating
+  const lb = admin.leaderboardRows([user], "week", now)[0];
+  assert.equal(lb.avg, d.top[0].avg);
+  assert.equal(d.students[0].weekRank, lb.rank);
 });

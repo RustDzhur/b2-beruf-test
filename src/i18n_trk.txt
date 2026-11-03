@@ -433,3 +433,26 @@ r28|{~1}: değerlendirilmedi
 422|yaklaşık 3 dakika
 423|yaklaşık 4 dakika
 424|Sözlü sınav · Sprechen · ikili, yaklaşık 16 dakika · hazırlık süresi yok
+x5|Hatalar nasıl kapanır
+x6|Hata kalıcı olarak kapandı: farklı günlerde 3 doğru cevap.
+x7|Tekrar sayıldı.
+x8|Sonraki tekrar şu tarihten itibaren:
+x9|Doğru, ama zamanı henüz gelmedi; bu yüzden hata listede kalıyor.
+x10|Şu tarihten itibaren sayılır:
+x11|Hata kaydedildi. Yarın tekrar gelin: farklı günlerde 3 doğru cevap gerekir; hatadan 1, 3 ve 7 gün sonra.
+x12|bugün
+x13|yarın
+x14|Bugün tekrarla
+x15|Bir hata tek doğru cevaptan sonra silinmez: tahmin tutmuş olabilir. Bu soruya farklı günlerde 3 kez doğru cevap verdiğinizde kapanır.
+x16|Nasıl çalışır
+x17|1. tekrar: hatadan 1 gün sonra
+x18|2. tekrar: hatadan 3 gün sonra
+x19|3. tekrar: hatadan 7 gün sonra
+x20|Süresinden önce verilen cevap alıştırma sayılır, ancak hata listede kalır. Yanlış cevap sayımı baştan başlatır.
+x21|●○○ dizisi kaç tekrarın sayıldığını gösterir.
+x22|Doğru cevaptan sonra burada hâlâ bir hata görüyorsanız bu bir arıza değildir: zamanı henüz gelmemiştir ya da bir kez daha tekrar etmeniz gerekir.
+x23|Şimdi tekrar zamanı
+x24|Günlerini bekleyenler
+x25|İlk denemede
+x26|Şimdi
+r29|{~1} itibaren

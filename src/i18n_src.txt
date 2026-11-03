@@ -433,3 +433,26 @@ r28|{~1}: not rated|{~1}: nicht bewertet
 422|about 3 minutes|ca. 3 Minuten
 423|about 4 minutes|ca. 4 Minuten
 424|Oral exam · Sprechen · in pairs, about 16 minutes · no preparation time|Mündliche Prüfung · Sprechen · Paarprüfung, ca. 16 Minuten · keine Vorbereitungszeit
+x5|How mistakes get closed|So werden Fehler abgeschlossen
+x6|Mistake closed for good: 3 correct answers on different days.|Fehler endgültig erledigt: 3 richtige Antworten an verschiedenen Tagen.
+x7|Repetition counted.|Wiederholung gezählt.
+x8|Next repetition from:|Nächste Wiederholung ab:
+x9|Correct, but it is not time yet, so the mistake stays on the list.|Richtig, aber der Termin ist noch nicht erreicht, deshalb bleibt der Fehler in der Liste.
+x10|Will count from:|Wird gezählt ab:
+x11|Mistake recorded. Come back tomorrow: you need 3 correct answers on different days, 1, 3 and 7 days after the mistake.|Fehler gespeichert. Kommen Sie morgen wieder: Sie brauchen 3 richtige Antworten an verschiedenen Tagen, nach 1, 3 und 7 Tagen.
+x12|today|heute
+x13|tomorrow|morgen
+x14|Repeat today|Heute wiederholen
+x15|A mistake does not disappear after one correct answer: that could be a lucky guess. It is closed once you answer this question correctly 3 times on different days.|Ein Fehler verschwindet nicht nach einer richtigen Antwort: Das kann Zufall sein. Er ist erledigt, wenn Sie diese Frage an 3 verschiedenen Tagen richtig beantwortet haben.
+x16|How it works|So funktioniert es
+x17|Repetition 1: 1 day after the mistake|1. Wiederholung: 1 Tag nach dem Fehler
+x18|Repetition 2: 3 days after the mistake|2. Wiederholung: 3 Tage nach dem Fehler
+x19|Repetition 3: 7 days after the mistake|3. Wiederholung: 7 Tage nach dem Fehler
+x20|An answer before the due date counts as practice, but the mistake stays on the list. A wrong answer restarts the count.|Eine Antwort vor dem Termin zählt als Übung, der Fehler bleibt aber in der Liste. Eine falsche Antwort beginnt die Zählung von vorn.
+x21|The series ●○○ shows how many repetitions have been counted.|Die Reihe ●○○ zeigt, wie viele Wiederholungen schon gezählt sind.
+x22|If you still see a mistake here after a correct answer, this is not a bug: its date has not come yet, or you need to repeat it once more.|Wenn Sie hier nach einer richtigen Antwort noch einen Fehler sehen, ist das kein Fehler der Seite: Der Termin ist noch nicht erreicht oder Sie müssen noch einmal wiederholen.
+x23|Time to repeat|Jetzt wiederholen
+x24|Waiting for their day|Warten auf ihren Termin
+x25|From the first attempt|Beim ersten Versuch
+x26|Now|Aktuell
+r29|From {~1}|Ab {~1}

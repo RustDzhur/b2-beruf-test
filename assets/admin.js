@@ -114,8 +114,12 @@ function langSelect() {
   const sel = el("select", { class: "adm-lang", "aria-label": "Язык", title: "Язык" },
     Object.keys(ADM_LANGS).map(code => el("option", { value: code, selected: code === ADM_LANG, title: ADM_LANG_TITLE[code] }, ADM_LANGS[code])));
   sel.value = ADM_LANG;
+  // the selector itself is skipped by the language pass, so its label is translated here
+  const label = () => { const t = admTr("Язык"); sel.setAttribute("aria-label", t); sel.title = t; };
+  label();
   sel.onchange = () => {
     setAdminLang(sel.value);
+    label();
     document.title = admTr(S.me && S.me.ok ? "Кабинет преподавателя · DTB B2 Beruf" : "Вход · Кабинет преподавателя");
   };
   return sel;
@@ -533,7 +537,7 @@ function renderDashboard() {
     kpi("Активны 7 дней", fmt(t.active7d), fmt(t.active30d) + " за 30 дней", "clock", "var(--c-hoeren)"),
     kpi("Дней занятий", fmt(t.days), t.students ? "в среднем " + (t.days / t.students).toFixed(1) + " на ученика" : "пока нет данных", "calendar", "var(--c-lesen)"),
     kpi("Попыток решения", fmt(t.tests), fmt(t.tasks) + " заданий · " + fmt(t.successTasks) + " успешных", "target", "var(--c-sprechen)"),
-    kpi("Средний успех", pctText(t.avgScore), "лучший результат " + pctText(t.avgBest), "check", "var(--c-schreiben)"),
+    kpi("Средний успех (с первой попытки)", pctText(t.avgScore), "лучший результат " + pctText(t.avgBest), "check", "var(--c-schreiben)"),
     kpi("Ошибки к повтору", fmt(t.failures), fmt(d.weak.length) + " " + (d.weak.length === 1 ? "слабая тема" : "слабых " + plural(d.weak.length, "тема", "темы", "тем")), "alert", "var(--bad)")
   ));
 
@@ -565,7 +569,7 @@ function renderDashboard() {
       el("div", { class: "adm-card-head" }, el("div", null, el("h2", null, "Слабые места"), el("p", null, "Части с наибольшим числом ошибок"))),
       weakList(d.weak, true)),
     el("section", { class: "adm-card span-4" },
-      el("div", { class: "adm-card-head" }, el("div", null, el("h2", null, "Лидеры"), el("p", null, "Лучший средний результат"))),
+      el("div", { class: "adm-card-head" }, el("div", null, el("h2", null, "Лидеры недели"), el("p", null, "Тот же рейтинг, что видят ученики: очки за неделю"))),
       topList(d.top))
   ));
 
@@ -660,10 +664,10 @@ function studentListBody(list) {
 function topList(top) {
   if (!top || !top.length) return el("div", { class: "adm-chart-empty" }, "Пока нет результатов.");
   return el("div", { class: "adm-toplist" }, top.map((s, i) => el("a", { class: "adm-toprow", href: "#student=" + encodeURIComponent(s.uid), onclick: e => { e.preventDefault(); openStudent(s.uid); } },
-    el("span", { class: "adm-rank" }, i + 1),
+    el("span", { class: "adm-rank" }, s.rank || i + 1),
     avatar(s.name, s.initials),
-    el("span", { class: "adm-topname" }, el("b", null, s.name), el("small", null, fmt(s.tasks) + " заданий · " + fmt(s.days) + " дн.")),
-    el("span", { class: "adm-topscorescore score-" + scoreTone(s.scorePct) }, pctText(s.scorePct)))));
+    el("span", { class: "adm-topname" }, el("b", null, s.name), el("small", null, fmt(s.tests) + " попыток · " + fmt(s.days) + " дн. · " + pctText(s.avg) + " с первой попытки")),
+    el("span", { class: "adm-topscorescore score-" + scoreTone(s.avg) }, fmt(s.points)))));
 }
 
 function renderActivity() {
@@ -765,10 +769,11 @@ function renderDrawerFor(uid) {
       stat(fmt(s.days), "дней занятий"),
       stat(fmt(s.tasks), "заданий"),
       stat(fmt(s.attempts), "попыток"),
-      stat(pctText(s.scorePct), "средний успех", "score-" + scoreTone(s.scorePct)),
+      stat(pctText(s.scorePct), "с первой попытки", "score-" + scoreTone(s.scorePct)),
       stat(fmt(s.failures), "ошибок"),
       stat(fmt(s.streak.longest), "лучшая серия")),
-    el("p", { class: "adm-drawer-note" }, "Лучший средний результат: " + pctText(s.bestPct) + " · успешных заданий: " + fmt(s.successTasks) + " из " + fmt(s.tasks) + " · ошибок к повтору: " + fmt(s.failures)),
+    el("p", { class: "adm-drawer-note" }, "Сейчас (с учётом пересдач): " + pctText(s.currentPct) + " · лучший: " + pctText(s.bestPct) + " · успешных заданий: " + fmt(s.successTasks) + " из " + fmt(s.tasks) + " · ошибок к повтору: " + fmt(s.failures)),
+    el("p", { class: "adm-drawer-note" }, s.weekRank ? "Рейтинг недели: #" + s.weekRank + " · " + fmt(s.weekPoints) + " очков" : "Рейтинг недели: —"),
     s.answers && s.answers.total ? el("p", { class: "adm-drawer-note" }, el("span", null, "Верных ответов"), ": " + fmt(s.answers.correct) + " / " + fmt(s.answers.total) + (s.answers.pct != null ? " · " + pctText(s.answers.pct) : "")) : null,
     el("h3", null, "Достижения · " + s.earned + " из 10"),
     el("div", { class: "adm-achievements" }, s.achievements.map(a => el("div", { class: "adm-badge" + (a.earned ? " earned" : ""), title: a.hint }, el("b", null, a.icon), el("span", null, a.label)))),

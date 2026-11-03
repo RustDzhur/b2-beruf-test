@@ -316,6 +316,17 @@ function cleanName(s) {
   return String(s || "").replace(/\s+/g, " ").trim().slice(0, 60);
 }
 
+// earliest logged attempt per task: Map(vid -> {t, pct})
+function firstAttempts(log) {
+  const m = new Map();
+  for (const x of log || []) {
+    if (!x || !x.vid || !num(x.t) || !num(x.mx)) continue;
+    const cur = m.get(x.vid);
+    if (!cur || num(x.t) < cur.t) m.set(x.vid, { t: num(x.t), pct: clampPct(num(x.sc) / num(x.mx) * 100) });
+  }
+  return m;
+}
+
 function streakOf(days) {
   const set = new Set(days);
   let longest = 0, run = 0, prev = null;
@@ -357,13 +368,18 @@ function computeStudent(raw, now = Date.now()) {
   const log = Array.isArray(d.log) ? d.log.filter(x => x && num(x.t)) : [];
   const nstat = d.nstat && typeof d.nstat === "object" ? d.nstat : {};
 
+  // First attempt of every task is what the rating uses: a retake to 100% must not hide the original mistakes.
+  // Source: res[vid].first (saved from now on), otherwise the earliest entry of the attempt log, otherwise the last result.
+  const firstLog = firstAttempts(log);
   const items = [];
   for (const [vid, o] of Object.entries(res)) {
     if (!o || !num(o.max)) continue;
     const part = partOf(vid);
+    const cur = clampPct(num(o.last) / num(o.max) * 100);
     items.push({
       vid, part,
-      cur: clampPct(num(o.last) / num(o.max) * 100),
+      first: o.first != null ? clampPct(num(o.first) / num(o.max) * 100) : firstLog.has(vid) ? firstLog.get(vid).pct : cur,
+      cur,
       best: clampPct(num(o.best) / num(o.max) * 100),
       n: Math.max(1, num(o.n)),
       ts: num(o.ts),
@@ -383,7 +399,8 @@ function computeStudent(raw, now = Date.now()) {
 
   const tasks = items.length;
   const attempts = items.reduce((a, x) => a + x.n, 0);
-  const scorePct = round1(mean(items.map(x => x.cur)));
+  const scorePct = round1(mean(items.map(x => x.first)));
+  const currentPct = round1(mean(items.map(x => x.cur)));
   const bestPct = round1(mean(items.map(x => x.best)));
   const successTasks = items.filter(x => x.best >= 80).length;
   const failTasks = items.filter(x => x.best < 50).length;
@@ -396,10 +413,10 @@ function computeStudent(raw, now = Date.now()) {
     if (s) {
       s.tasks++; s.attempts += it.n;
       if (!s._sum) s._sum = 0;
-      s._sum += it.cur;
+      s._sum += it.first;
     }
     const p = partAgg.get(it.part.key) || { key: it.part.key, label: it.part.label, section: it.part.section, tasks: 0, attempts: 0, sum: 0 };
-    p.tasks++; p.attempts += it.n; p.sum += it.cur;
+    p.tasks++; p.attempts += it.n; p.sum += it.first;
     partAgg.set(it.part.key, p);
   }
   for (const id of SECTION_ORDER) {
@@ -483,6 +500,7 @@ function computeStudent(raw, now = Date.now()) {
     attempts,
     answers,
     scorePct,
+    currentPct,
     bestPct,
     successTasks,
     failTasks,
@@ -570,10 +588,16 @@ function dashboard(rawUsers, now = Date.now()) {
   }
   const weak = [...weakMap.values()].sort((a, b) => b.count - a.count).slice(0, 10);
 
-  const top = students.filter(s => s.hasName && s.scorePct != null && s.tasks >= 5)
-    .sort((a, b) => b.scorePct - a.scorePct || b.attempts - a.attempts)
-    .slice(0, 5)
-    .map(s => ({ uid: s.uid, name: s.name, initials: s.initials, scorePct: s.scorePct, tasks: s.tasks, days: s.days }));
+  // the same ranking the students see in their trainer (weekly points), so both cabinets always agree
+  const lbWeek = leaderboardRows(rawUsers, "week", now);
+  const lbAll = leaderboardRows(rawUsers, "all", now);
+  const weekRank = new Map(lbWeek.map(r => [r.uid, r])), allRank = new Map(lbAll.map(r => [r.uid, r]));
+  students.forEach(s => {
+    const w = weekRank.get(s.uid), a = allRank.get(s.uid);
+    s.weekRank = w ? w.rank : null; s.weekPoints = w ? w.points : 0;
+    s.allRank = a ? a.rank : null; s.allPoints = a ? a.points : 0;
+  });
+  const top = lbWeek.slice(0, 5).map(r => ({ uid: r.uid, name: r.name, initials: r.initials, rank: r.rank, points: r.points, tests: r.tests, days: r.days, avg: r.avg }));
 
   return {
     generatedAt: now,
@@ -604,23 +628,27 @@ function leaderboardStats(raw, period, now) {
   const days = Array.isArray(d.days) ? [...new Set(d.days.filter(isDay))] : [];
   if (period === "week") {
     const cutoff = now - 7 * DAY;
-    let points = 0, tests = 0, sum = 0;
+    // points reward every attempt of the week; the average counts only first attempts at a task (same rule as the cabinets)
+    let points = 0, tests = 0, sum = 0, firsts = 0;
     if (log.length) {
+      const firstLog = firstAttempts(log);
       for (const x of log) {
         if (num(x.t) < cutoff) continue;
         const mx = num(x.mx);
         if (!mx) continue;
         const p = clampPct(num(x.sc) / mx * 100);
-        points += Math.round(p); tests++; sum += p;
+        points += Math.round(p); tests++;
+        if (firstLog.get(x.vid) && firstLog.get(x.vid).t === num(x.t)) { sum += p; firsts++; }
       }
     } else {
       for (const o of Object.values(res)) {
         if (!o || num(o.ts) < cutoff || !num(o.max)) continue;
         const p = clampPct(num(o.best) / num(o.max) * 100);
-        points += Math.round(p); tests++; sum += p;
+        points += Math.round(p); tests++;
+        if (num(o.n) <= 1) { sum += p; firsts++; }
       }
     }
-    return { points, tests, avg: tests ? round1(sum / tests) : null, days: days.filter(d => dayStart(d) >= cutoff).length };
+    return { points, tests, avg: firsts ? round1(sum / firsts) : null, days: days.filter(d => dayStart(d) >= cutoff).length };
   }
   let points = 0;
   for (const o of Object.values(res)) {

@@ -46,7 +46,12 @@ function mergeCloud(cd, cupd) {
     const loc = store.get(k, null);
     if (loc == null) { store.set(k, cd[k]); return; }
     if (k === "days") store.set(k, [...new Set([...(loc || []), ...(cd[k] || [])])].sort().slice(-400));
-    else if (k === "res") { const m = { ...loc }; Object.entries(cd[k] || {}).forEach(([v, o]) => { if (!m[v] || (o.ts || 0) > (m[v].ts || 0)) m[v] = o; }); store.set(k, m); }
+    else if (k === "res") { const m = { ...loc }; Object.entries(cd[k] || {}).forEach(([v, o]) => {
+        const keep = m[v];
+        if (!keep || (o.ts || 0) > (keep.ts || 0)) m[v] = o;
+        const f = [keep && keep.first, o && o.first].filter(x => x != null);
+        if (f.length && m[v].first == null) m[v] = { ...m[v], first: f[0] };
+      }); store.set(k, m); }
     else if (k === "log") {
       const byKey = new Map();
       [...(Array.isArray(loc) ? loc : []), ...(Array.isArray(cd[k]) ? cd[k] : [])].forEach(x => { if (x && x.t) byKey.set(x.t + "|" + x.vid, x); });

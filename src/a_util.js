@@ -115,6 +115,7 @@ function markActive() { const d = store.get("days", []); if (!d.includes(today()
 function saveRes(vid, score, max) {
   const r = store.get("res", {});
   const o = r[vid] || { best: 0, n: 0 };
+  if (!o.n && o.first == null) o.first = score; // first attempt is kept for the rating: retakes must not hide the original mistakes
   o.last = score; o.max = max; o.n++; o.ts = Date.now(); o.best = Math.max(o.best || 0, score);
   r[vid] = o; store.set("res", r); markActive();
   // compact activity log for the teacher cabinet (last 2000 attempts); synced to Firestore
@@ -122,13 +123,35 @@ function saveRes(vid, score, max) {
   if (Array.isArray(log)) { log.push({ t: o.ts, vid, sc: score, mx: max }); store.set("log", log.slice(-2000)); }
 }
 const resOf = (vid) => store.get("res", {})[vid];
+// A mistake leaves the list only after 3 correct answers on separate days (see a0_repeat.js).
+// Returns what happened to every question that has a mistake on record, so the result screen can explain it.
 function trackItems(list) { // list: [{key, n, ok, vid, sec}]
-  const w = store.get("wrong", {}), ns = store.get("nstat", {});
+  const w = store.get("wrong", {}), ns = store.get("nstat", {}), day = rpDay(), now = Date.now(), out = [];
   for (const it of list) {
-    if (it.ok) delete w[it.key]; else w[it.key] = { vid: it.vid, sec: it.sec, n: it.n, ts: Date.now() };
+    const r = rpAnswer(w[it.key], it.ok, day, now, it);
+    if (r.entry) w[it.key] = r.entry; else delete w[it.key];
+    if (r.status !== "none") out.push({ key: it.key, n: it.n, status: r.status, ok: r.ok, due: r.due });
     if (it.n) { const s = ns[it.n] || [0, 0]; s[0] += it.ok ? 1 : 0; s[1]++; ns[it.n] = s; }
   }
   store.set("wrong", w); store.set("nstat", ns); updateNav();
+  return out;
+}
+// Dates are shown as DD.MM. (same in every language); "today"/"tomorrow" stay Russian keys that the language pass translates.
+const rpPretty = (day) => { if (!day) return ""; if (day === rpDay()) return "сегодня"; if (day === rpAddDays(rpDay(), 1)) return "завтра"; const [, m, d] = day.split("-"); return d + "." + m + "."; };
+// Explanation under a result: why a mistake is still on the list after a correct answer and when to come back.
+// Every sentence is its own text node so the language pass can translate it (src/i18n_*.txt, ids x5...).
+function repeatNote(changes) {
+  const by = (st) => (changes || []).filter(c => c.status === st);
+  const nums = (list, withStep) => h("span", { class: "rp-n" }, list.map(c => "№" + c.n + (withStep ? " (" + c.ok + "/" + REPEAT_NEED + ")" : "")).join(", "));
+  const earliest = (list) => rpPretty(list.map(c => c.due).sort()[0]);
+  const line = (icon, list, text, withStep, dueLabel, due) => h("div", { class: "rp-line" }, icon + " ", nums(list, withStep), " — ", text, dueLabel ? [" ", h("span", null, dueLabel), " ", h("b", null, due)] : null);
+  const fixed = by("fixed"), step = by("step"), early = by("early"), bad = by("wrong");
+  const lines = [];
+  if (fixed.length) lines.push(line("✅", fixed, "Ошибка закрыта навсегда: 3 верных ответа в разные дни."));
+  if (step.length) lines.push(line("🔁", step, "Повторение засчитано.", true, "Следующее повторение с:", earliest(step)));
+  if (early.length) lines.push(line("⏳", early, "Верно, но срок ещё не наступил, поэтому ошибка остаётся в списке.", false, "Засчитается с:", earliest(early)));
+  if (bad.length) lines.push(line("❗", bad, "Ошибка записана. Вернитесь завтра: нужно 3 верных ответа в разные дни, через 1, 3 и 7 дней после ошибки."));
+  return lines.length ? h("div", { class: "note info repeat-note" }, h("b", null, "Как закрываются ошибки"), lines) : null;
 }
 
 /* ---------- ИИ (sample capability) ---------- */
