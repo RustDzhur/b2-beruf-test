@@ -200,6 +200,12 @@ const ADM_I18N = {
   "85%+ на 10 заданиях": ["85%+ on 10 tasks", "85 %+ bei 10 Aufgaben", "85 %+ sur 10 tâches", "10 görevde %85+", "85%+ في 10 مهام", "85%+ su 10 attività"],
   "80%+ в Hören": ["80%+ in Hören", "80 %+ in Hören", "80 %+ en Hören", "Hören'de %80+", "80%+ في Hören", "80%+ in Hören"],
   "80%+ в Schreiben": ["80%+ in Schreiben", "80 %+ in Schreiben", "80 %+ en Schreiben", "Schreiben'de %80+", "80%+ في Schreiben", "80%+ in Schreiben"],
+  "По рейтингу (очки за неделю)": ["By rank (points this week)", "Nach Rang (Punkte der Woche)", "Par classement (points de la semaine)", "Sıralamaya göre (haftalık puan)", "حسب الترتيب (نقاط الأسبوع)", "Per classifica (punti della settimana)"],
+  "По точности (с первой попытки)": ["By accuracy (first attempt)", "Nach Genauigkeit (erster Versuch)", "Par précision (premier essai)", "Doğruluğa göre (ilk deneme)", "حسب الدقة (المحاولة الأولى)", "Per precisione (primo tentativo)"],
+  "Место": ["Rank", "Platz", "Rang", "Sıra", "المركز", "Posizione"],
+  "Очки": ["Points", "Punkte", "Points", "Puan", "النقاط", "Punti"],
+  "место:": ["rank:", "Platz:", "rang :", "sıra:", "المركز:", "posizione:"],
+  "очков:": ["points:", "Punkte:", "points :", "puan:", "النقاط:", "punti:"],
 };
 
 const ADM_RULES = [

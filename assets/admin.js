@@ -16,7 +16,7 @@ const S = {
   loginBusy: false,
   query: "",
   filter: "all",
-  sort: "score-desc",
+  sort: "rating",
   range: 30,
   selectedUid: null,
   lastLoaded: 0,
@@ -381,6 +381,8 @@ function filteredStudents() {
   });
   const cmp = {
     name: (a, b) => a.name.localeCompare(b.name, "ru"),
+    // same order as the students' leaderboard: weekly points (rank), people without points last
+    rating: (a, b) => (a.weekRank == null ? 1e9 : a.weekRank) - (b.weekRank == null ? 1e9 : b.weekRank) || a.name.localeCompare(b.name, "ru"),
     "score-desc": (a, b) => (b.scorePct == null ? -1 : b.scorePct) - (a.scorePct == null ? -1 : a.scorePct) || a.name.localeCompare(b.name, "ru"),
     "days-desc": (a, b) => b.days - a.days || a.name.localeCompare(b.name, "ru"),
     "tests-desc": (a, b) => b.attempts - a.attempts || a.name.localeCompare(b.name, "ru"),
@@ -583,7 +585,7 @@ function renderDashboard() {
         ["all", "Все", counts.all], ["active", "Активные", counts.active], ["help", "Нужна помощь", counts.help], ["inactive", "Не заходили", counts.inactive],
       ].map(([id, label, n]) => el("button", { class: S.filter === id ? "on" : "", "data-filter": id, onclick: () => { S.filter = id; renderStudentList(); syncFilterButtons(); }, "aria-pressed": S.filter === id }, label + " · " + n))),
       el("select", { class: "adm-select", "aria-label": "Сортировка", onchange: e => { S.sort = e.target.value; renderStudentList(); } },
-        [["score-desc", "Сначала сильные"], ["active-desc", "Недавно активные"], ["fail-desc", "Больше ошибок"], ["days-desc", "Больше дней"], ["tests-desc", "Больше заданий"], ["name", "По имени"]]
+        [["rating", "По рейтингу (очки за неделю)"], ["score-desc", "По точности (с первой попытки)"], ["active-desc", "Недавно активные"], ["fail-desc", "Больше ошибок"], ["days-desc", "Больше дней"], ["tests-desc", "Больше заданий"], ["name", "По имени"]]
           .map(([v, l]) => el("option", { value: v, selected: S.sort === v }, l)))),
     el("div", { id: "adm-students-body" }, studentListBody(students))));
 
@@ -641,9 +643,11 @@ function studentListBody(list) {
   }
   const table = el("div", { class: "adm-table-wrap" },
     el("table", { class: "adm-table" },
-      el("thead", null, el("tr", null, ["Ученик", "Дней", "Попыток / заданий", "Успех", "Ошибки", "Был(а)", ""].map(h => el("th", null, h)))),
+      el("thead", null, el("tr", null, ["Место", "Ученик", "Очки", "Дней", "Попыток / заданий", "Успех", "Ошибки", "Был(а)", ""].map(h => el("th", null, h)))),
       el("tbody", null, list.map(s => el("tr", { tabindex: "0", role: "button", "aria-label": "Открыть профиль " + s.name, onclick: () => openStudent(s.uid), onkeydown: e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openStudent(s.uid); } } },
+        el("td", null, el("span", { class: "adm-num" }, s.weekRank ? "#" + s.weekRank : "—")),
         el("td", null, studentCell(s)),
+        el("td", null, el("span", { class: "adm-num" }, fmt(s.weekPoints))),
         el("td", null, el("span", { class: "adm-num" }, fmt(s.days))),
         el("td", null, el("span", { class: "adm-num", title: fmt(s.attempts) + " " + plural(s.attempts, "попытка", "попытки", "попыток") + ", " + fmt(s.tasks) + " " + plural(s.tasks, "задание", "задания", "заданий") }, fmt(s.attempts), el("small", null, " / " + fmt(s.tasks)))),
         el("td", null, progress(s.scorePct, s.bestPct)),
@@ -654,6 +658,8 @@ function studentListBody(list) {
   const mobile = el("div", { class: "adm-row-mobile" }, list.map(s => el("div", { class: "adm-student-row", tabindex: "0", role: "button", "aria-label": "Открыть профиль " + s.name, onclick: () => openStudent(s.uid), onkeydown: e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openStudent(s.uid); } } },
     studentCell(s),
     el("div", { class: "adm-mrow-stats" },
+      el("span", null, "место: ", el("b", null, s.weekRank ? "#" + s.weekRank : "—")),
+      el("span", null, "очков: ", el("b", null, fmt(s.weekPoints))),
       el("span", null, "дней: ", el("b", null, fmt(s.days))),
       el("span", null, "попыток: ", el("b", null, fmt(s.attempts))),
       el("span", null, "ошибок: ", el("b", null, fmt(s.failures)))),
