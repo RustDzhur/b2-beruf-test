@@ -628,18 +628,22 @@ function leaderboardStats(raw, period, now) {
   const days = Array.isArray(d.days) ? [...new Set(d.days.filter(isDay))] : [];
   if (period === "week") {
     const cutoff = now - 7 * DAY;
-    // points reward every attempt of the week; the average counts only first attempts at a task (same rule as the cabinets)
+    // points: only the best result per task within the week (so the week never exceeds the all-time total);
+    // tests counts every attempt; the average counts only first attempts at a task (same rule as the cabinets)
     let points = 0, tests = 0, sum = 0, firsts = 0;
     if (log.length) {
+      const bestWeek = new Map();
       const firstLog = firstAttempts(log);
       for (const x of log) {
         if (num(x.t) < cutoff) continue;
         const mx = num(x.mx);
         if (!mx) continue;
         const p = clampPct(num(x.sc) / mx * 100);
-        points += Math.round(p); tests++;
+        tests++;
+        bestWeek.set(x.vid, Math.max(bestWeek.get(x.vid) || 0, Math.round(p)));
         if (firstLog.get(x.vid) && firstLog.get(x.vid).t === num(x.t)) { sum += p; firsts++; }
       }
+      for (const v of bestWeek.values()) points += v;
     } else {
       for (const o of Object.values(res)) {
         if (!o || num(o.ts) < cutoff || !num(o.max)) continue;

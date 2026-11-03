@@ -206,3 +206,16 @@ test("rating uses the first attempt, so a retake to 100% does not hide the mista
   assert.equal(lb.avg, d.top[0].avg);
   assert.equal(d.students[0].weekRank, lb.rank);
 });
+
+test("weekly points count the best result per task, so the week never exceeds all-time", () => {
+  const now = Date.now();
+  const raw = { data: {
+    res: { v1: { best: 10, max: 10, n: 5, ts: now }, v2: { best: 5, max: 10, n: 1, ts: now } },
+    log: [0, 1, 2, 3, 4].map(i => ({ vid: "v1", sc: 5 + i, mx: 10, t: now - 1000 + i })).concat([{ vid: "v2", sc: 5, mx: 10, t: now - 500 }]),
+    days: [],
+  } };
+  const w = admin.leaderboardStats(raw, "week", now), a = admin.leaderboardStats(raw, "all", now);
+  assert.equal(w.points, 90 + 50);
+  assert.equal(w.tests, 6);
+  assert.ok(w.points <= a.points);
+});
