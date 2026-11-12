@@ -455,4 +455,7 @@ x23|À répéter maintenant
 x24|En attente de leur jour
 x25|Au premier essai
 x26|Actuellement
+x27|Classement général
+x28|Les points s'accumulent depuis l'inscription et n'expirent jamais
+x29|Cumulez des points sur la durée et comparez-vous aux autres élèves. Les élèves avec progression dans le cloud participent.
 r29|À partir de {~1}

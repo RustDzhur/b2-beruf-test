@@ -588,16 +588,14 @@ function dashboard(rawUsers, now = Date.now()) {
   }
   const weak = [...weakMap.values()].sort((a, b) => b.count - a.count).slice(0, 10);
 
-  // the same ranking the students see in their trainer (weekly points), so both cabinets always agree
-  const lbWeek = leaderboardRows(rawUsers, "week", now);
+  // the same ranking the students see in their trainer (total points since registration), so both cabinets always agree
   const lbAll = leaderboardRows(rawUsers, "all", now);
-  const weekRank = new Map(lbWeek.map(r => [r.uid, r])), allRank = new Map(lbAll.map(r => [r.uid, r]));
+  const allRank = new Map(lbAll.map(r => [r.uid, r]));
   students.forEach(s => {
-    const w = weekRank.get(s.uid), a = allRank.get(s.uid);
-    s.weekRank = w ? w.rank : null; s.weekPoints = w ? w.points : 0;
+    const a = allRank.get(s.uid);
     s.allRank = a ? a.rank : null; s.allPoints = a ? a.points : 0;
   });
-  const top = lbWeek.slice(0, 5).map(r => ({ uid: r.uid, name: r.name, initials: r.initials, rank: r.rank, points: r.points, tests: r.tests, days: r.days, avg: r.avg }));
+  const top = lbAll.slice(0, 5).map(r => ({ uid: r.uid, name: r.name, initials: r.initials, rank: r.rank, points: r.points, tests: r.tests, days: r.days, avg: r.avg }));
 
   return {
     generatedAt: now,

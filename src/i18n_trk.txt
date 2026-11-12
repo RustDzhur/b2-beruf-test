@@ -455,4 +455,7 @@ x23|Şimdi tekrar zamanı
 x24|Günlerini bekleyenler
 x25|İlk denemede
 x26|Şimdi
+x27|Genel sıralama
+x28|Puanlar kayıttan itibaren birikir ve asla silinmez
+x29|Zamanla puan biriktirin ve kendinizi diğer öğrencilerle karşılaştırın. Bulut ilerlemesi olan öğrenciler katılır.
 r29|{~1} itibaren

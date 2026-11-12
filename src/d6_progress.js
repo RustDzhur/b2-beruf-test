@@ -345,7 +345,7 @@ function viewProgress() {
 }
 
 /* ------------------------------------------------------------- leaderboard */
-let lbPeriod = "week";
+let lbPeriod = "all";
 let lbCache = { at: 0, week: null, all: null };
 function myLeaderboardUid() {
   try { return (typeof cloud !== "undefined" && cloud && cloud.s && cloud.s.uid) || ""; } catch { return ""; }
@@ -372,8 +372,8 @@ function lbMedal(rank) {
 function lbAward(rank) { return rank === 1 ? T("Золото") : rank === 2 ? T("Серебро") : rank === 3 ? T("Бронза") : ""; }
 function homeLeadersCard() {
   const card = h("div", { class: "home-card" },
-    h("h2", null, "🏆 " + T("Рейтинг недели")),
-    h("p", { class: "sub" }, T("Кто лучше всех занимается на этой неделе")),
+    h("h2", null, "🏆 " + T("Общий рейтинг")),
+    h("p", { class: "sub" }, T("Очки копятся с момента регистрации и не сгорают")),
     h("div", { id: "home-leaders" }, h("div", { class: "pg-empty" }, T("Загрузка…"))),
     h("div", { style: "margin-top:8px" }, h("a", { class: "small", href: "#leaderboard" }, T("Смотреть весь рейтинг") + " →")));
   setTimeout(loadHomeLeaders, 0);
@@ -383,7 +383,7 @@ async function loadHomeLeaders() {
   const box = document.getElementById("home-leaders");
   if (!box) return;
   try {
-    const d = await fetchLeaderboard("week", false);
+    const d = await fetchLeaderboard("all", false);
     const top = (d.entries || []).slice(0, 3);
     if (!top.length) { box.replaceChildren(h("div", { class: "pg-empty" }, T("Пока нет участников"))); return; }
     box.replaceChildren(h("div", { class: "home-lb-list" }, top.map(e => h("div", { class: "home-lb-row" },
@@ -418,15 +418,13 @@ function homeProgressCard() {
 }
 function homeStrip() { return h("div", { class: "home-strip" }, homeProgressCard(), homeLeadersCard()); }
 function viewLeaderboard() {
-  const tabs = h("div", { class: "lb-tabs", role: "group", "aria-label": T("Период") },
-    [["week", T("За неделю")], ["all", T("За всё время")]].map(([p, label]) => h("button", { class: lbPeriod === p ? "on" : "", "data-lb": p, onclick: () => { lbPeriod = p; renderLeaderboardView(true); } }, label)));
   const wrap = h("div", { class: "lb-wrap" },
     h("div", { class: "lb-hero" },
       h("div", null,
         h("div", { class: "eyebrow", style: "margin-bottom:5px" }, "DTB B2 · " + T("Рейтинг")),
         h("h1", null, T("Рейтинг учеников")),
-        h("p", null, T("Кто лучше всех занимается на этой неделе. Участвуют ученики с облачным прогрессом."))),
-      tabs),
+        h("p", null, T("Копите очки за всё время и сравнивайте себя с другими учениками. Участвуют ученики с облачным прогрессом."))),
+      h("button", { class: "btn small", onclick: () => renderLeaderboardView(true) }, T("Обновить"))),
     h("div", { id: "lb-content" }, h("div", { class: "lb-loading" }, T("Загрузка…"))));
   setTimeout(() => renderLeaderboardView(false), 0);
   return wrap;

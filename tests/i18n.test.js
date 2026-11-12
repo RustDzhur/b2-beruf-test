@@ -42,11 +42,11 @@ test("student interface: 'from <date>' rule translates and nests today/tomorrow"
 
 test("teacher cabinet: new labels are translated into every language", () => {
   const { ADM_I18N, ADM_RULES } = load("src/admin_i18n.js", "ADM_I18N, ADM_RULES");
-  for (const k of ["Лидеры недели", "Тот же рейтинг, что видят ученики: очки за неделю", "с первой попытки", "Средний успех (с первой попытки)", "Рейтинг недели: —"]) {
+  for (const k of ["Общий рейтинг", "Тот же рейтинг, что видят ученики: очки за всё время", "с первой попытки", "Средний успех (с первой попытки)", "Общий рейтинг: —"]) {
     assert.ok(ADM_I18N[k] && ADM_I18N[k].length === 6, "missing key: " + k);
     ADM_I18N[k].forEach(t => assert.ok(t && !/[А-Яа-яЁё]/.test(t), k));
   }
-  const samples = ["12 попыток · 1 дн. · 80% с первой попытки", "Рейтинг недели: #2 · 433 очков",
+  const samples = ["12 попыток · 1 дн. · 80% с первой попытки", "Общий рейтинг: #2 · 433 очков",
     "Сейчас (с учётом пересдач): 98% · лучший: 98% · успешных заданий: 3 из 3 · ошибок к повтору: 0"];
   for (const s of samples) {
     const r = ADM_RULES.find(([rx]) => rx.test(s));
@@ -61,7 +61,7 @@ test("teacher cabinet: counted phrases and tooltips lose no Russian in any langu
     "Активность: 7 дней", "Открыть профиль Many Attempts", "4 попытки, 3 задания", "Текущий: 98% · лучший: 98%", "Текущий результат: 98%", "Язык",
     "Распределение по успеваемости", "Динамика последних результатов", "решить первое задание", "10 разных заданий", "100 попыток решения", "неделя без пропусков",
     "30 активных дней", "100% за задание", "85%+ на 10 заданиях", "80%+ в Hören", "80%+ в Schreiben",
-    "Сейчас (с учётом пересдач): 98% · лучший: 98% · успешных заданий: 3 из 3 · ошибок к повтору: 0", "Рейтинг недели: #2 · 433 очков"];
+    "Сейчас (с учётом пересдач): 98% · лучший: 98% · успешных заданий: 3 из 3 · ошибок к повтору: 0", "Общий рейтинг: #2 · 433 очков"];
   const src = fs.readFileSync("src/admin_i18n.js", "utf8").split("function admLangNode")[0] + ";this.admTr = admTr; this.setL = (l) => { ADM_LANG = l; };";
   const ctx = vm.createContext({ localStorage: { getItem: () => null } });
   vm.runInContext(src, ctx);

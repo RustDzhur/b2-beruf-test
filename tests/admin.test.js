@@ -202,9 +202,9 @@ test("rating uses the first attempt, so a retake to 100% does not hide the mista
   const d = admin.dashboard([user], now);
   assert.equal(d.top[0].uid, "u9");
   assert.equal(d.top[0].avg, 70); // the teacher's leaders list shows the same number as the student's rating
-  const lb = admin.leaderboardRows([user], "week", now)[0];
+  const lb = admin.leaderboardRows([user], "all", now)[0];
   assert.equal(lb.avg, d.top[0].avg);
-  assert.equal(d.students[0].weekRank, lb.rank);
+  assert.equal(d.students[0].allRank, lb.rank);
 });
 
 test("weekly points count the best result per task, so the week never exceeds all-time", () => {

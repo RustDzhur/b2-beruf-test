@@ -455,4 +455,7 @@ x23|Time to repeat|Jetzt wiederholen
 x24|Waiting for their day|Warten auf ihren Termin
 x25|From the first attempt|Beim ersten Versuch
 x26|Now|Aktuell
+x27|Overall ranking|Gesamtrangliste
+x28|Points build up from registration and never expire|Punkte sammeln sich seit der Registrierung und verfallen nie
+x29|Collect points over time and compare yourself with other students. Students with cloud progress take part.|Sammeln Sie dauerhaft Punkte und vergleichen Sie sich mit anderen Schülern. Es nehmen Schüler mit Cloud-Fortschritt teil.
 r29|From {~1}|Ab {~1}

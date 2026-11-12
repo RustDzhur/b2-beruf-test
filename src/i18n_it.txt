@@ -455,4 +455,7 @@ x23|È ora di ripassare
 x24|In attesa del loro giorno
 x25|Al primo tentativo
 x26|Ora
+x27|Classifica generale
+x28|I punti si accumulano dalla registrazione e non scadono mai
+x29|Accumula punti nel tempo e confrontati con gli altri studenti. Partecipano gli studenti con progressi nel cloud.
 r29|Da {~1}
