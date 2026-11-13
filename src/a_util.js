@@ -193,7 +193,7 @@ const ERR = {
   error: "ИИ вернул ошибку. Попробуйте ещё раз."
 };
 // shown to everybody the teacher has not verified yet; the WhatsApp number comes from the server (VERIFY_CONTACT)
-const notVerifiedText = (contact) => "Доступ к ИИ закрыт: вы не прошли верификацию. Чтобы получить её, зарегистрируйтесь в облаке (анкета: e-mail и пароль) и напишите запрос на верификацию в WhatsApp" + (contact ? ": " + contact : "") + ". После одобрения вам откроются все инструменты, и вы сможете полноценно готовиться к экзамену.";
+const notVerifiedText = (contact) => "Тренажёр создан волонтёрски и остаётся бесплатным. Платным здесь является только ИИ: за каждый его ответ приходится платить за API. Поэтому полный доступ к ИИ открывается тем, кто вносит символический взнос на его оплату. Чтобы получить доступ, зарегистрируйтесь в облаке (анкета: e-mail и пароль) и напишите в WhatsApp" + (contact ? ": " + contact : "") + ". Там вам расскажут, как внести взнос. После подтверждения откроются все инструменты, и вы сможете полноценно готовиться к экзамену.";
 const errText = (e) => e && e.code === "not_verified" ? notVerifiedText(e.contact) : (ERR[e && e.code] || "Не удалось связаться с ИИ. Попробуйте ещё раз.");
 function thinking(msg) { return h("div", { class: "thinking" }, h("span", { class: "dots" }, h("i"), h("i"), h("i")), msg || "ИИ думает…"); }
 async function getSample() { const s = SAMPLE || await sampleReady; if (!s) throw { code: "not_granted" }; return s; }

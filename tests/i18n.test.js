@@ -84,7 +84,7 @@ test("student interface: verification texts are translated, with and without the
   const rule = I18N_RULES.find(r => new RegExp(r[0]).test(withNumber));
   assert.ok(rule, "no rule for the text with a number");
   rule[1].forEach((t, i) => assert.ok(t.includes("{1}") && !/[А-Яа-яЁё]/.test(t), LANGS[i]));
-  for (const k of ["E-mail нужен для верификации: тот же адрес отправьте преподавателю в WhatsApp, и после проверки вам откроется доступ к ИИ.", "Укажите e-mail: он нужен для сохранения прогресса в облаке и для верификации."]) {
+  for (const k of ["E-mail нужен для верификации: тот же адрес отправьте преподавателю в WhatsApp. ИИ доступен после верификации и символического взноса на оплату API.", "Укажите e-mail: он нужен для сохранения прогресса в облаке и для верификации."]) {
     assert.ok(I18N[k] && I18N[k].length === 6, k);
     I18N[k].forEach((t, i) => assert.ok(t && !/[А-Яа-яЁё]/.test(t), LANGS[i] + ": " + k));
   }

@@ -458,8 +458,8 @@ x26|Ora
 x27|Classifica generale
 x28|I punti si accumulano dalla registrazione e non scadono mai
 x29|Accumula punti nel tempo e confrontati con gli altri studenti. Partecipano gli studenti con progressi nel cloud.
-x30|Accesso all'IA chiuso: non sei stato verificato. Per ottenerla, registrati nel cloud (scheda: e-mail e password) e invia una richiesta di verifica su WhatsApp. Dopo l'approvazione si apriranno tutti gli strumenti e potrai prepararti pienamente all'esame.
-x31|L'e-mail serve per la verifica: invia lo stesso indirizzo all'insegnante su WhatsApp e, dopo il controllo, avrai accesso all'IA.
+x30|Il trainer è un progetto di volontariato e resta gratuito. Solo l'IA costa: ogni sua risposta si paga tramite l'API. Per questo l'accesso completo all'IA è aperto a chi dà un contributo simbolico. Per ottenerlo, registrati nel cloud (scheda: e-mail e password) e scrivi su WhatsApp. Lì ti spiegheranno come versare il contributo. Dopo la conferma si apriranno tutti gli strumenti e potrai prepararti pienamente all'esame.
+x31|L'e-mail serve per la verifica: invia lo stesso indirizzo all'insegnante su WhatsApp. L'IA è disponibile dopo la verifica e un contributo simbolico ai costi dell'API.
 x32|Inserisci un'e-mail: serve per salvare i progressi nel cloud e per la verifica.
 r29|Da {~1}
-r30|Accesso all'IA chiuso: non sei stato verificato. Per ottenerla, registrati nel cloud (scheda: e-mail e password) e invia una richiesta di verifica su WhatsApp: {1}. Dopo l'approvazione si apriranno tutti gli strumenti e potrai prepararti pienamente all'esame.
+r30|Il trainer è un progetto di volontariato e resta gratuito. Solo l'IA costa: ogni sua risposta si paga tramite l'API. Per questo l'accesso completo all'IA è aperto a chi dà un contributo simbolico. Per ottenerlo, registrati nel cloud (scheda: e-mail e password) e scrivi su WhatsApp: {1}. Lì ti spiegheranno come versare il contributo. Dopo la conferma si apriranno tutti gli strumenti e potrai prepararti pienamente all'esame.

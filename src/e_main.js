@@ -435,7 +435,7 @@ function viewProfile(first) {
       boxIn("zentrum", L7("Prüfungszentrum", "Examination Centre", "Centre d'examen", "Centro d'esame", "Sınav merkezi", "Экзаменационное учреждение"), 30),
       dateIn("datum", L7("Prüfungsdatum", "Date of Examination", "Date d'examen", "Data dell'esame", "Sınav tarihi", "Дата экзамена"))),
     h("label", { class: "cv-row" }, h("input", { class: "datein", type: "email", name: "email", value: c.email || "", autocomplete: "email", placeholder: "name@example.com", maxlength: 120 }), h("small", null, "E-mail")),
-    h("p", { class: "small muted", style: "margin:2px 0 8px" }, "E-mail нужен для верификации: тот же адрес отправьте преподавателю в WhatsApp, и после проверки вам откроется доступ к ИИ."),
+    h("p", { class: "small muted", style: "margin:2px 0 8px" }, "E-mail нужен для верификации: тот же адрес отправьте преподавателю в WhatsApp. ИИ доступен после верификации и символического взноса на оплату API."),
     h("label", { class: "cv-row" }, h("input", { class: "datein", type: "password", name: "pw", autocomplete: "new-password", placeholder: "••••••", minlength: 6 }), h("small", null, "Kennwort zum Speichern in der Cloud (optional, mindestens 6 Zeichen)")),
     err,
     h("div", { class: "s30-foot" }, h("b", null, "Antwortbogen S30"), h("span", null, "www.telc.net")));

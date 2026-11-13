@@ -458,8 +458,8 @@ x26|Şimdi
 x27|Genel sıralama
 x28|Puanlar kayıttan itibaren birikir ve asla silinmez
 x29|Zamanla puan biriktirin ve kendinizi diğer öğrencilerle karşılaştırın. Bulut ilerlemesi olan öğrenciler katılır.
-x30|Yapay zekâ erişimi kapalı: doğrulanmadınız. Doğrulanmak için bulutta kayıt olun (form: e-posta ve şifre) ve WhatsApp'tan doğrulama talebi gönderin. Onaylandığında tüm araçlar açılır ve sınava tam olarak hazırlanabilirsiniz.
-x31|E-posta doğrulama için gereklidir: aynı adresi WhatsApp'tan öğretmene gönderin, kontrolden sonra yapay zekâya erişiminiz açılır.
+x30|Eğitmen gönüllü bir projedir ve ücretsiz kalır. Yalnızca yapay zekâ para gerektirir: verdiği her yanıt için API ücreti ödenir. Bu yüzden yapay zekâya tam erişim, buna sembolik bir katkı sağlayanlara açılır. Erişim için bulutta kayıt olun (form: e-posta ve şifre) ve WhatsApp'tan yazın. Katkıyı nasıl yapacağınızı orada size anlatacaklar. Onaylandıktan sonra tüm araçlar açılır ve sınava tam olarak hazırlanabilirsiniz.
+x31|E-posta doğrulama için gereklidir: aynı adresi WhatsApp'tan öğretmene gönderin. Yapay zekâ, doğrulamadan ve API maliyetine sembolik bir katkıdan sonra kullanılabilir.
 x32|E-posta girin: ilerlemeyi bulutta saklamak ve doğrulama için gereklidir.
 r29|{~1} itibaren
-r30|Yapay zekâ erişimi kapalı: doğrulanmadınız. Doğrulanmak için bulutta kayıt olun (form: e-posta ve şifre) ve WhatsApp'tan doğrulama talebi gönderin: {1}. Onaylandığında tüm araçlar açılır ve sınava tam olarak hazırlanabilirsiniz.
+r30|Eğitmen gönüllü bir projedir ve ücretsiz kalır. Yalnızca yapay zekâ para gerektirir: verdiği her yanıt için API ücreti ödenir. Bu yüzden yapay zekâya tam erişim, buna sembolik bir katkı sağlayanlara açılır. Erişim için bulutta kayıt olun (form: e-posta ve şifre) ve WhatsApp'tan yazın: {1}. Katkıyı nasıl yapacağınızı orada size anlatacaklar. Onaylandıktan sonra tüm araçlar açılır ve sınava tam olarak hazırlanabilirsiniz.
