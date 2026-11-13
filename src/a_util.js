@@ -162,10 +162,13 @@ async function localSample() {
   const call = async (input, opts = {}) => {
     const messages = typeof input === "string" ? [{ role: "user", content: input }] : input;
     let r;
-    try { r = await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages, tier: opts.modelTier || "default" }), signal: opts.signal }); }
+    // the server lets only teacher-verified students use the AI; it recognises them by the cloud login token
+    const headers = { "Content-Type": "application/json" };
+    try { if (cloudOn()) headers.Authorization = "Bearer " + await fbToken(); } catch {}
+    try { r = await fetch("/api/ai", { method: "POST", headers, body: JSON.stringify({ messages, tier: opts.modelTier || "default" }), signal: opts.signal }); }
     catch (e) { throw e && e.name === "AbortError" ? { code: "cancelled" } : { code: "network" }; }
     const j = await r.json().catch(() => ({}));
-    if (!r.ok) throw { code: j.code || "error", message: j.message };
+    if (!r.ok) throw { code: j.code || "error", message: j.message, contact: j.contact || "" };
     opts.onText && opts.onText({ text: j.text, delta: j.text });
     return { text: j.text };
   };
@@ -189,7 +192,9 @@ const ERR = {
   authentication_error: "Ключ API не подходит. Проверьте OPENAI_API_KEY.",
   error: "ИИ вернул ошибку. Попробуйте ещё раз."
 };
-const errText = (e) => ERR[e && e.code] || "Не удалось связаться с ИИ. Попробуйте ещё раз.";
+// shown to everybody the teacher has not verified yet; the WhatsApp number comes from the server (VERIFY_CONTACT)
+const notVerifiedText = (contact) => "Доступ к ИИ закрыт: вы не прошли верификацию. Чтобы получить её, зарегистрируйтесь в облаке (анкета: e-mail и пароль) и напишите запрос на верификацию в WhatsApp" + (contact ? ": " + contact : "") + ". После одобрения вам откроются все инструменты, и вы сможете полноценно готовиться к экзамену.";
+const errText = (e) => e && e.code === "not_verified" ? notVerifiedText(e.contact) : (ERR[e && e.code] || "Не удалось связаться с ИИ. Попробуйте ещё раз.");
 function thinking(msg) { return h("div", { class: "thinking" }, h("span", { class: "dots" }, h("i"), h("i"), h("i")), msg || "ИИ думает…"); }
 async function getSample() { const s = SAMPLE || await sampleReady; if (!s) throw { code: "not_granted" }; return s; }
 const LANG_NAME = { ru: "Russian", en: "English", de: "German", fr: "French", tr: "Turkish", ar: "Arabic", it: "Italian" };

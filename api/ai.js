@@ -4,6 +4,6 @@ module.exports = async (req, res) => {
   res.setHeader("Cache-Control", "no-store");
   if (req.method !== "POST") { res.statusCode = 405; return res.end(JSON.stringify({ code: "error", message: "POST only" })); }
   const ip = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim() || "x";
-  const [code, out] = await ai.handle(req.body, ip, ai.sameOrigin(req.headers));
+  const [code, out] = await ai.handle(req.body, ip, ai.sameOrigin(req.headers), req.headers.authorization);
   res.statusCode = code; res.setHeader("Content-Type", "application/json; charset=utf-8"); res.end(JSON.stringify(out));
 };

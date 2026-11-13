@@ -458,4 +458,8 @@ x26|Actuellement
 x27|Classement général
 x28|Les points s'accumulent depuis l'inscription et n'expirent jamais
 x29|Cumulez des points sur la durée et comparez-vous aux autres élèves. Les élèves avec progression dans le cloud participent.
+x30|Accès à l'IA fermé : vous n'avez pas été vérifié. Pour l'obtenir, inscrivez-vous dans le cloud (fiche : e-mail et mot de passe) et envoyez une demande de vérification sur WhatsApp. Une fois la demande approuvée, tous les outils seront disponibles et vous pourrez vous préparer pleinement à l'examen.
+x31|L'e-mail sert à la vérification : envoyez la même adresse à l'enseignant sur WhatsApp, et après contrôle vous aurez accès à l'IA.
+x32|Indiquez un e-mail : il est nécessaire pour sauvegarder la progression dans le cloud et pour la vérification.
 r29|À partir de {~1}
+r30|Accès à l'IA fermé : vous n'avez pas été vérifié. Pour l'obtenir, inscrivez-vous dans le cloud (fiche : e-mail et mot de passe) et envoyez une demande de vérification sur WhatsApp: {1}. Une fois la demande approuvée, tous les outils seront disponibles et vous pourrez vous préparer pleinement à l'examen.

@@ -708,3 +708,8 @@ body.adm-lock { overflow: hidden; }
 [dir="rtl"] .adm-weak-row .adm-weak-count { text-align: left; }
 [dir="rtl"] .adm-progress b { text-align: left; }
 [dir="rtl"] .adm-login { direction: rtl; }
+
+/* AI access (manual verification) */
+.adm-student-name span.adm-email { color: var(--ink); opacity: .75; word-break: break-all; }
+.adm-verify { display: inline-flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.adm-verify .adm-btn { padding: 4px 10px; font-size: 12px; }

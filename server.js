@@ -4,6 +4,7 @@ const ROOT = __dirname, PORT = +process.env.PORT || 5173;
 const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png", ".ico": "image/x-icon", ".mp3": "audio/mpeg" };
 const ai = require("./api/_ai.js");
 const admin = require("./api/_admin.js");
+const verify = require("./api/_verify.js");
 const json = (res, code, o) => { res.writeHead(code, { "Content-Type": "application/json; charset=utf-8" }); res.end(JSON.stringify(o)); };
 // Teacher cabinet: on a local run a random password is generated once, so /admin is never open by accident.
 let generatedAdminPassword = "";
@@ -47,6 +48,12 @@ async function adminRoute(req, res, p) {
       if (!admin.verifySession(headers.cookie)) return send(401, { code: "unauthorized", message: "Войдите в кабинет." });
       return send(200, await admin.buildDashboard());
     }
+    if (p === "/api/admin/verify" && req.method === "POST") {
+      if (!admin.verifySession(headers.cookie)) return send(401, { code: "unauthorized", message: "Войдите в кабинет." });
+      const b = admin.bodyOf(await readBody(req));
+      await verify.setVerified(b.uid, !!b.verified);
+      return send(200, { ok: true, uid: String(b.uid), verified: !!b.verified });
+    }
     return send(404, { code: "not_found", message: "Неизвестный метод API." });
   } catch (e) {
     return send(e.status || 500, { code: e.code || "error", message: e.message || "Ошибка сервера." });
@@ -54,7 +61,7 @@ async function adminRoute(req, res, p) {
 }
 async function aiRoute(req, res) {
   let body = ""; for await (const c of req) { body += c; if (body.length > 2e6) return json(res, 413, { code: "error", message: "too large" }); }
-  const [code, out] = await ai.handle(body, req.socket.remoteAddress || "local", ai.sameOrigin(req.headers));
+  const [code, out] = await ai.handle(body, req.socket.remoteAddress || "local", ai.sameOrigin(req.headers), req.headers.authorization);
   json(res, code, out);
 }
 // live neural speech for texts that are not pre-rendered (Claude's replies, voice tests): edge-tts, cached in the temp dir

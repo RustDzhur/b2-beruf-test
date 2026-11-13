@@ -434,6 +434,8 @@ function viewProfile(first) {
       boxIn("ort", L7("Postleitzahl und Ort", "Postcode and town", "Code postal et ville", "CAP e città", "Posta kodu ve şehir", "Индекс и город"), 30),
       boxIn("zentrum", L7("Prüfungszentrum", "Examination Centre", "Centre d'examen", "Centro d'esame", "Sınav merkezi", "Экзаменационное учреждение"), 30),
       dateIn("datum", L7("Prüfungsdatum", "Date of Examination", "Date d'examen", "Data dell'esame", "Sınav tarihi", "Дата экзамена"))),
+    h("label", { class: "cv-row" }, h("input", { class: "datein", type: "email", name: "email", value: c.email || "", autocomplete: "email", placeholder: "name@example.com", maxlength: 120 }), h("small", null, "E-mail")),
+    h("p", { class: "small muted", style: "margin:2px 0 8px" }, "E-mail нужен для верификации: тот же адрес отправьте преподавателю в WhatsApp, и после проверки вам откроется доступ к ИИ."),
     h("label", { class: "cv-row" }, h("input", { class: "datein", type: "password", name: "pw", autocomplete: "new-password", placeholder: "••••••", minlength: 6 }), h("small", null, "Kennwort zum Speichern in der Cloud (optional, mindestens 6 Zeichen)")),
     err,
     h("div", { class: "s30-foot" }, h("b", null, "Antwortbogen S30"), h("span", null, "www.telc.net")));
@@ -444,6 +446,9 @@ function viewProfile(first) {
     const pw = x.pw || ""; delete x.pw;
     if (!x.fam || !x.vor) { err.textContent = "Укажите фамилию и имя."; err.hidden = false; return; }
     if (pw && pw.length < 6) { err.textContent = "Das Kennwort ist zu kurz (mindestens 6 Zeichen)."; err.hidden = false; return; }
+    x.email = (x.email || "").toLowerCase();
+    // cloud accounts must carry a real e-mail: it is how the teacher recognises the student when verifying
+    if ((pw || cloudOn() || x.email) && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(x.email)) { err.textContent = "Укажите e-mail: он нужен для сохранения прогресса в облаке и для верификации."; err.hidden = false; return; }
     store.set("cand", { ...x, done: true });
     if (pw) {
       err.hidden = true; const btn = document.querySelector(".btn.primary"); if (btn) btn.disabled = true;

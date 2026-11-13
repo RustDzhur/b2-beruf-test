@@ -70,3 +70,30 @@ test("teacher cabinet: counted phrases and tooltips lose no Russian in any langu
     for (const s of samples) assert.ok(!/[А-Яа-яЁё]/.test(ctx.admTr(s)), `${l}: ${s} -> ${ctx.admTr(s)}`);
   }
 });
+
+// the "not verified" message is built in a_util.js (notVerifiedText), the profile hint/error in e_main.js; all must exist in every language
+test("student interface: verification texts are translated, with and without the WhatsApp number", () => {
+  const { I18N, I18N_RULES } = load("src/i18n.js", "I18N, I18N_RULES");
+  const util = fs.readFileSync("src/a_util.js", "utf8");
+  const fn = new Function(util.match(/const notVerifiedText = [^\n]+/)[0] + "; return notVerifiedText;")();
+  const exact = fn("");
+  assert.ok(I18N[exact], "no exact translation for the text without a number");
+  assert.equal(I18N[exact].length, 6);
+  I18N[exact].forEach((t, i) => assert.ok(t && !/[А-Яа-яЁё]/.test(t), LANGS[i]));
+  const withNumber = fn("+49 000 0000000");
+  const rule = I18N_RULES.find(r => new RegExp(r[0]).test(withNumber));
+  assert.ok(rule, "no rule for the text with a number");
+  rule[1].forEach((t, i) => assert.ok(t.includes("{1}") && !/[А-Яа-яЁё]/.test(t), LANGS[i]));
+  for (const k of ["E-mail нужен для верификации: тот же адрес отправьте преподавателю в WhatsApp, и после проверки вам откроется доступ к ИИ.", "Укажите e-mail: он нужен для сохранения прогресса в облаке и для верификации."]) {
+    assert.ok(I18N[k] && I18N[k].length === 6, k);
+    I18N[k].forEach((t, i) => assert.ok(t && !/[А-Яа-яЁё]/.test(t), LANGS[i] + ": " + k));
+  }
+});
+
+test("teacher cabinet: verification labels are translated into every language", () => {
+  const { ADM_I18N } = load("src/admin_i18n.js", "ADM_I18N");
+  for (const k of ["Доступ к ИИ", "Верифицирован", "Не верифицирован", "Не верифицированные", "Подтвердить", "Отозвать", "Не удалось сохранить.", "Не удалось загрузить статусы верификации"]) {
+    assert.ok(ADM_I18N[k] && ADM_I18N[k].length === 6, "missing: " + k);
+    ADM_I18N[k].forEach((t, i) => assert.ok(t && !/[А-Яа-яЁё]/.test(t), LANGS[i] + ": " + k));
+  }
+});

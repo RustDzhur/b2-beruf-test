@@ -1,0 +1,117 @@
+// Manual verification of students. Only verified students may use the AI (the only feature that spends money).
+// Source of truth: Firestore collection `verified`, one document per student uid (existence = verified).
+// It is read and written ONLY here with the service account, so a student cannot grant it to themselves
+// (the Firestore rules for the browser cover only users/{uid}).
+// The browser proves who it is with its Firebase ID token (Authorization: Bearer ...), which is checked against Google.
+const crypto = require("crypto");
+const admin = require("./_admin.js");
+
+const WEB_KEY = process.env.FIREBASE_WEB_API_KEY || "AIzaSyA5_PmCPlHg-9P1OD9LQFHXXF4Svj6Vajo"; // public by design (same key as in the page)
+const UID_RE = /^[A-Za-z0-9_-]{6,128}$/;
+const TOKEN_TTL = 5 * 60 * 1000, VERIFIED_TTL = 60 * 1000;
+const tokenCache = new Map(), verifiedCache = new Map();
+const mem = new Set(); // used only with ADMIN_FIXTURES (no Firestore), so the cabinet can be tried locally
+
+const contact = () => String(process.env.VERIFY_CONTACT || "").slice(0, 60);
+const open = () => process.env.AI_OPEN === "1"; // escape hatch for local work: everybody may use the AI
+const useMem = () => { try { return !admin.serviceAccount() && !!admin.fixtureUsers(); } catch { return false; } };
+const fail = (status, code, message) => Object.assign(new Error(message), { status, code });
+
+function base() {
+  const sa = admin.serviceAccount();
+  if (!sa) throw fail(501, "no_service_account", "Не настроен ключ Firebase.");
+  return "https://firestore.googleapis.com/v1/projects/" + encodeURIComponent(sa.project_id) + "/databases/(default)/documents/verified";
+}
+
+async function lookupUid(idToken) {
+  const key = crypto.createHash("sha256").update(idToken).digest("hex");
+  const hit = tokenCache.get(key);
+  if (hit && hit.exp > Date.now()) return hit.uid;
+  let r, j;
+  try {
+    r = await fetch("https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=" + encodeURIComponent(WEB_KEY), {
+      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ idToken }) });
+    j = await r.json().catch(() => ({}));
+  } catch { throw fail(502, "verify_unavailable", "Нет связи с Google."); }
+  if (!r.ok) {
+    if (r.status === 400 || r.status === 401) return null; // expired or forged token
+    throw fail(502, "verify_unavailable", "Google: HTTP " + r.status);
+  }
+  const uid = j.users && j.users[0] && j.users[0].localId;
+  if (!uid) return null;
+  if (tokenCache.size > 2000) tokenCache.clear();
+  tokenCache.set(key, { uid, exp: Date.now() + TOKEN_TTL });
+  return uid;
+}
+
+async function isVerified(uid) {
+  if (!UID_RE.test(uid)) return false;
+  if (useMem()) return mem.has(uid);
+  const hit = verifiedCache.get(uid);
+  if (hit && hit.exp > Date.now()) return hit.v;
+  let r;
+  try { r = await fetch(base() + "/" + uid, { headers: { authorization: "Bearer " + await admin.accessToken() } }); }
+  catch (e) { if (e && e.code) throw e; throw fail(502, "verify_unavailable", "Нет связи с Firestore."); }
+  if (r.status !== 200 && r.status !== 404) throw fail(502, "verify_unavailable", "Firestore: HTTP " + r.status);
+  const v = r.status === 200;
+  if (verifiedCache.size > 5000) verifiedCache.clear();
+  verifiedCache.set(uid, { v, exp: Date.now() + VERIFIED_TTL });
+  return v;
+}
+
+async function setVerified(uid, on) {
+  uid = String(uid || "");
+  if (!UID_RE.test(uid)) throw fail(400, "bad_uid", "Некорректный UID.");
+  if (useMem()) { on ? mem.add(uid) : mem.delete(uid); return; }
+  const token = await admin.accessToken();
+  let r;
+  try {
+    r = on
+      ? await fetch(base() + "/" + uid + "?updateMask.fieldPaths=at", { method: "PATCH",
+        headers: { authorization: "Bearer " + token, "content-type": "application/json" },
+        body: JSON.stringify({ fields: { at: { integerValue: String(Date.now()) } } }) })
+      : await fetch(base() + "/" + uid, { method: "DELETE", headers: { authorization: "Bearer " + token } });
+  } catch { throw fail(502, "firestore_unreachable", "Нет связи с Firestore."); }
+  if (!r.ok && !(r.status === 404 && !on)) throw fail(502, "firestore_failed", "Firestore: HTTP " + r.status);
+  verifiedCache.delete(uid);
+}
+
+async function listVerified() {
+  if (useMem()) return new Set(mem);
+  const token = await admin.accessToken();
+  const out = new Set();
+  let pageToken = "", pages = 0;
+  do {
+    const url = new URL(base());
+    url.searchParams.set("pageSize", "300");
+    if (pageToken) url.searchParams.set("pageToken", pageToken);
+    let r, j;
+    try { r = await fetch(url, { headers: { authorization: "Bearer " + token } }); j = await r.json().catch(() => ({})); }
+    catch { throw fail(502, "firestore_unreachable", "Нет связи с Firestore."); }
+    if (r.status === 404) break;
+    if (!r.ok) throw fail(502, "firestore_failed", "Firestore: HTTP " + r.status);
+    for (const d of (j.documents || [])) out.add(String(d.name || "").split("/").pop());
+    pageToken = j.nextPageToken || "";
+  } while (pageToken && ++pages < 50);
+  return out;
+}
+
+// hooks so tests can run without Google
+const impl = { lookupUid, isVerified };
+
+// Authorization header -> {ok:true, uid} or {ok:false, status, code}
+async function check(authHeader) {
+  if (open()) return { ok: true, uid: "open" };
+  const m = /^Bearer\s+(\S{20,4096})$/.exec(String(authHeader || ""));
+  if (!m) return { ok: false, status: 403, code: "not_verified" };
+  try {
+    const uid = await impl.lookupUid(m[1]);
+    if (!uid) return { ok: false, status: 403, code: "not_verified" };
+    if (!(await impl.isVerified(uid))) return { ok: false, status: 403, code: "not_verified" };
+    return { ok: true, uid };
+  } catch (e) {
+    return { ok: false, status: e.status || 503, code: e.code || "verify_unavailable" };
+  }
+}
+
+module.exports = { check, setVerified, listVerified, isVerified, contact, UID_RE, _hooks: impl };

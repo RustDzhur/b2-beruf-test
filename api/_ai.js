@@ -4,6 +4,7 @@ const OPENAI_KEY = process.env.OPENAI_API_KEY, ANTHROPIC_KEY = process.env.ANTHR
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o";
 const CLAUDE_MODEL = process.env.CLAUDE_MODEL || "claude-sonnet-5-5";
 const ready = () => !!(OPENAI_KEY || ANTHROPIC_KEY);
+const verify = require("./_verify.js");
 
 // best-effort limits so a public page cannot burn the whole budget: size, token cap, per-IP rate (per instance)
 const MAX_CHARS = 40000, MAX_OUT = 3500, WINDOW = 10 * 60 * 1000, MAX_REQ = 30;
@@ -33,10 +34,14 @@ async function ask(messages) {
 }
 
 // returns [httpStatus, jsonBody]
-async function handle(body, ip, sameOrigin) {
+async function handle(body, ip, sameOrigin, authHeader) {
   if (!ready()) return [503, { code: "not_granted", message: "no API key configured" }];
   if (!sameOrigin) return [403, { code: "error", message: "forbidden origin" }];
   if (limited(ip)) return [429, { code: "rate_limited", message: "too many requests" }];
+  // only students the teacher has verified by hand may spend the AI budget
+  const gate = await verify.check(authHeader);
+  if (!gate.ok) return [gate.status, { code: gate.code, message: "verification required", contact: verify.contact() }];
+  if (limited("u:" + gate.uid)) return [429, { code: "rate_limited", message: "too many requests" }];
   let messages;
   try { messages = (typeof body === "string" ? JSON.parse(body) : body).messages; } catch { return [400, { code: "error", message: "bad json" }]; }
   if (!Array.isArray(messages) || !messages.length || messages.some(m => !m || !["user", "assistant"].includes(m.role) || typeof m.content !== "string")) return [400, { code: "error", message: "bad messages" }];

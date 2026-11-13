@@ -315,6 +315,11 @@ function partOf(vid) {
 function cleanName(s) {
   return String(s || "").replace(/\s+/g, " ").trim().slice(0, 60);
 }
+// the e-mail a student typed in the form (shown to the teacher to match it with the WhatsApp request; not proof of ownership)
+function cleanEmail(s) {
+  const t = String(s || "").trim().toLowerCase().slice(0, 120);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(t) ? t : "";
+}
 
 // earliest logged attempt per task: Map(vid -> {t, pct})
 function firstAttempts(log) {
@@ -495,6 +500,7 @@ function computeStudent(raw, now = Date.now()) {
   return {
     uid: String((raw && raw.uid) || ""),
     fam, vor, name: name || "Без имени", initials, hasName: !!(fam || vor),
+    email: cleanEmail(cand.email), verified: false,
     days: days.length,
     tasks,
     attempts,
@@ -521,8 +527,9 @@ function computeStudent(raw, now = Date.now()) {
   };
 }
 
-function dashboard(rawUsers, now = Date.now()) {
+function dashboard(rawUsers, now = Date.now(), verified = null) {
   const students = (rawUsers || []).map(u => computeStudent(u, now));
+  if (verified) students.forEach(s => { s.verified = verified.has(s.uid); });
   const withData = students.filter(s => s.tasks > 0 || s.days > 0);
   const withScore = students.filter(s => s.scorePct != null);
   const d7 = dayKey(-6), d30 = dayKey(-29);
@@ -612,7 +619,10 @@ function dashboard(rawUsers, now = Date.now()) {
 
 async function buildDashboard() {
   const { source, users } = await loadUsers();
-  const out = dashboard(users);
+  let verified = null, verifyError = "";
+  try { verified = await require("./_verify.js").listVerified(); } catch (e) { verifyError = e.message || "verify"; }
+  const out = dashboard(users, Date.now(), verified);
+  out.verifyError = verifyError; // the cabinet warns instead of showing everybody as unverified by mistake
   out.source = source;
   return out;
 }
