@@ -500,7 +500,7 @@ function computeStudent(raw, now = Date.now()) {
   return {
     uid: String((raw && raw.uid) || ""),
     fam, vor, name: name || "Без имени", initials, hasName: !!(fam || vor),
-    email: cleanEmail(cand.email), verified: false,
+    email: cleanEmail(cand.email), verified: false, admitted: true,
     days: days.length,
     tasks,
     attempts,
@@ -527,9 +527,10 @@ function computeStudent(raw, now = Date.now()) {
   };
 }
 
-function dashboard(rawUsers, now = Date.now(), verified = null) {
+function dashboard(rawUsers, now = Date.now(), verified = null, admitted = null) {
   const students = (rawUsers || []).map(u => computeStudent(u, now));
   if (verified) students.forEach(s => { s.verified = verified.has(s.uid); });
+  if (admitted) students.forEach(s => { s.admitted = admitted.has(s.uid); });
   const withData = students.filter(s => s.tasks > 0 || s.days > 0);
   const withScore = students.filter(s => s.scorePct != null);
   const d7 = dayKey(-6), d30 = dayKey(-29);
@@ -621,7 +622,9 @@ async function buildDashboard() {
   const { source, users } = await loadUsers();
   let verified = null, verifyError = "";
   try { verified = await require("./_verify.js").listVerified(); } catch (e) { verifyError = e.message || "verify"; }
-  const out = dashboard(users, Date.now(), verified);
+  let admitted = null;
+  try { admitted = await require("./_admit.js").listAdmitted(); } catch (e) { verifyError = verifyError || e.message || "admit"; }
+  const out = dashboard(users, Date.now(), verified, admitted);
   out.verifyError = verifyError; // the cabinet warns instead of showing everybody as unverified by mistake
   out.source = source;
   return out;
@@ -655,7 +658,7 @@ async function deleteUsers(uids) {
       const r = await fetch(docs + "users/" + uid, { headers: auth });
       if (r.ok) backup.push(parseRawDoc(await r.json()));
       else if (r.status !== 404) throw new Error("Firestore: HTTP " + r.status);
-      for (const col of ["users", "verified"]) {
+      for (const col of ["users", "verified", "admitted"]) {
         const d = await fetch(docs + col + "/" + uid, { method: "DELETE", headers: auth });
         if (!d.ok && d.status !== 404) throw new Error("Firestore " + col + ": HTTP " + d.status);
       }
@@ -754,9 +757,10 @@ async function buildLeaderboard(period = "week", uid = "", now = Date.now()) {
   period = period === "all" ? "all" : "week";
   if (!lbCache.week || now - lbCache.at > 60000) {
     const { users: everyone } = await loadUsers();
-    // only students the teacher has approved appear in the public leaderboard
-    const ok = await require("./_verify.js").listVerified();
-    const users = everyone.filter(u => ok.has(u.uid));
+    // everybody admitted to the trainer is in the leaderboard (old accounts automatically); new sign-ups wait for "Допустить"
+    let ok = null;
+    try { ok = await require("./_admit.js").listAdmitted(); } catch {}
+    const users = ok ? everyone.filter(u => ok.has(u.uid)) : everyone;
     lbCache = {
       at: now,
       week: leaderboardRows(users, "week", now),

@@ -54,6 +54,12 @@ async function adminRoute(req, res, p) {
       await verify.setVerified(b.uid, !!b.verified);
       return send(200, { ok: true, uid: String(b.uid), verified: !!b.verified });
     }
+    if (p === "/api/admin/admit" && req.method === "POST") {
+      if (!admin.verifySession(headers.cookie)) return send(401, { code: "unauthorized", message: "Войдите в кабинет." });
+      const b = admin.bodyOf(await readBody(req));
+      await require("./api/_admit.js").setAdmitted(b.uid, !!b.admitted);
+      return send(200, { ok: true, uid: String(b.uid), admitted: !!b.admitted });
+    }
     if (p === "/api/admin/delete" && req.method === "POST") {
       if (!admin.verifySession(headers.cookie)) return send(401, { code: "unauthorized", message: "Войдите в кабинет." });
       const b = admin.bodyOf(await readBody(req));
