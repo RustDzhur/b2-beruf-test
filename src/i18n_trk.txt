@@ -540,3 +540,8 @@ x106|Aboneliğiniz sona erdi
 x107|Erişim kapandı, ilerlemeniz kayıtlı.
 x108|Devam etmek için ayda 5 € (yapay zekâsız) veya ayda 10 € (yapay zekâlı) ödeyin ve yöneticiye WhatsApp'tan yazın.
 x109|Lütfen aramayın, sadece mesaj gönderin.
+x110|Çevrimiçi ödeyin: erişim ödemeden hemen sonra açılır.
+x111|Ödeme alındı, erişim açık.
+x112|Ödeme gerçekleşmedi. Tekrar deneyin veya yöneticiye yazın.
+x113|PayPal ile öde
+x114|Bağlantıyla ödedikten sonra yöneticiye WhatsApp'tan yazın: erişim kontrolden sonra açılır.

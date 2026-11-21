@@ -540,3 +540,8 @@ x106|Votre abonnement est terminé
 x107|L'accès est fermé, votre progression est conservée.
 x108|Pour continuer, payez 5 € par mois (sans IA) ou 10 € par mois (avec IA) et écrivez à l'administrateur sur WhatsApp.
 x109|Merci de ne pas appeler, uniquement un message.
+x110|Payez en ligne : l'accès s'ouvre dès le paiement.
+x111|Paiement reçu, l'accès est ouvert.
+x112|Le paiement n'a pas abouti. Réessayez ou écrivez à l'administrateur.
+x113|Payer avec PayPal
+x114|Après le paiement par le lien, écrivez à l'administrateur sur WhatsApp : l'accès s'ouvre après vérification.

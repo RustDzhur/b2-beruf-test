@@ -29,6 +29,18 @@ async function route({ method, path, headers, body, ip }) {
     if (!uid) return out(401, { code: "unauthorized", message: "Войдите в аккаунт." });
     return out(200, await admin.linkEmail(uid, verify.emails.get(uid), admin.bodyOf(body).email));
   }
+  if (path.startsWith("/api/pay/")) { // PayPal: the student pays from the site, the server checks it and opens access
+    const pay = require("./_pay.js");
+    if (path === "/api/pay/config" && method === "GET") return out(200, pay.config());
+    if (path === "/api/pay/webhook" && method === "POST") return out(200, await pay.webhook(headers, body));
+    const m = /^Bearer\s+(\S{20,4096})$/.exec(String(headers.authorization || ""));
+    const uid = m ? await verify._hooks.lookupUid(m[1]) : null;
+    if (!uid) return out(401, { code: "unauthorized", message: "Войдите в аккаунт." });
+    const bb = admin.bodyOf(body);
+    if (path === "/api/pay/create" && method === "POST") return out(200, await pay.createOrder(uid, bb.plan));
+    if (path === "/api/pay/capture" && method === "POST") return out(200, await pay.captureOrder(uid, bb.orderId));
+    return out(404, { code: "not_found", message: "Неизвестный метод API." });
+  }
   if (path === "/api/cron/subs") { // Vercel Cron, once a day: reminders and "subscription ended" letters
     const secret = String(process.env.CRON_SECRET || "");
     if (!secret) return out(501, { code: "no_cron_secret", message: "CRON_SECRET is not set." });

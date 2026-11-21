@@ -540,3 +540,8 @@ x106|Your subscription has ended|Ihr Abo ist abgelaufen
 x107|Access is closed, your progress is saved.|Der Zugang ist gesperrt, Ihr Fortschritt bleibt gespeichert.
 x108|To continue, pay €5 per month (without AI) or €10 per month (with AI) and write to the administrator on WhatsApp.|Um weiterzumachen, zahlen Sie 5 € pro Monat (ohne KI) oder 10 € pro Monat (mit KI) und schreiben Sie dem Administrator auf WhatsApp.
 x109|Please do not call, send a message only.|Bitte nicht anrufen, nur eine Nachricht.
+x110|Pay online: access opens right after payment.|Online bezahlen: Der Zugang wird sofort nach der Zahlung freigeschaltet.
+x111|Payment received, access is open.|Zahlung erhalten, der Zugang ist freigeschaltet.
+x112|The payment did not go through. Try again or write to the administrator.|Die Zahlung hat nicht geklappt. Versuchen Sie es erneut oder schreiben Sie dem Administrator.
+x113|Pay with PayPal|Mit PayPal bezahlen
+x114|After paying via the link, write to the administrator on WhatsApp: access opens once the payment is checked.|Schreiben Sie nach der Zahlung über den Link dem Administrator auf WhatsApp: Der Zugang wird nach der Prüfung freigeschaltet.

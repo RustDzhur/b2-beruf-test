@@ -179,3 +179,15 @@ git push -u origin main
   paid month and a notice when a month or a trial has ended. Set in **one** Vercel project only:
   `CRON_SECRET` (any long random string), `RESEND_API_KEY` (resend.com), `MAIL_FROM` (e.g. `DTB Trainer <abo@your-domain>`,
   the domain verified in Resend). Without them access still closes on time, only the letters are not sent.
+
+## PayPal
+
+Students pay 5 € (trainer) or 10 € (trainer + AI) on the waiting / "subscription ended" screen. The server creates the
+order with the fixed price, captures it and checks status `COMPLETED`, the amount and `EUR` before it admits the
+student and adds one paid month. Every capture is stored once in Firestore `payments/{captureId}`, so repeats never add
+a second month. Routes go through `api/router.js` (`/api/pay/config|create|capture|webhook`), no extra functions.
+
+Vercel settings: `PAYPAL_CLIENT_ID`, `PAYPAL_SECRET` (developer.paypal.com → Apps & Credentials), `PAYPAL_ENV=live`
+for real money (anything else = sandbox), optional `PAYPAL_WEBHOOK_ID` (webhook URL `https://<site>/api/pay/webhook`,
+event "Payment capture completed") as a backup, optional `PAYPAL_ME` (paypal.me name) shown as a plain payment link
+when the API keys are not set; that link does not open access by itself.

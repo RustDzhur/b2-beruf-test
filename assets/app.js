@@ -1430,6 +1430,31 @@ async function cloudAccess() {
   cloud.checked = true;
   return cloud.ok;
 }
+// PayPal: the server creates the order with a fixed price and checks the payment before it opens access
+let payCfg = null;
+async function payConfig() {
+  if (payCfg) return payCfg;
+  try { const r = await fetch("/api/pay/config"); payCfg = r.ok ? await r.json() : { enabled: false }; } catch { payCfg = { enabled: false }; }
+  return payCfg;
+}
+async function payApi(path, body) {
+  const r = await fetch("/api/pay/" + path, { method: "POST", headers: { Authorization: "Bearer " + await fbToken(), "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.message || "PayPal");
+  return j;
+}
+let paySdk = null;
+function payLoadSdk(clientId) {
+  if (window.paypal) return Promise.resolve(window.paypal);
+  if (!paySdk) paySdk = new Promise((ok, no) => {
+    const sc = document.createElement("script");
+    sc.src = "https://www.paypal.com/sdk/js?client-id=" + encodeURIComponent(clientId) + "&currency=EUR&intent=capture&components=buttons";
+    sc.onload = () => window.paypal ? ok(window.paypal) : no(new Error("PayPal"));
+    sc.onerror = () => { paySdk = null; no(new Error("PayPal")); };
+    document.head.append(sc);
+  });
+  return paySdk;
+}
 function cloudOff(wipe) {
   clearTimeout(cloud.timer);
   if (wipe) SYNC_KEYS.forEach(k => { try { localStorage.removeItem("dtb." + k); } catch {} });
@@ -2511,19 +2536,46 @@ function viewProfile(first) {
       h("div", { class: "reg-links" }, mode === "edit" ? null : reset, out, first || signedIn ? null : h("a", { class: "reg-link", href: "#home" }, "Назад"))));
 }
 // prices: the trainer alone, or the trainer with the AI that checks homework
-function priceBox() {
+// payment buttons under a price card: PayPal Checkout when the keys are set, else the paypal.me link as a fallback
+function payButton(plan, msg) {
+  const box = h("div", { class: "price-pay" });
+  if (!cloud.s) return box;
+  payConfig().then(cfg => {
+    if (cfg.enabled && cfg.clientId) {
+      payLoadSdk(cfg.clientId).then(pp => pp.Buttons({
+        style: { layout: "vertical", label: "pay", height: 40 },
+        createOrder: () => payApi("create", { plan }).then(j => j.id),
+        onApprove: d => payApi("capture", { orderId: d.orderID }).then(async () => {
+          msg.hidden = false; msg.className = "reg-note ok"; msg.textContent = "Оплата прошла, доступ открыт.";
+          await cloudAccess(); setTimeout(render, 1200);
+        }),
+        onError: () => { msg.hidden = false; msg.className = "reg-note err"; msg.textContent = "Оплата не прошла. Попробуйте ещё раз или напишите администратору."; },
+      }).render(box)).catch(() => {});
+    } else if (cfg.me) {
+      box.append(h("a", { class: "reg-btn pay-link", href: cfg.me + "/" + (plan === "ai" ? 10 : 5) + "EUR", target: "_blank", rel: "noopener" }, "Оплатить через PayPal"),
+        h("p", { class: "reg-note" }, "После оплаты по ссылке напишите администратору в WhatsApp: доступ откроется после проверки."));
+    }
+  });
+  return box;
+}
+function priceBox(pay) {
+  const msg = h("p", { class: "reg-note", hidden: true });
   return h("div", { class: "price" },
     h("div", { class: "price-head" }, "Стоимость подписки"),
+    pay ? (() => { const n = h("p", { class: "reg-note", hidden: true }, "Оплатите онлайн: доступ откроется сразу после оплаты."); payConfig().then(c => { n.hidden = !c.enabled; }); return n; })() : null,
     h("div", { class: "price-grid" },
       h("div", { class: "price-card" },
         h("div", { class: "price-name" }, "Тренажёр"),
         h("div", { class: "price-sum", dir: "ltr" }, h("b", null, "5 €"), h("span", null, " / ", h("span", null, "месяц"))),
-        h("p", null, "Все задания экзамена, проверка ответов, работа над ошибками и рейтинг группы. Без ИИ.")),
+        h("p", null, "Все задания экзамена, проверка ответов, работа над ошибками и рейтинг группы. Без ИИ."),
+        pay ? payButton("basic", msg) : null),
       h("div", { class: "price-card best" },
         h("span", { class: "price-tag" }, "Лучшая подготовка"),
         h("div", { class: "price-name" }, "Тренажёр + ИИ"),
         h("div", { class: "price-sum", dir: "ltr" }, h("b", null, "10 €"), h("span", null, " / ", h("span", null, "месяц"))),
-        h("p", null, "Всё из тарифа «Тренажёр» и ИИ, который проверяет домашние задания, письма и устные ответы и помогает лучше подготовиться к экзамену."))));
+        h("p", null, "Всё из тарифа «Тренажёр» и ИИ, который проверяет домашние задания, письма и устные ответы и помогает лучше подготовиться к экзамену."),
+        pay ? payButton("ai", msg) : null)),
+    msg);
 }
 // waiting room: the account exists, but the teacher has not admitted it yet
 function viewPending() {
@@ -2548,7 +2600,7 @@ function viewPending() {
             h("li", null, "После оплаты администратор откроет доступ, и тренажёр заработает на всех ваших устройствах.")),
       !org && c.groupName ? h("p", { class: "reg-note" }, h("span", null, "Ваша группа:"), " ", h("b", null, c.groupName)) : null,
       contactBlock(cloud.contact, c, mail),
-      org ? null : priceBox(),
+      org ? null : priceBox(true),
       msg,
       h("div", { class: "reg-actions" },
         h("button", { class: "reg-btn", onclick: async () => { msg.hidden = false; msg.textContent = "Проверяем…"; if (await cloudAccess()) render(); else msg.textContent = "Доступ ещё не подтверждён."; } }, "Проверить снова"),
