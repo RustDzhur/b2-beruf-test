@@ -54,6 +54,11 @@ async function adminRoute(req, res, p) {
       await verify.setVerified(b.uid, !!b.verified);
       return send(200, { ok: true, uid: String(b.uid), verified: !!b.verified });
     }
+    if (p === "/api/admin/delete" && req.method === "POST") {
+      if (!admin.verifySession(headers.cookie)) return send(401, { code: "unauthorized", message: "Войдите в кабинет." });
+      const b = admin.bodyOf(await readBody(req));
+      return send(200, Object.assign({ ok: true }, await admin.deleteUsers(b.uids)));
+    }
     return send(404, { code: "not_found", message: "Неизвестный метод API." });
   } catch (e) {
     return send(e.status || 500, { code: e.code || "error", message: e.message || "Ошибка сервера." });
@@ -82,6 +87,7 @@ http.createServer((req, res) => {
   if (req.url.startsWith("/api/tts?")) return tts(req, res);
   if (req.url === "/api/status") return json(res, 200, { ready: ai.ready() });
   if (req.url === "/api/ai" && req.method === "POST") return aiRoute(req, res);
+  if (req.url === "/api/access") return verify.access(req.headers.authorization).then(([code, out]) => json(res, code, out));
   let p = decodeURIComponent(req.url.split("?")[0]);
   if (p === "/api/leaderboard" && req.method === "GET") {
     const q = new URL(req.url, "http://x").searchParams;

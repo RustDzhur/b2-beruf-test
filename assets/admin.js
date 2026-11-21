@@ -20,6 +20,7 @@ const S = {
   range: 30,
   selectedUid: null,
   lastLoaded: 0,
+  picked: new Set(), // students ticked for deletion
 };
 
 /* ------------------------------------------------------------------ dom ---- */
@@ -358,7 +359,7 @@ function studentCell(s) {
     el("div", { class: "adm-student-name" }, el("b", null, s.name), el("span", null, sub), s.email ? el("span", { class: "adm-email" }, s.email) : null));
 }
 
-/* access to the AI: the teacher confirms a student by hand after the WhatsApp request (stored server-side in Firestore `verified`) */
+/* access to the trainer (and the AI): the teacher confirms a student by hand after the WhatsApp request (stored server-side in Firestore `verified`) */
 async function toggleVerify(s, reopen) {
   const want = !s.verified;
   try {
@@ -372,6 +373,40 @@ function verifyControl(s, reopen) {
   return el("span", { class: "adm-verify" },
     el("span", { class: "adm-chip " + (s.verified ? "ok" : "warn") }, s.verified ? "Верифицирован" : "Не верифицирован"),
     el("button", { class: "adm-btn" + (s.verified ? "" : " primary"), onclick: e => { e.stopPropagation(); toggleVerify(s, reopen); } }, s.verified ? "Отозвать" : "Подтвердить"));
+}
+
+/* removing strangers: tick students, save a backup, then delete progress, approval and the account */
+function pickBox(s) {
+  return el("input", { type: "checkbox", class: "adm-pick", "aria-label": "Выбрать " + s.name, checked: S.picked.has(s.uid),
+    onclick: e => e.stopPropagation(), onkeydown: e => e.stopPropagation(),
+    onchange: e => { e.target.checked ? S.picked.add(s.uid) : S.picked.delete(s.uid); syncPicked(); } });
+}
+function syncPicked() {
+  const b = document.getElementById("adm-del");
+  if (!b) return;
+  b.disabled = !S.picked.size;
+  b.textContent = "Удалить выбранных · " + S.picked.size;
+}
+function saveJson(obj, name) {
+  const blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
+  const a = el("a", { href: URL.createObjectURL(blob), download: name });
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+async function deletePicked() {
+  const all = (S.data && S.data.students) || [];
+  const chosen = all.filter(s => S.picked.has(s.uid));
+  if (!chosen.length) return;
+  const names = chosen.map(s => "• " + s.name + (s.email ? " <" + s.email + ">" : "") + " — " + fmt(s.allPoints) + " очк.").join("\n");
+  if (!confirm("Удалить " + chosen.length + " учеников навсегда?\n\n" + names + "\n\nПрогресс, доступ и аккаунт будут удалены. Резервная копия скачается автоматически.")) return;
+  let out;
+  try { out = await api("/api/admin/delete", { method: "POST", body: JSON.stringify({ uids: chosen.map(s => s.uid) }) }); }
+  catch (e) { alert(e.message || "Не удалось удалить."); return; }
+  const info = chosen.map(s => ({ uid: s.uid, name: s.name, fam: s.fam, vor: s.vor, email: s.email, points: s.allPoints }));
+  saveJson({ deletedAt: new Date().toISOString(), students: info, documents: out.backup || [] }, "dtb-deleted-" + todayIso() + ".json");
+  (out.deleted || []).forEach(u => S.picked.delete(u));
+  if (out.failed && out.failed.length) alert("Не удалось удалить " + out.failed.length + ":\n" + out.failed.map(f => f.uid + ": " + f.message).join("\n"));
+  loadDashboard();
 }
 
 function filterCounts() {
@@ -390,7 +425,7 @@ function filteredStudents() {
   const q = S.query.trim().toLowerCase();
   const d7 = daysAgo(6), d14 = daysAgo(13);
   let arr = ((S.data && S.data.students) || []).filter(s => {
-    if (q && !(s.name.toLowerCase().includes(q) || s.uid.toLowerCase().includes(q))) return false;
+    if (q && !(s.name.toLowerCase().includes(q) || s.uid.toLowerCase().includes(q) || String(s.email || "").toLowerCase().includes(q))) return false;
     if (S.filter === "active") return s.lastActive && s.lastActive >= d7;
     if (S.filter === "help") return (s.scorePct != null && s.scorePct < 50) || s.failures >= 10;
     if (S.filter === "inactive") return !s.lastActive || s.lastActive < d14;
@@ -599,13 +634,14 @@ function renderDashboard() {
       el("h2", null, "Ученики"), el("span", { class: "adm-count", id: "adm-count" }, fmt(students.length)),
       el("span", { class: "adm-small-note", style: "color:var(--muted);font-size:12px" }, "нажмите на строку, чтобы открыть профиль")),
     el("div", { class: "adm-toolbar" },
-      el("div", { class: "adm-search" }, icon("search"), el("input", { type: "search", placeholder: "Имя, фамилия или UID", "aria-label": "Поиск ученика", value: S.query, oninput: onSearch })),
+      el("div", { class: "adm-search" }, icon("search"), el("input", { type: "search", placeholder: "Имя, e-mail или UID", "aria-label": "Поиск ученика", value: S.query, oninput: onSearch })),
       el("div", { class: "adm-filter", role: "group", "aria-label": "Фильтр" }, [
         ["all", "Все", counts.all], ["active", "Активные", counts.active], ["help", "Нужна помощь", counts.help], ["inactive", "Не заходили", counts.inactive], ["unverified", "Не верифицированные", counts.unverified],
       ].map(([id, label, n]) => el("button", { class: S.filter === id ? "on" : "", "data-filter": id, onclick: () => { S.filter = id; renderStudentList(); syncFilterButtons(); }, "aria-pressed": S.filter === id }, label + " · " + n))),
       el("select", { class: "adm-select", "aria-label": "Сортировка", onchange: e => { S.sort = e.target.value; renderStudentList(); } },
         [["rating", "По рейтингу (общие очки)"], ["score-desc", "По точности (с первой попытки)"], ["active-desc", "Недавно активные"], ["fail-desc", "Больше ошибок"], ["days-desc", "Больше дней"], ["tests-desc", "Больше заданий"], ["name", "По имени"]]
-          .map(([v, l]) => el("option", { value: v, selected: S.sort === v }, l)))),
+          .map(([v, l]) => el("option", { value: v, selected: S.sort === v }, l))),
+      el("button", { class: "adm-btn danger", id: "adm-del", disabled: !S.picked.size, onclick: deletePicked }, "Удалить выбранных · " + S.picked.size)),
     el("div", { id: "adm-students-body" }, studentListBody(students))));
 
   main.append(el("p", { class: "adm-foot" }, "Показаны только имя, прогресс и активность. Дата рождения, адрес и другие поля анкеты не читаются. Данные обновляются, когда ученик сохраняет прогресс в облаке."));
@@ -664,8 +700,9 @@ function studentListBody(list) {
   }
   const table = el("div", { class: "adm-table-wrap" },
     el("table", { class: "adm-table" },
-      el("thead", null, el("tr", null, ["Место", "Ученик", "Доступ к ИИ", "Очки", "Дней", "Попыток / заданий", "Успех", "Ошибки", "Был(а)", ""].map(h => el("th", null, h)))),
+      el("thead", null, el("tr", null, ["", "Место", "Ученик", "Доступ", "Очки", "Дней", "Попыток / заданий", "Успех", "Ошибки", "Был(а)", ""].map(h => el("th", null, h)))),
       el("tbody", null, list.map(s => el("tr", { tabindex: "0", role: "button", "aria-label": "Открыть профиль " + s.name, onclick: () => openStudent(s.uid), onkeydown: e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openStudent(s.uid); } } },
+        el("td", null, pickBox(s)),
         el("td", null, el("span", { class: "adm-num" }, s.allRank ? "#" + s.allRank : "—")),
         el("td", null, studentCell(s)),
         el("td", null, verifyControl(s, false)),
@@ -678,7 +715,7 @@ function studentListBody(list) {
         el("td", null, el("span", { style: "color:var(--muted);display:inline-flex" }, icon("chevron", 15)))
       )))));
   const mobile = el("div", { class: "adm-row-mobile" }, list.map(s => el("div", { class: "adm-student-row", tabindex: "0", role: "button", "aria-label": "Открыть профиль " + s.name, onclick: () => openStudent(s.uid), onkeydown: e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openStudent(s.uid); } } },
-    studentCell(s),
+    el("div", { style: "display:flex;gap:10px;align-items:center" }, pickBox(s), studentCell(s)),
     verifyControl(s, false),
     el("div", { class: "adm-mrow-stats" },
       el("span", null, "место: ", el("b", null, s.allRank ? "#" + s.allRank : "—")),
@@ -802,7 +839,7 @@ function renderDrawerFor(uid) {
       stat(fmt(s.failures), "ошибок"),
       stat(fmt(s.streak.longest), "лучшая серия")),
     el("p", { class: "adm-drawer-note" }, "Сейчас (с учётом пересдач): " + pctText(s.currentPct) + " · лучший: " + pctText(s.bestPct) + " · успешных заданий: " + fmt(s.successTasks) + " из " + fmt(s.tasks) + " · ошибок к повтору: " + fmt(s.failures)),
-    el("div", { class: "adm-drawer-note" }, el("span", null, "Доступ к ИИ"), ": ", verifyControl(s, true), s.email ? el("div", { class: "adm-email" }, s.email) : null),
+    el("div", { class: "adm-drawer-note" }, el("span", null, "Доступ к тренажёру"), ": ", verifyControl(s, true), s.email ? el("div", { class: "adm-email" }, s.email) : null),
     el("p", { class: "adm-drawer-note" }, s.allRank ? "Общий рейтинг: #" + s.allRank + " · " + fmt(s.allPoints) + " очков" : "Общий рейтинг: —"),
     s.answers && s.answers.total ? el("p", { class: "adm-drawer-note" }, el("span", null, "Верных ответов"), ": " + fmt(s.answers.correct) + " / " + fmt(s.answers.total) + (s.answers.pct != null ? " · " + pctText(s.answers.pct) : "")) : null,
     el("h3", null, "Достижения · " + s.earned + " из 10"),

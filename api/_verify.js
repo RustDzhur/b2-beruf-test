@@ -114,4 +114,12 @@ async function check(authHeader) {
   }
 }
 
-module.exports = { check, setVerified, listVerified, isVerified, contact, UID_RE, _hooks: impl };
+// GET /api/access: a student who is not approved yet gets {verified:false} (200), so the page can show the contact
+async function access(authHeader) {
+  const r = await check(authHeader);
+  if (r.ok) return [200, { verified: true, contact: contact() }];
+  if (r.code === "not_verified") return [200, { verified: false, contact: contact() }];
+  return [r.status || 503, { code: r.code || "verify_unavailable", verified: null, contact: contact() }];
+}
+
+module.exports = { check, access, setVerified, listVerified, isVerified, contact, UID_RE, _hooks: impl };
