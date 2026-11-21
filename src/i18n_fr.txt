@@ -545,3 +545,5 @@ x111|Paiement reçu, l'accès est ouvert.
 x112|Le paiement n'a pas abouti. Réessayez ou écrivez à l'administrateur.
 x113|Payer avec PayPal
 x114|Après le paiement par le lien, écrivez à l'administrateur sur WhatsApp : l'accès s'ouvre après vérification.
+x115|Payez avec PayPal et envoyez une capture du paiement à l'administrateur sur WhatsApp. L'administrateur ouvre l'accès et votre mois commence ce jour-là.
+x116|Envoyer le justificatif sur WhatsApp

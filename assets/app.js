@@ -1418,42 +1418,18 @@ async function cloudGroupRequest(name, email) {
 async function cloudResetPw(email) { await fbReq("sendOobCode", { requestType: "PASSWORD_RESET", email }); }
 
 // access to the trainer: only after the teacher approved the account in /admin (server checks Firestore `verified`)
-cloud.ok = store.get("approved", false) === true; cloud.contact = store.get("contact", "");
+cloud.ok = store.get("approved", false) === true; cloud.contact = store.get("contact", ""); cloud.pay = store.get("pay", "");
 async function cloudAccess() {
   if (!cloud.s) { cloud.ok = false; return false; }
   try {
     const r = await fetch("/api/access", { headers: { Authorization: "Bearer " + await fbToken() } });
     const j = await r.json().catch(() => ({}));
     if (j.contact) { cloud.contact = j.contact; store.set("contact", j.contact); }
+    if (typeof j.pay === "string") { cloud.pay = j.pay; store.set("pay", j.pay); }
     if (j.verified === true || j.verified === false) { cloud.ok = j.verified; store.set("approved", j.verified); cloud.expired = j.expired === true; cloud.sub = j.sub || null; }
   } catch {} // offline: keep the last known answer
   cloud.checked = true;
   return cloud.ok;
-}
-// PayPal: the server creates the order with a fixed price and checks the payment before it opens access
-let payCfg = null;
-async function payConfig() {
-  if (payCfg) return payCfg;
-  try { const r = await fetch("/api/pay/config"); payCfg = r.ok ? await r.json() : { enabled: false }; } catch { payCfg = { enabled: false }; }
-  return payCfg;
-}
-async function payApi(path, body) {
-  const r = await fetch("/api/pay/" + path, { method: "POST", headers: { Authorization: "Bearer " + await fbToken(), "Content-Type": "application/json" }, body: JSON.stringify(body) });
-  const j = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(j.message || "PayPal");
-  return j;
-}
-let paySdk = null;
-function payLoadSdk(clientId) {
-  if (window.paypal) return Promise.resolve(window.paypal);
-  if (!paySdk) paySdk = new Promise((ok, no) => {
-    const sc = document.createElement("script");
-    sc.src = "https://www.paypal.com/sdk/js?client-id=" + encodeURIComponent(clientId) + "&currency=EUR&intent=capture&components=buttons";
-    sc.onload = () => window.paypal ? ok(window.paypal) : no(new Error("PayPal"));
-    sc.onerror = () => { paySdk = null; no(new Error("PayPal")); };
-    document.head.append(sc);
-  });
-  return paySdk;
 }
 function cloudOff(wipe) {
   clearTimeout(cloud.timer);
@@ -2536,46 +2512,34 @@ function viewProfile(first) {
       h("div", { class: "reg-links" }, mode === "edit" ? null : reset, out, first || signedIn ? null : h("a", { class: "reg-link", href: "#home" }, "Назад"))));
 }
 // prices: the trainer alone, or the trainer with the AI that checks homework
-// payment buttons under a price card: PayPal Checkout when the keys are set, else the paypal.me link as a fallback
-function payButton(plan, msg) {
-  const box = h("div", { class: "price-pay" });
-  if (!cloud.s) return box;
-  payConfig().then(cfg => {
-    if (cfg.enabled && cfg.clientId) {
-      payLoadSdk(cfg.clientId).then(pp => pp.Buttons({
-        style: { layout: "vertical", label: "pay", height: 40 },
-        createOrder: () => payApi("create", { plan }).then(j => j.id),
-        onApprove: d => payApi("capture", { orderId: d.orderID }).then(async () => {
-          msg.hidden = false; msg.className = "reg-note ok"; msg.textContent = "Оплата прошла, доступ открыт.";
-          await cloudAccess(); setTimeout(render, 1200);
-        }),
-        onError: () => { msg.hidden = false; msg.className = "reg-note err"; msg.textContent = "Оплата не прошла. Попробуйте ещё раз или напишите администратору."; },
-      }).render(box)).catch(() => {});
-    } else if (cfg.me) {
-      box.append(h("a", { class: "reg-btn pay-link", href: cfg.me + "/" + (plan === "ai" ? 10 : 5) + "EUR", target: "_blank", rel: "noopener" }, "Оплатить через PayPal"),
-        h("p", { class: "reg-note" }, "После оплаты по ссылке напишите администратору в WhatsApp: доступ откроется после проверки."));
-    }
-  });
-  return box;
+// payment under a price card: the PayPal.me link with the amount filled in, then the receipt to the administrator on
+// WhatsApp. The administrator checks the payment and opens access by hand; the month starts then.
+function payButton(plan) {
+  if (!cloud.pay) return null;
+  const sum = plan === "ai" ? 10 : 5, c = cand(), mail = (cloud.s && cloud.s.email) || c.email || "";
+  const m = String(cloud.contact || "").match(/\+?\d[\d\s().\/-]{5,}\d/), digits = m ? m[0].replace(/\D/g, "") : "";
+  const text = "Hallo! Ich habe " + sum + " € per PayPal bezahlt (Tarif: " + (plan === "ai" ? "Trainer + KI" : "Trainer") + ", 1 Monat). Der Beleg ist im Anhang.\nName: " +
+    [c.fam, c.vor].filter(Boolean).join(" ") + "\nE-Mail: " + mail;
+  return h("div", { class: "price-pay" },
+    h("a", { class: "reg-btn pay-link", href: cloud.pay + "/" + sum + "EUR", target: "_blank", rel: "noopener" }, h("span", null, "Оплатить через PayPal"), " · " + sum + " €"),
+    digits ? h("a", { class: "reg-link pay-wa", href: "https://wa.me/" + digits + "?text=" + encodeURIComponent(text), target: "_blank", rel: "noopener" }, "Отправить подтверждение в WhatsApp") : null);
 }
 function priceBox(pay) {
-  const msg = h("p", { class: "reg-note", hidden: true });
   return h("div", { class: "price" },
     h("div", { class: "price-head" }, "Стоимость подписки"),
-    pay ? (() => { const n = h("p", { class: "reg-note", hidden: true }, "Оплатите онлайн: доступ откроется сразу после оплаты."); payConfig().then(c => { n.hidden = !c.enabled; }); return n; })() : null,
+    pay && cloud.pay ? h("p", { class: "reg-note" }, "Оплатите через PayPal и отправьте скриншот оплаты администратору в WhatsApp. Администратор откроет доступ, и с этого дня начнётся месяц подписки.") : null,
     h("div", { class: "price-grid" },
       h("div", { class: "price-card" },
         h("div", { class: "price-name" }, "Тренажёр"),
         h("div", { class: "price-sum", dir: "ltr" }, h("b", null, "5 €"), h("span", null, " / ", h("span", null, "месяц"))),
         h("p", null, "Все задания экзамена, проверка ответов, работа над ошибками и рейтинг группы. Без ИИ."),
-        pay ? payButton("basic", msg) : null),
+        pay ? payButton("basic") : null),
       h("div", { class: "price-card best" },
         h("span", { class: "price-tag" }, "Лучшая подготовка"),
         h("div", { class: "price-name" }, "Тренажёр + ИИ"),
         h("div", { class: "price-sum", dir: "ltr" }, h("b", null, "10 €"), h("span", null, " / ", h("span", null, "месяц"))),
         h("p", null, "Всё из тарифа «Тренажёр» и ИИ, который проверяет домашние задания, письма и устные ответы и помогает лучше подготовиться к экзамену."),
-        pay ? payButton("ai", msg) : null)),
-    msg);
+        pay ? payButton("ai") : null)));
 }
 // waiting room: the account exists, but the teacher has not admitted it yet
 function viewPending() {

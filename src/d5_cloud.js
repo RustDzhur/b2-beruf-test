@@ -138,42 +138,18 @@ async function cloudGroupRequest(name, email) {
 async function cloudResetPw(email) { await fbReq("sendOobCode", { requestType: "PASSWORD_RESET", email }); }
 
 // access to the trainer: only after the teacher approved the account in /admin (server checks Firestore `verified`)
-cloud.ok = store.get("approved", false) === true; cloud.contact = store.get("contact", "");
+cloud.ok = store.get("approved", false) === true; cloud.contact = store.get("contact", ""); cloud.pay = store.get("pay", "");
 async function cloudAccess() {
   if (!cloud.s) { cloud.ok = false; return false; }
   try {
     const r = await fetch("/api/access", { headers: { Authorization: "Bearer " + await fbToken() } });
     const j = await r.json().catch(() => ({}));
     if (j.contact) { cloud.contact = j.contact; store.set("contact", j.contact); }
+    if (typeof j.pay === "string") { cloud.pay = j.pay; store.set("pay", j.pay); }
     if (j.verified === true || j.verified === false) { cloud.ok = j.verified; store.set("approved", j.verified); cloud.expired = j.expired === true; cloud.sub = j.sub || null; }
   } catch {} // offline: keep the last known answer
   cloud.checked = true;
   return cloud.ok;
-}
-// PayPal: the server creates the order with a fixed price and checks the payment before it opens access
-let payCfg = null;
-async function payConfig() {
-  if (payCfg) return payCfg;
-  try { const r = await fetch("/api/pay/config"); payCfg = r.ok ? await r.json() : { enabled: false }; } catch { payCfg = { enabled: false }; }
-  return payCfg;
-}
-async function payApi(path, body) {
-  const r = await fetch("/api/pay/" + path, { method: "POST", headers: { Authorization: "Bearer " + await fbToken(), "Content-Type": "application/json" }, body: JSON.stringify(body) });
-  const j = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(j.message || "PayPal");
-  return j;
-}
-let paySdk = null;
-function payLoadSdk(clientId) {
-  if (window.paypal) return Promise.resolve(window.paypal);
-  if (!paySdk) paySdk = new Promise((ok, no) => {
-    const sc = document.createElement("script");
-    sc.src = "https://www.paypal.com/sdk/js?client-id=" + encodeURIComponent(clientId) + "&currency=EUR&intent=capture&components=buttons";
-    sc.onload = () => window.paypal ? ok(window.paypal) : no(new Error("PayPal"));
-    sc.onerror = () => { paySdk = null; no(new Error("PayPal")); };
-    document.head.append(sc);
-  });
-  return paySdk;
 }
 function cloudOff(wipe) {
   clearTimeout(cloud.timer);
