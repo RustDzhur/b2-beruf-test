@@ -121,3 +121,20 @@ test("a forged group cookie is rejected", () => {
   assert.equal(admin.sessionRole("dtb_admin=" + good.replace("ABC123", "MAIN")), null);
   assert.equal(admin.sessionRole("dtb_admin=" + admin.createSession()), "super");
 });
+
+test("an old account signed in by name gets its real e-mail attached (and never a real one replaced)", async () => {
+  const calls = [];
+  admin.authAdmin.update = async (uid, email) => { calls.push([uid, email]); };
+  verify._hooks.lookupUid = async () => "olduid123";
+  const tok = { authorization: "Bearer " + "t".repeat(40) };
+  verify.emails.set("olduid123", "u0123abcd@dtb-trainer.app");
+  let r = await call("POST", "/api/link-email", { email: "Real@Example.com" }, null, tok);
+  assert.equal(r.status, 200); assert.equal(r.json.linked, true);
+  assert.deepEqual(calls, [["olduid123", "real@example.com"]]);
+  verify.emails.set("olduid123", "other@example.com");
+  r = await call("POST", "/api/link-email", { email: "real@example.com" }, null, tok);
+  assert.equal(r.status, 409);
+  r = await call("POST", "/api/link-email", { email: "x@example.com" });
+  assert.equal(r.status, 401);
+  admin.authAdmin.update = null;
+});

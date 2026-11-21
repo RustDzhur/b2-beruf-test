@@ -532,6 +532,6 @@ x98|Lütfen aramayın: erişim isteyen bir mesaj gönderin. Soyadınızı, adın
 x99|Ödemeden sonra yönetici erişimi açar ve alıştırma tüm cihazlarınızda çalışır.
 x100|Yöneticinin WhatsApp'ı:
 x101|Sadece mesaj, lütfen aramayın.
-x102|Bu e-postayla bir hesap bulunamadı. Adresi kontrol edin veya kayıt olun.
+x102|E-posta veya şifre yanlış. Şifreyi “Şifreyi mi unuttunuz?” ile sıfırlayabilirsiniz. E-postayla girişten önce burada çalıştıysanız “Kayıt” sekmesini açın ve aynı soyadı, adı ve şifreyi girin: eski ilerlemeniz bulunur ve e-posta ona bağlanır.
 x103|Açık grup
 x104|Açık grup: kendi başıma, öğretmensiz çalışıyorum

@@ -532,6 +532,6 @@ x98|Merci de ne pas appeler : envoyez un message pour demander l'accès. Indique
 x99|Après le paiement, l'administrateur ouvre l'accès et l'entraîneur fonctionne sur tous vos appareils.
 x100|WhatsApp de l'administrateur :
 x101|Messages uniquement, merci de ne pas appeler.
-x102|Aucun compte avec cet e-mail. Vérifiez l'adresse ou inscrivez-vous.
+x102|E-mail ou mot de passe incorrect. Vous pouvez réinitialiser le mot de passe avec « Mot de passe oublié ? ». Si vous étudiiez ici avant la connexion par e-mail, ouvrez « Inscription » et saisissez les mêmes nom, prénom et mot de passe : votre ancienne progression sera retrouvée et l'e-mail y sera lié.
 x103|Groupe ouvert
 x104|Groupe ouvert : j’apprends seul, sans enseignant

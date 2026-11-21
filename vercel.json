@@ -21,6 +21,10 @@
       "destination": "/api/router?__p=access"
     },
     {
+      "source": "/api/link-email",
+      "destination": "/api/router?__p=link-email"
+    },
+    {
       "source": "/admin",
       "destination": "/admin.html"
     },

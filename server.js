@@ -61,7 +61,7 @@ http.createServer((req, res) => {
       .then(data => json(res, 200, data))
       .catch(e => json(res, e.status || 500, { code: e.code || "error", message: e.message || "Рейтинг временно недоступен." }));
   }
-  if (p.startsWith("/api/admin/") || p === "/api/groups" || p === "/api/group-request") return adminRoute(req, res, p);
+  if (p.startsWith("/api/admin/") || p === "/api/groups" || p === "/api/group-request" || p === "/api/link-email") return adminRoute(req, res, p);
   if (p.startsWith("/api/")) { res.writeHead(404, { "Content-Type": "application/json; charset=utf-8" }); return res.end(JSON.stringify({ code: "not_found" })); }
   if (p === "/") p = "/index.html";
   if (p === "/admin" || p === "/admin/") p = "/admin.html";

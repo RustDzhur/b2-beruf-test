@@ -532,6 +532,6 @@ x98|Please do not call: send a message asking for access. Include your surname, 
 x99|After payment the administrator opens access, and the trainer works on all your devices.|Nach der Zahlung schaltet der Administrator den Zugang frei, und der Trainer funktioniert auf allen Ihren Geräten.
 x100|Administrator's WhatsApp:|WhatsApp des Administrators:
 x101|Messages only, please do not call.|Bitte nur Nachrichten, nicht anrufen.
-x102|No account with this e-mail. Check the address or sign up.|Kein Konto mit dieser E-Mail gefunden. Prüfen Sie die Adresse oder registrieren Sie sich.
+x102|Wrong e-mail or password. You can reset the password with “Forgot password?”. If you studied here before e-mail sign-in existed, open “Sign up” and enter the same surname, first name and password: your old progress will be found and the e-mail linked to it.|Falsche E-Mail oder falsches Kennwort. Das Kennwort können Sie mit „Kennwort vergessen?“ zurücksetzen. Wenn Sie schon vor der Anmeldung per E-Mail hier gelernt haben, öffnen Sie „Registrierung“ und geben Sie denselben Familiennamen, Vornamen und dasselbe Kennwort ein: Ihr alter Fortschritt wird gefunden und die E-Mail damit verknüpft.
 x103|Open group|Offene Gruppe
 x104|Open group: I study on my own, without a teacher|Offene Gruppe: Ich lerne selbstständig, ohne Lehrkraft

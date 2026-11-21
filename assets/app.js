@@ -1374,14 +1374,14 @@ const NOT_FOUND = /EMAIL_NOT_FOUND|INVALID_LOGIN_CREDENTIALS|INVALID_PASSWORD|US
 async function cloudConnect(c, password, opt) {
   const login = !!(opt && opt.login); // "Вход": never create a new account
   const email = String(c.email || "").trim().toLowerCase();
-  let a, created = false;
+  let a, created = false, legacy = false;
   try { a = await fbAuth("signInWithPassword", email, password); }
   catch (e) {
     if (!NOT_FOUND.test(e.msg)) throw e;
     if (c.fam && c.vor) {
       try {
         a = await fbAuth("signInWithPassword", await fbMail(c), password);
-        try { const u = await fbReq("update", { idToken: a.idToken, email, returnSecureToken: true }); if (u.idToken) a = { ...a, ...u }; } catch {}
+        legacy = true;
       } catch (e1) { if (!NOT_FOUND.test(e1.msg)) throw e1; a = null; }
     }
     if (!a && login) throw Object.assign(new Error("NOACC"), { msg: "NOACC" });
@@ -1393,6 +1393,10 @@ async function cloudConnect(c, password, opt) {
   cloud.s = { uid: a.localId, refresh: a.refreshToken, email };
   cloud.id = a.idToken; cloud.exp = Date.now() + (+a.expiresIn || 3600) * 1000;
   store.set("cloud", cloud.s);
+  // an old account (opened by name + password): the server attaches the real e-mail, so the next sign-in works by e-mail
+  if (legacy) {
+    try { await fetch("/api/link-email", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + a.idToken }, body: JSON.stringify({ email }) }); } catch {}
+  }
   // confirmation letter; its link leads back to the waiting screen with the WhatsApp request and the prices
   if (created) {
     const send = extra => fbReq("sendOobCode", { requestType: "VERIFY_EMAIL", idToken: a.idToken, ...extra });
@@ -1440,7 +1444,7 @@ function cloudBoot(then) {
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden" && cloud.s) cloudPush().catch(() => {}); });
 }
 function cloudErrText(e) {
-  if (e.msg === "NOACC") return "Аккаунт с таким e-mail не найден. Проверьте адрес или зарегистрируйтесь.";
+  if (e.msg === "NOACC") return "Неверный e-mail или пароль. Пароль можно восстановить кнопкой «Забыли пароль?». Если вы занимались раньше, до входа по e-mail, откройте «Регистрация» и введите те же фамилию, имя и пароль: старый прогресс найдётся, и e-mail привяжется к нему.";
   if (e.msg === "PW") return "Falsches Kennwort für dieses Konto. Passwort vergessen? Klicken Sie unten auf „Kennwort zurücksetzen“.";
   if (/INVALID_EMAIL/.test(e.msg || "")) return "Diese E-Mail-Adresse ist ungültig.";
   if (/TOO_MANY_ATTEMPTS/.test(e.msg || "")) return "Zu viele Versuche. Bitte später noch einmal.";
