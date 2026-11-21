@@ -12,15 +12,20 @@ const assert = require("node:assert/strict");
 const admin = require("../api/_admin.js");
 const verify = require("../api/_verify.js");
 
-test("leaderboard shows only students the teacher approved", async () => {
+test("leaderboard: old accounts are in it without approval; a new account appears after admission", async () => {
+  const A = require("../api/_admit.js");
   const { users } = await admin.loadUsers();
-  let lb = await admin.buildLeaderboard("all", "", Date.now() + 61000);
-  assert.equal(lb.participants, 0);
   const named = users.filter(u => u.data && u.data.cand && u.data.cand.vor);
-  await verify.setVerified(named[0].uid, true);
-  lb = await admin.buildLeaderboard("all", named[0].uid, Date.now() + 122000);
-  assert.ok(lb.participants <= 1);
-  lb.entries.forEach(e => assert.equal(e.isMe, true));
+  let lb = await admin.buildLeaderboard("all", "", Date.now() + 61000);
+  const all = lb.participants;
+  assert.ok(all > 1);
+  A._memNew.add(named[0].uid); // pretend this one signed up after the switch
+  lb = await admin.buildLeaderboard("all", "", Date.now() + 122000);
+  assert.equal(lb.participants, all - 1);
+  await A.setAdmitted(named[0].uid, true);
+  lb = await admin.buildLeaderboard("all", "", Date.now() + 183000);
+  assert.equal(lb.participants, all);
+  assert.equal(await verify.isVerified(named[0].uid), false); // admission does not open the AI
 });
 
 test("deleteUsers returns a backup and removes the students", async () => {
