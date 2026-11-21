@@ -66,7 +66,7 @@ async function route({ method, path, headers, body, ip }) {
   if (path === "/api/admin/link-email" && method === "POST") { // main administrator attaches an e-mail to a student's account
     superOnly(role);
     if (!require("./_verify.js").UID_RE.test(String(b.uid || ""))) return out(400, { code: "bad_uid", message: "Некорректный UID." });
-    return out(200, await admin.linkEmail(String(b.uid), "", b.email, true));
+    return out(200, await admin.linkEmail(String(b.uid), "", b.email, true, b.password));
   }
   if (path === "/api/admin/move" && method === "POST") { // move students to another group
     superOnly(role);

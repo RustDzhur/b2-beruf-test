@@ -665,25 +665,33 @@ async function assertRole(uids, role) {
 // protection is on.) Only a synthetic address is ever replaced.
 const SYNTH_RE = /@dtb-trainer\.app$/;
 const authAdmin = { update: null }; // tests: replace with a fake
-async function linkEmail(uid, current, email, force) {
+// With a password (main administrator only) the account gets a new password and a confirmed e-mail at once,
+// so the person can sign in right away without waiting for any letter.
+async function linkEmail(uid, current, email, force, password) {
   email = cleanEmail(email);
   if (!email) throw adminError("bad_email", 400, "Некорректный e-mail.");
+  if (password != null && password !== "") {
+    password = String(password);
+    if (password.length < 6 || password.length > 128) throw adminError("bad_password", 400, "Пароль: от 6 до 128 символов.");
+  } else password = "";
   current = String(current || "").toLowerCase();
-  if (current === email) return { ok: true, linked: false };
+  if (current === email && !password) return { ok: true, linked: false };
   if (!force && current && !SYNTH_RE.test(current)) throw adminError("has_email", 409, "У аккаунта уже есть e-mail.");
-  if (authAdmin.update) { await authAdmin.update(uid, email); return { ok: true, linked: true }; }
+  if (authAdmin.update) { await authAdmin.update(uid, email, password); return { ok: true, linked: true, password: !!password }; }
   const sa = serviceAccount();
   if (!sa) throw adminError("no_service_account", 501, "Не настроен ключ Firebase.");
   const r = await fetch("https://identitytoolkit.googleapis.com/v1/projects/" + encodeURIComponent(sa.project_id) + "/accounts:update", {
     method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + await accessToken() },
-    body: JSON.stringify({ localId: uid, email, emailVerified: false }) });
+    body: JSON.stringify(password ? { localId: uid, email, password, emailVerified: true } : { localId: uid, email, emailVerified: false }) });
   if (!r.ok) {
     const j = await r.json().catch(() => ({}));
     const m = (j.error && j.error.message) || ("HTTP " + r.status);
     if (/EMAIL_EXISTS/.test(m)) throw adminError("email_exists", 409, "Этот e-mail уже занят другим аккаунтом.");
+    if (/USER_NOT_FOUND/.test(m)) throw adminError("no_user", 404, "Аккаунт не найден в Firebase.");
+    if (/WEAK_PASSWORD/.test(m)) throw adminError("bad_password", 400, "Слишком простой пароль (минимум 6 символов).");
     throw adminError("auth_failed", 502, "Firebase Auth: " + m);
   }
-  return { ok: true, linked: true };
+  return { ok: true, linked: true, password: !!password };
 }
 
 /* ------------------------------------------------------------ delete users */
