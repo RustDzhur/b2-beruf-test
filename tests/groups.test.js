@@ -28,6 +28,10 @@ test("organizer asks for a group, the main teacher approves it, the organizer se
   const code = r.json.group.code;
   assert.equal(r.json.group.status, "pending");
 
+  // the open group for self-learners is always there next to the main group and cannot be deleted
+  r = await call("GET", "/api/groups");
+  assert.deepEqual(r.json.groups.slice(0, 2).map(g => g.code), ["MAIN", "PUBLIC"]);
+
   // not yet visible in the sign-up list, organizer cannot sign in yet
   r = await call("GET", "/api/groups");
   assert.ok(!r.json.groups.some(g => g.code === code));
@@ -99,6 +103,9 @@ test("organizer asks for a group, the main teacher approves it, the organizer se
   assert.equal(r.json.students.find(s => s.uid === users[6].uid).admitted, false);
   await call("POST", "/api/admin/admit", { uid: users[6].uid, admitted: true }, superCookie);
   assert.equal(await A.isAdmitted(users[6].uid, Date.parse("2026-10-01T00:00:00Z")), true);
+
+  r = await call("POST", "/api/admin/groups", { code: "PUBLIC", remove: true }, superCookie);
+  assert.equal(r.status, 400);
 
   // leaderboards are per group
   const lbNew = await admin.buildLeaderboard("all", users[1].uid, Date.now() + 61000);

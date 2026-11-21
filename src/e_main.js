@@ -443,7 +443,11 @@ function viewProfile(first) {
   syncWho();
   if (!fixed && mode !== "login") fetch("/api/groups").then(r => r.json()).then(j => {
     const list = (j && j.groups) || [];
-    list.forEach(g => { if (g.code !== c.group) grpSel.append(h("option", { value: g.code, selected: list.length === 1 && !c.group }, g.name)); });
+    // the open group comes first for people without a teacher
+    const pub = list.filter(g => g.code === "PUBLIC"), rest = list.filter(g => g.code !== "PUBLIC");
+    pub.forEach(g => { if (g.code !== c.group) grpSel.append(h("option", { value: g.code }, "Общая группа: занимаюсь сам, без учителя")); });
+    if (rest.length) grpSel.append(h("option", { disabled: true }, "──────────"));
+    rest.forEach(g => { if (g.code !== c.group) grpSel.append(h("option", { value: g.code }, g.name)); });
   }).catch(() => {});
 
   const mail = c.email || (cloud.s && cloud.s.email && !/@dtb-trainer\.app$/.test(cloud.s.email) ? cloud.s.email : "");

@@ -533,3 +533,5 @@ x99|Après le paiement, l'administrateur ouvre l'accès et l'entraîneur fonctio
 x100|WhatsApp de l'administrateur :
 x101|Messages uniquement, merci de ne pas appeler.
 x102|Aucun compte avec cet e-mail. Vérifiez l'adresse ou inscrivez-vous.
+x103|Groupe ouvert
+x104|Groupe ouvert : j’apprends seul, sans enseignant

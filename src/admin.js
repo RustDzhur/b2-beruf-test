@@ -687,13 +687,13 @@ function groupsCard() {
       el("thead", null, el("tr", null, ["Группа", "Организатор", "Учеников", "Статус", ""].map(h => el("th", null, h)))),
       el("tbody", null, list.map(g => el("tr", null,
         el("td", null, el("b", null, g.name), el("div", { class: "adm-email" }, g.code)),
-        el("td", null, g.code === "MAIN" ? "вы" : (g.email || "—")),
+        el("td", null, g.code === "MAIN" ? "вы" : g.code === "PUBLIC" ? "без учителя" : (g.email || "—")),
         el("td", null, el("span", { class: "adm-num" }, fmt(g.students || 0))),
         el("td", null, el("span", { class: "adm-chip " + (g.status === "ok" ? "ok" : "warn") }, g.status === "ok" ? "Одобрена" : "Ждёт одобрения")),
         el("td", null, el("span", { style: "display:inline-flex;gap:6px;flex-wrap:wrap" },
           g.status !== "ok" ? el("button", { class: "adm-btn primary", onclick: () => groupAction({ code: g.code, status: "ok" }) }, "Одобрить") : null,
           el("button", { class: "adm-btn", onclick: () => { const n = prompt("Новое название группы", g.name); if (n && n.trim()) groupAction({ code: g.code, name: n.trim() }); } }, "Переименовать"),
-          g.code === "MAIN" ? null : el("button", { class: "adm-btn danger", onclick: () => groupAction({ code: g.code, remove: true }, "Удалить группу «" + g.name + "»? Ученики группы останутся в базе и будут видны только вам (в «Все группы»).") }, g.status === "ok" ? "Удалить" : "Отклонить")))))))));
+          g.code === "MAIN" || g.code === "PUBLIC" ? null : el("button", { class: "adm-btn danger", onclick: () => groupAction({ code: g.code, remove: true }, "Удалить группу «" + g.name + "»? Ученики группы останутся в базе и будут видны только вам (в «Все группы»).") }, g.status === "ok" ? "Удалить" : "Отклонить")))))))));
 }
 
 function renderDashboard() {
