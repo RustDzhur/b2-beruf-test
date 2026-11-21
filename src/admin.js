@@ -383,9 +383,32 @@ function pickBox(s) {
 }
 function syncPicked() {
   const b = document.getElementById("adm-del");
-  if (!b) return;
-  b.disabled = !S.picked.size;
-  b.textContent = "Удалить выбранных · " + S.picked.size;
+  if (b) { b.disabled = !S.picked.size; b.textContent = "Удалить выбранных · " + S.picked.size; }
+  const a = document.getElementById("adm-approve");
+  if (a) { a.disabled = !S.picked.size; a.textContent = "Подтвердить выбранных · " + S.picked.size; }
+  const all = document.getElementById("adm-pick-all");
+  if (all) { const list = filteredStudents(); all.checked = list.length > 0 && list.every(s => S.picked.has(s.uid)); }
+}
+// tick / untick every student in the current filter (e.g. "Не верифицированные")
+function pickAll(on) {
+  filteredStudents().forEach(s => on ? S.picked.add(s.uid) : S.picked.delete(s.uid));
+  document.querySelectorAll(".adm-pick:not(#adm-pick-all)").forEach(b => { b.checked = on; });
+  renderStudentList(); syncPicked();
+}
+// approve many students at once: they appear in the leaderboard and get access to the trainer
+async function approvePicked() {
+  const all = (S.data && S.data.students) || [];
+  const chosen = all.filter(s => S.picked.has(s.uid) && !s.verified);
+  if (!chosen.length) { S.picked.clear(); renderStudentList(); syncPicked(); return; }
+  if (!confirm("Подтвердить " + chosen.length + " учеников? Они появятся в рейтинге и получат доступ к тренажёру.")) return;
+  const btn = document.getElementById("adm-approve"); if (btn) { btn.disabled = true; btn.textContent = "Подтверждаем…"; }
+  let failed = 0;
+  for (const s of chosen) {
+    try { await api("/api/admin/verify", { method: "POST", body: JSON.stringify({ uid: s.uid, verified: true }) }); s.verified = true; S.picked.delete(s.uid); }
+    catch { failed++; }
+  }
+  if (failed) alert("Не удалось подтвердить: " + failed);
+  renderStudentList(); syncFilterButtons(); syncPicked();
 }
 function saveJson(obj, name) {
   const blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
@@ -641,6 +664,7 @@ function renderDashboard() {
       el("select", { class: "adm-select", "aria-label": "Сортировка", onchange: e => { S.sort = e.target.value; renderStudentList(); } },
         [["rating", "По рейтингу (общие очки)"], ["score-desc", "По точности (с первой попытки)"], ["active-desc", "Недавно активные"], ["fail-desc", "Больше ошибок"], ["days-desc", "Больше дней"], ["tests-desc", "Больше заданий"], ["name", "По имени"]]
           .map(([v, l]) => el("option", { value: v, selected: S.sort === v }, l))),
+      el("button", { class: "adm-btn primary", id: "adm-approve", disabled: !S.picked.size, onclick: approvePicked }, "Подтвердить выбранных · " + S.picked.size),
       el("button", { class: "adm-btn danger", id: "adm-del", disabled: !S.picked.size, onclick: deletePicked }, "Удалить выбранных · " + S.picked.size)),
     el("div", { id: "adm-students-body" }, studentListBody(students))));
 
@@ -700,7 +724,7 @@ function studentListBody(list) {
   }
   const table = el("div", { class: "adm-table-wrap" },
     el("table", { class: "adm-table" },
-      el("thead", null, el("tr", null, ["", "Место", "Ученик", "Доступ", "Очки", "Дней", "Попыток / заданий", "Успех", "Ошибки", "Был(а)", ""].map(h => el("th", null, h)))),
+      el("thead", null, el("tr", null, [el("input", { type: "checkbox", class: "adm-pick", id: "adm-pick-all", "aria-label": "Выбрать всех", title: "Выбрать всех в списке", checked: list.length > 0 && list.every(s => S.picked.has(s.uid)), onchange: e => pickAll(e.target.checked) }), "Место", "Ученик", "Доступ", "Очки", "Дней", "Попыток / заданий", "Успех", "Ошибки", "Был(а)", ""].map(h => el("th", null, h)))),
       el("tbody", null, list.map(s => el("tr", { tabindex: "0", role: "button", "aria-label": "Открыть профиль " + s.name, onclick: () => openStudent(s.uid), onkeydown: e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openStudent(s.uid); } } },
         el("td", null, pickBox(s)),
         el("td", null, el("span", { class: "adm-num" }, s.allRank ? "#" + s.allRank : "—")),
