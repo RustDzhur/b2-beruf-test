@@ -21,6 +21,8 @@ const S = {
   selectedUid: null,
   lastLoaded: 0,
   picked: new Set(), // students ticked for deletion
+  group: "", // main teacher: "" = all groups, otherwise one group code
+  loginMode: "super", // "super" (main teacher password) | "org" (group organizer e-mail + password)
 };
 
 /* ------------------------------------------------------------------ dom ---- */
@@ -121,7 +123,7 @@ function langSelect() {
   sel.onchange = () => {
     setAdminLang(sel.value);
     label();
-    document.title = admTr(S.me && S.me.ok ? "Кабинет преподавателя · DTB B2 Beruf" : "Вход · Кабинет преподавателя");
+    document.title = admTr(S.me && S.me.ok ? cabTitle() + " · DTB B2 Beruf" : "Вход · " + cabTitle());
   };
   return sel;
 }
@@ -356,7 +358,8 @@ function studentCell(s) {
     ? (s.firstDay ? "с нами с " + fmtDate(s.firstDay) : "облачный прогресс") + (s.streak && s.streak.current >= 2 ? " · 🔥 " + s.streak.current : "")
     : "не заполнил(а) анкету · " + s.uid.slice(0, 8) + "…";
   return el("div", { class: "adm-student" }, avatar(s.name, s.initials),
-    el("div", { class: "adm-student-name" }, el("b", null, s.name), el("span", null, sub), s.email ? el("span", { class: "adm-email" }, s.email) : null));
+    el("div", { class: "adm-student-name" }, el("b", null, s.name), el("span", null, sub), s.email ? el("span", { class: "adm-email" }, s.email) : null, s.phone ? el("span", { class: "adm-email", dir: "ltr" }, "📱 " + s.phone) : null,
+      isSuper() && !S.group && S.data && S.data.groups && S.data.groups.length > 1 ? el("span", { class: "adm-email" }, "👥 " + groupName(s.group)) : null));
 }
 
 /* access to the trainer (and the AI): the teacher confirms a student by hand after the WhatsApp request (stored server-side in Firestore `verified`) */
@@ -379,16 +382,21 @@ async function toggleAdmit(s, reopen) {
   if (reopen) renderDrawerFor(s.uid);
 }
 function verifyControl(s, reopen) {
+  // a group teacher only sees the state; every change is made by the main administrator
+  if (!isSuper()) return el("span", { class: "adm-verify" },
+    el("span", { class: "adm-chip " + (s.admitted ? (s.verified ? "ok" : "") : "warn") }, !s.admitted ? "Нет доступа" : s.verified ? "ИИ открыт" : "ИИ закрыт"));
   if (!s.admitted) return el("span", { class: "adm-verify" },
     el("span", { class: "adm-chip warn" }, "Ждёт допуска"),
     el("button", { class: "adm-btn primary", onclick: e => { e.stopPropagation(); toggleAdmit(s, reopen); } }, "Допустить"));
   return el("span", { class: "adm-verify" },
     el("span", { class: "adm-chip " + (s.verified ? "ok" : "") }, s.verified ? "ИИ открыт" : "ИИ закрыт"),
-    el("button", { class: "adm-btn", onclick: e => { e.stopPropagation(); toggleVerify(s, reopen); } }, s.verified ? "Закрыть ИИ" : "Открыть ИИ"));
+    el("button", { class: "adm-btn", onclick: e => { e.stopPropagation(); toggleVerify(s, reopen); } }, s.verified ? "Закрыть ИИ" : "Открыть ИИ"),
+    reopen ? el("button", { class: "adm-btn danger", onclick: e => { e.stopPropagation(); if (confirm("Заблокировать " + s.name + "? Тренажёр и ИИ закроются, прогресс сохранится.")) toggleAdmit(s, reopen); } }, "Заблокировать") : null);
 }
 
 /* removing strangers: tick students, save a backup, then delete progress, approval and the account */
 function pickBox(s) {
+  if (!isSuper()) return null;
   return el("input", { type: "checkbox", class: "adm-pick", "aria-label": "Выбрать " + s.name, checked: S.picked.has(s.uid),
     onclick: e => e.stopPropagation(), onkeydown: e => e.stopPropagation(),
     onchange: e => { e.target.checked ? S.picked.add(s.uid) : S.picked.delete(s.uid); syncPicked(); } });
@@ -398,6 +406,10 @@ function syncPicked() {
   if (b) { b.disabled = !S.picked.size; b.textContent = "Удалить выбранных · " + S.picked.size; }
   const a = document.getElementById("adm-approve");
   if (a) { a.disabled = !S.picked.size; a.textContent = "Допустить выбранных · " + S.picked.size; }
+  const bl = document.getElementById("adm-block");
+  if (bl) { bl.disabled = !S.picked.size; bl.textContent = "Заблокировать · " + S.picked.size; }
+  const mv = document.getElementById("adm-move");
+  if (mv) mv.disabled = !S.picked.size;
   const all = document.getElementById("adm-pick-all");
   if (all) { const list = filteredStudents(); all.checked = list.length > 0 && list.every(s => S.picked.has(s.uid)); }
 }
@@ -421,6 +433,37 @@ async function approvePicked() {
   }
   if (failed) alert("Не удалось допустить: " + failed);
   renderStudentList(); syncFilterButtons(); syncPicked();
+}
+// block many students: they lose the trainer and the AI, the progress stays (works for old accounts too)
+async function blockPicked() {
+  const all = (S.data && S.data.students) || [];
+  const chosen = all.filter(s => S.picked.has(s.uid) && s.admitted);
+  if (!chosen.length) return;
+  if (!confirm("Заблокировать " + chosen.length + " учеников? Тренажёр и ИИ закроются, прогресс сохранится. Вернуть можно кнопкой «Допустить».")) return;
+  let failed = 0;
+  for (const s of chosen) {
+    try { await api("/api/admin/admit", { method: "POST", body: JSON.stringify({ uid: s.uid, admitted: false }) }); s.admitted = false; S.picked.delete(s.uid); }
+    catch { failed++; }
+  }
+  if (failed) alert("Не удалось заблокировать: " + failed);
+  renderStudentList(); syncFilterButtons(); syncPicked();
+}
+// move ticked students to another (approved) group
+async function movePicked(sel) {
+  const code = sel.value; sel.value = "";
+  const chosen = ((S.data && S.data.students) || []).filter(s => S.picked.has(s.uid));
+  if (!code || !chosen.length) return;
+  if (!confirm("Перенести " + chosen.length + " учеников в группу «" + groupName(code) + "»?")) return;
+  try { await api("/api/admin/move", { method: "POST", body: JSON.stringify({ uids: chosen.map(s => s.uid), group: code }) }); }
+  catch (e) { alert(e.message || "Не удалось перенести."); return; }
+  S.picked.clear();
+  loadDashboard();
+}
+function moveSelect() {
+  const open = ((S.data && S.data.groups) || []).filter(g => g.status === "ok");
+  if (open.length < 2) return null;
+  return el("select", { class: "adm-select", id: "adm-move", "aria-label": "Перенести в группу", disabled: !S.picked.size, onchange: e => movePicked(e.target) },
+    el("option", { value: "" }, "Перенести в группу…"), open.map(g => el("option", { value: g.code }, g.name)));
 }
 function saveJson(obj, name) {
   const blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
@@ -484,16 +527,24 @@ function filteredStudents() {
 
 /* ------------------------------------------------------------------ login -- */
 function renderLogin() {
-  document.title = typeof admTr === "function" ? admTr("Вход · Кабинет преподавателя") : "Вход · Кабинет преподавателя";
+  document.title = typeof admTr === "function" ? admTr("Вход · " + cabTitle()) : "Вход · " + cabTitle();
+  const org = S.loginMode === "org";
   const input = el("input", { class: "adm-input", type: "password", name: "password", autocomplete: "current-password", placeholder: "Пароль", required: true, "aria-label": "Пароль" });
+  const email = org ? el("input", { class: "adm-input", type: "email", name: "email", autocomplete: "email", placeholder: "name@example.com", required: true, "aria-label": "E-mail" }) : null;
   const err = el("p", { class: "adm-login-error", role: "alert", hidden: !S.loginError }, S.loginError);
   const btn = el("button", { class: "adm-btn primary adm-block", type: "submit" }, S.loginBusy ? "Проверяем…" : "Войти", icon("lock", 16));
   if (S.loginBusy) btn.disabled = true;
+  const mode = el("div", { class: "adm-seg", role: "group", style: "margin-bottom:14px" },
+    [["super", "Главный администратор"], ["org", "Организатор группы"]].map(([m, l]) =>
+      el("button", { type: "button", class: S.loginMode === m ? "on" : "", "aria-pressed": S.loginMode === m, onclick: () => { S.loginMode = m; S.loginError = ""; renderLogin(); } }, l)));
   const form = el("form", { onsubmit: submitLogin },
-    el("div", { class: "adm-field" }, el("label", { for: "adm-pw" }, "Пароль преподавателя"), input),
+    org ? el("div", { class: "adm-field" }, el("label", { for: "adm-em" }, "E-mail организатора"), email) : null,
+    el("div", { class: "adm-field" }, el("label", { for: "adm-pw" }, org ? "Пароль от тренажёра" : "Пароль администратора"), input),
     err, btn);
-  input.id = "adm-pw";
-  const hint = S.me && S.me.configured === false
+  input.id = "adm-pw"; if (email) email.id = "adm-em";
+  const hint = org
+    ? el("p", { class: "adm-login-hint" }, "Войдите с тем же e-mail и паролем, с которыми вы зарегистрировались в тренажёре как организатор. Кабинет откроется после того, как главный администратор одобрит группу.")
+    : S.me && S.me.configured === false
     ? el("p", { class: "adm-login-hint" }, "ADMIN_PASSWORD не задан на сервере. На Vercel добавьте переменную окружения ", el("code", null, "ADMIN_PASSWORD"), " и сделайте Redeploy. При локальном запуске пароль печатается в консоли.")
     : el("p", { class: "adm-login-hint" }, "Пароль проверяется на сервере, в браузере он не сохраняется. Сессия живёт 8 часов.");
   ROOT.replaceChildren(el("div", { class: "adm-login" },
@@ -501,24 +552,26 @@ function renderLogin() {
       el("div", { class: "adm-login-top" },
         el("div", { class: "adm-brand-mark" }, "DTB"),
         el("div", { class: "adm-login-tools" }, langSelect(), themeButton())),
-      el("h1", null, "Кабинет преподавателя"),
+      el("h1", null, cabTitle()),
       el("p", { class: "adm-sub" }, "Прогресс учеников DTB B2 Beruf: дни занятий, решённые задания, ошибки и достижения — в одном месте."),
+      mode,
       form,
       hint,
       el("p", { class: "adm-login-foot" }, "Данные читаются из Firebase. Доступ только по паролю."))));
   paintAdminTheme();
-  requestAnimationFrame(() => input.focus());
+  requestAnimationFrame(() => (email || input).focus());
 }
-
 async function submitLogin(e) {
   e.preventDefault();
   const input = e.target.querySelector("input[name=password]");
   const pw = input ? input.value : "";
-  if (!pw) { S.loginError = "Введите пароль."; renderLogin(); return; }
+  const em = e.target.querySelector("input[name=email]");
+  const email = em ? em.value.trim() : "";
+  if (!pw || (em && !email)) { S.loginError = em ? "Введите e-mail и пароль." : "Введите пароль."; renderLogin(); return; }
   S.loginBusy = true; S.loginError = ""; renderLogin();
   try {
-    await api("/api/admin/login", { method: "POST", body: JSON.stringify({ password: pw }) });
-    S.me = Object.assign({}, S.me || {}, { ok: true, configured: true });
+    const r = await api("/api/admin/login", { method: "POST", body: JSON.stringify(email ? { email, password: pw } : { password: pw }) });
+    S.me = Object.assign({}, S.me || {}, { ok: true, configured: true, role: r.role });
     S.loginBusy = false;
     S.data = null;
     await loadDashboard();
@@ -533,7 +586,7 @@ async function submitLogin(e) {
 
 /* ---------------------------------------------------------------- loading -- */
 function renderLoading() {
-  document.title = typeof admTr === "function" ? admTr("Кабинет преподавателя · DTB B2 Beruf") : "Кабинет преподавателя · DTB B2 Beruf";
+  document.title = typeof admTr === "function" ? admTr(cabTitle() + " · DTB B2 Beruf") : cabTitle() + " · DTB B2 Beruf";
   ROOT.replaceChildren(el("div", { class: "adm-loading" }, el("div", { class: "adm-spinner" }), "Загружаем прогресс учеников…"));
 }
 
@@ -555,7 +608,7 @@ async function loadDashboard() {
   S.loading = true;
   if (!S.data) renderLoading();
   try {
-    const data = await api("/api/admin/dashboard");
+    const data = await api("/api/admin/dashboard" + (S.group ? "?group=" + encodeURIComponent(S.group) : ""));
     S.data = data;
     S.error = null;
     S.lastLoaded = Date.now();
@@ -584,7 +637,7 @@ function topBar() {
     el("div", { class: "adm-top-in" },
       el("a", { class: "adm-brand", href: "/admin", style: "text-decoration:none;color:inherit" },
         el("span", { class: "adm-brand-mark" }, "DTB"),
-        el("span", { class: "adm-brand-text" }, el("b", null, "Кабинет преподавателя"), el("span", null, "DTB B2 Beruf · прогресс учеников"))),
+        el("span", { class: "adm-brand-text" }, el("b", null, cabTitle()), el("span", null, "DTB B2 Beruf · прогресс учеников"))),
       el("div", { class: "adm-top-right" },
         el("span", { class: "adm-source" + (badSource ? " test" : "") }, source),
         el("span", { class: "adm-updated", id: "adm-updated" }, updatedText()),
@@ -600,8 +653,51 @@ function updatedText() {
   return min < 1 ? "обновлено только что" : "обновлено " + min + " " + plural(min, "минуту", "минуты", "минут") + " назад";
 }
 
+/* ---------------------------------------------------------------- groups -- */
+const isSuper = () => !S.data || S.data.role === "super";
+// main administrator (ADMIN_PASSWORD) sees "Кабинет администратора"; a group organizer sees "Кабинет преподавателя"
+function cabTitle() {
+  const role = S.data ? S.data.role : S.me && S.me.ok ? S.me.role : (S.loginMode === "org" ? "org" : "super");
+  return role === "super" ? "Кабинет администратора" : "Кабинет преподавателя";
+}
+function groupName(code) {
+  const g = ((S.data && S.data.groups) || []).find(x => x.code === code);
+  return g ? g.name : (code || "");
+}
+function groupPicker() {
+  const list = (S.data && S.data.groups) || [];
+  if (list.length < 2) return null;
+  return el("select", { class: "adm-select", style: "margin-top:10px", "aria-label": "Группа", onchange: e => { S.group = e.target.value; S.picked.clear(); loadDashboard(); } },
+    el("option", { value: "", selected: !S.group }, "Все группы"),
+    list.map(g => el("option", { value: g.code, selected: S.group === g.code }, g.name + " · " + fmt(g.students || 0))));
+}
+async function groupAction(body, confirmText) {
+  if (confirmText && !confirm(confirmText)) return;
+  try { await api("/api/admin/groups", { method: "POST", body: JSON.stringify(body) }); }
+  catch (e) { alert(e.message || "Не удалось сохранить."); return; }
+  loadDashboard();
+}
+function groupsCard() {
+  const list = (S.data && S.data.groups) || [];
+  const pending = list.filter(g => g.status !== "ok").length;
+  return el("section", { class: "adm-card", style: "margin-bottom:14px" },
+    el("div", { class: "adm-card-head" }, el("div", null, el("h2", null, "Группы"),
+      el("p", null, pending ? "Заявки организаторов ждут одобрения · " + pending : "Организатор регистрируется в тренажёре и указывает название группы. Здесь вы одобряете группу, после этого у организатора открывается свой кабинет."))),
+    el("div", { class: "adm-table-wrap" }, el("table", { class: "adm-table" },
+      el("thead", null, el("tr", null, ["Группа", "Организатор", "Учеников", "Статус", ""].map(h => el("th", null, h)))),
+      el("tbody", null, list.map(g => el("tr", null,
+        el("td", null, el("b", null, g.name), el("div", { class: "adm-email" }, g.code)),
+        el("td", null, g.code === "MAIN" ? "вы" : (g.email || "—")),
+        el("td", null, el("span", { class: "adm-num" }, fmt(g.students || 0))),
+        el("td", null, el("span", { class: "adm-chip " + (g.status === "ok" ? "ok" : "warn") }, g.status === "ok" ? "Одобрена" : "Ждёт одобрения")),
+        el("td", null, el("span", { style: "display:inline-flex;gap:6px;flex-wrap:wrap" },
+          g.status !== "ok" ? el("button", { class: "adm-btn primary", onclick: () => groupAction({ code: g.code, status: "ok" }) }, "Одобрить") : null,
+          el("button", { class: "adm-btn", onclick: () => { const n = prompt("Новое название группы", g.name); if (n && n.trim()) groupAction({ code: g.code, name: n.trim() }); } }, "Переименовать"),
+          g.code === "MAIN" ? null : el("button", { class: "adm-btn danger", onclick: () => groupAction({ code: g.code, remove: true }, "Удалить группу «" + g.name + "»? Ученики группы останутся в базе и будут видны только вам (в «Все группы»).") }, g.status === "ok" ? "Удалить" : "Отклонить")))))))));
+}
+
 function renderDashboard() {
-  document.title = typeof admTr === "function" ? admTr("Кабинет преподавателя · DTB B2 Beruf") : "Кабинет преподавателя · DTB B2 Beruf";
+  document.title = typeof admTr === "function" ? admTr(cabTitle() + " · DTB B2 Beruf") : cabTitle() + " · DTB B2 Beruf";
   const d = S.data;
   const t = d.totals;
   const counts = filterCounts();
@@ -611,7 +707,8 @@ function renderDashboard() {
   const hero = el("div", { class: "adm-hero" },
     el("div", null,
       el("div", { class: "eyebrow", style: "margin-bottom:6px" }, "DTB B2 Beruf · Lehrerkabinett"),
-      el("h1", null, "Прогресс учеников"),
+      el("h1", null, isSuper() ? "Прогресс учеников" : el("span", null, el("span", null, "Группа"), " «" + groupName(d.view) + "»")),
+      isSuper() ? groupPicker() : null,
       el("p", null, t.students
         ? fmt(t.students) + " " + plural(t.students, "ученик", "ученика", "учеников") + " в облаке · " + fmt(t.active7d) + " активны за неделю · " + fmt(t.tasks) + " заданий решено"
         : "Здесь появятся ученики, которые сохраняют прогресс в облаке.")),
@@ -620,6 +717,7 @@ function renderDashboard() {
       el("button", { class: "adm-btn primary", onclick: () => loadDashboard() }, icon("refresh", 16), "Обновить")));
 
   main.append(hero);
+  if (isSuper()) main.append(groupsCard());
   if (S.data && S.data.verifyError) main.append(el("div", { class: "adm-error-card", style: "margin-bottom:14px" }, el("h3", null, "Не удалось загрузить статусы верификации"), "Все ученики пока показаны как не верифицированные. Нажмите «Обновить» или проверьте ключ Firebase."));
   if (S.error && S.data) main.append(el("div", { class: "adm-error-card", style: "margin-bottom:14px" }, el("h3", null, "Не удалось обновить"), S.error.message || "", el("div", { style: "margin-top:8px" }, el("button", { class: "adm-btn", onclick: () => loadDashboard() }, "Повторить"))));
 
@@ -676,8 +774,10 @@ function renderDashboard() {
       el("select", { class: "adm-select", "aria-label": "Сортировка", onchange: e => { S.sort = e.target.value; renderStudentList(); } },
         [["rating", "По рейтингу (общие очки)"], ["score-desc", "По точности (с первой попытки)"], ["active-desc", "Недавно активные"], ["fail-desc", "Больше ошибок"], ["days-desc", "Больше дней"], ["tests-desc", "Больше заданий"], ["name", "По имени"]]
           .map(([v, l]) => el("option", { value: v, selected: S.sort === v }, l))),
-      el("button", { class: "adm-btn primary", id: "adm-approve", disabled: !S.picked.size, onclick: approvePicked }, "Допустить выбранных · " + S.picked.size),
-      el("button", { class: "adm-btn danger", id: "adm-del", disabled: !S.picked.size, onclick: deletePicked }, "Удалить выбранных · " + S.picked.size)),
+      isSuper() ? el("button", { class: "adm-btn primary", id: "adm-approve", disabled: !S.picked.size, onclick: approvePicked }, "Допустить выбранных · " + S.picked.size) : null,
+      isSuper() ? el("button", { class: "adm-btn", id: "adm-block", disabled: !S.picked.size, onclick: blockPicked }, "Заблокировать · " + S.picked.size) : null,
+      isSuper() ? moveSelect() : null,
+      isSuper() ? el("button", { class: "adm-btn danger", id: "adm-del", disabled: !S.picked.size, onclick: deletePicked }, "Удалить выбранных · " + S.picked.size) : null),
     el("div", { id: "adm-students-body" }, studentListBody(students))));
 
   main.append(el("p", { class: "adm-foot" }, "Показаны только имя, прогресс и активность. Дата рождения, адрес и другие поля анкеты не читаются. Данные обновляются, когда ученик сохраняет прогресс в облаке."));
@@ -736,7 +836,7 @@ function studentListBody(list) {
   }
   const table = el("div", { class: "adm-table-wrap" },
     el("table", { class: "adm-table" },
-      el("thead", null, el("tr", null, [el("input", { type: "checkbox", class: "adm-pick", id: "adm-pick-all", "aria-label": "Выбрать всех", title: "Выбрать всех в списке", checked: list.length > 0 && list.every(s => S.picked.has(s.uid)), onchange: e => pickAll(e.target.checked) }), "Место", "Ученик", "Доступ", "Очки", "Дней", "Попыток / заданий", "Успех", "Ошибки", "Был(а)", ""].map(h => el("th", null, h)))),
+      el("thead", null, el("tr", null, [isSuper() ? el("input", { type: "checkbox", class: "adm-pick", id: "adm-pick-all", "aria-label": "Выбрать всех", title: "Выбрать всех в списке", checked: list.length > 0 && list.every(s => S.picked.has(s.uid)), onchange: e => pickAll(e.target.checked) }) : "", "Место", "Ученик", "Доступ", "Очки", "Дней", "Попыток / заданий", "Успех", "Ошибки", "Был(а)", ""].map(h => el("th", null, h)))),
       el("tbody", null, list.map(s => el("tr", { tabindex: "0", role: "button", "aria-label": "Открыть профиль " + s.name, onclick: () => openStudent(s.uid), onkeydown: e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openStudent(s.uid); } } },
         el("td", null, pickBox(s)),
         el("td", null, el("span", { class: "adm-num" }, s.allRank ? "#" + s.allRank : "—")),
@@ -792,7 +892,7 @@ function applyWidths(root) {
 
 /* ----------------------------------------------------------------- funnel --- */
 function renderFatal() {
-  document.title = typeof admTr === "function" ? admTr("Кабинет преподавателя · DTB B2 Beruf") : "Кабинет преподавателя · DTB B2 Beruf";
+  document.title = typeof admTr === "function" ? admTr(cabTitle() + " · DTB B2 Beruf") : cabTitle() + " · DTB B2 Beruf";
   const e = S.error || {};
   const box = el("div", { class: "adm-main" });
   const card = el("section", { class: "adm-card", style: "margin-top:20px" });
@@ -875,7 +975,7 @@ function renderDrawerFor(uid) {
       stat(fmt(s.failures), "ошибок"),
       stat(fmt(s.streak.longest), "лучшая серия")),
     el("p", { class: "adm-drawer-note" }, "Сейчас (с учётом пересдач): " + pctText(s.currentPct) + " · лучший: " + pctText(s.bestPct) + " · успешных заданий: " + fmt(s.successTasks) + " из " + fmt(s.tasks) + " · ошибок к повтору: " + fmt(s.failures)),
-    el("div", { class: "adm-drawer-note" }, el("span", null, "Доступ"), ": ", verifyControl(s, true), s.email ? el("div", { class: "adm-email" }, s.email) : null),
+    el("div", { class: "adm-drawer-note" }, el("span", null, "Доступ"), ": ", verifyControl(s, true), s.email ? el("div", { class: "adm-email" }, s.email) : null, s.phone ? el("div", { class: "adm-email", dir: "ltr" }, el("a", { href: "https://wa.me/" + s.phone.replace(/\D/g, ""), target: "_blank", rel: "noopener" }, "WhatsApp " + s.phone)) : null),
     el("p", { class: "adm-drawer-note" }, s.allRank ? "Общий рейтинг: #" + s.allRank + " · " + fmt(s.allPoints) + " очков" : "Общий рейтинг: —"),
     s.answers && s.answers.total ? el("p", { class: "adm-drawer-note" }, el("span", null, "Верных ответов"), ": " + fmt(s.answers.correct) + " / " + fmt(s.answers.total) + (s.answers.pct != null ? " · " + pctText(s.answers.pct) : "")) : null,
     el("h3", null, "Достижения · " + s.earned + " из 10"),

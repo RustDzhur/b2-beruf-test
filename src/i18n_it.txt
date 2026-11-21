@@ -482,7 +482,54 @@ x48|L'accesso non è ancora stato autorizzato.
 x49|Verifica di nuovo
 x50|Cambia account
 x51|Verifica dell'accesso…
-x52|Il numero dell'insegnante non è ancora indicato.
+x52|Il numero dell'amministratore non è ancora indicato.
 x53|Scrivi su WhatsApp
 x54|Chiama
 x55|Reimposta password
+x56|Sono uno studente
+x57|Organizzo un gruppo
+x58|— scegli il tuo gruppo —
+x59|Il tuo gruppo *
+x60|Nome del tuo gruppo *
+x61|Chi sei? *
+x62|Indica il nome del gruppo.
+x63|Scegli il tuo gruppo.
+x64|Impossibile creare il gruppo.
+x65|Esiste già un gruppo con questo nome.
+x66|Il tuo gruppo attende l'approvazione dell'amministratore principale:
+x67|Dopo l'approvazione si apre il trainer e lo spazio del gruppo è su /admin (accesso «Organizzatore del gruppo» con la tua e-mail e password).
+x68|Il tuo gruppo:
+x69|Spazio del gruppo
+x70|Gruppo principale
+x71|Dati per il foglio risposte (facoltativo)
+x72|Cognome *
+x73|Nome *
+x74|Telefono (WhatsApp) *
+x75|Password *
+x76|Password * (almeno 6 caratteri)
+x77|Dopo la registrazione riceverai un'e-mail di conferma. L'accesso si apre dopo il permesso dell'amministratore: scrivigli su WhatsApp. Per favore solo un messaggio, non chiamare.
+x78|Accedi
+x79|Registrati
+x80|Inserisci un numero con WhatsApp, ad es. +49 151 2345678.
+x81|Password dimenticata?
+x82|Trainer per l'esame telc
+x83|Accesso
+x84|Registrazione
+x85|Accedi con l'e-mail e la password usate per la registrazione. I progressi verranno caricati dal cloud.
+x86|Crea un account: i progressi sono salvati nel cloud e disponibili su ogni dispositivo.
+x87|Questi dati li vede il tuo insegnante.
+x88|Indietro
+x89|Prezzo dell'abbonamento
+x90|Trainer
+x91|mese
+x92|Tutte le attività d'esame, correzione delle risposte, lavoro sugli errori e classifica del gruppo. Senza IA.
+x93|Preparazione migliore
+x94|Trainer + IA
+x95|Tutto il pacchetto «Trainer» più l'IA che corregge compiti, lettere e risposte orali e ti aiuta a prepararti meglio all'esame.
+x96|Conferma l'e-mail: apri il messaggio e clicca sul link.
+x97|Scrivi all'amministratore su WhatsApp.
+x98|Per favore non chiamare: invia un messaggio per chiedere l'accesso. Indica cognome, nome, e-mail di registrazione e il pacchetto scelto.
+x99|Dopo il pagamento l'amministratore apre l'accesso e il trainer funziona su tutti i tuoi dispositivi.
+x100|WhatsApp dell'amministratore:
+x101|Solo messaggi, per favore non chiamare.
+x102|Nessun account con questa e-mail. Controlla l'indirizzo o registrati.

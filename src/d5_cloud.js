@@ -91,7 +91,8 @@ const NOT_FOUND = /EMAIL_NOT_FOUND|INVALID_LOGIN_CREDENTIALS|INVALID_PASSWORD|US
 // then merge cloud progress with this device and upload the result.
 // Accounts made before the e-mail sign-up used a synthetic address from name + birth date: they still open,
 // and get the real e-mail attached so the next sign-in works by e-mail.
-async function cloudConnect(c, password) {
+async function cloudConnect(c, password, opt) {
+  const login = !!(opt && opt.login); // "Вход": never create a new account
   const email = String(c.email || "").trim().toLowerCase();
   let a, created = false;
   try { a = await fbAuth("signInWithPassword", email, password); }
@@ -103,6 +104,7 @@ async function cloudConnect(c, password) {
         try { const u = await fbReq("update", { idToken: a.idToken, email, returnSecureToken: true }); if (u.idToken) a = { ...a, ...u }; } catch {}
       } catch (e1) { if (!NOT_FOUND.test(e1.msg)) throw e1; a = null; }
     }
+    if (!a && login) throw Object.assign(new Error("NOACC"), { msg: "NOACC" });
     if (!a) {
       try { a = await fbAuth("signUp", email, password); created = true; }
       catch (e2) { if (/EMAIL_EXISTS/.test(e2.msg)) throw Object.assign(new Error("PW"), { msg: "PW" }); throw e2; }
@@ -111,11 +113,23 @@ async function cloudConnect(c, password) {
   cloud.s = { uid: a.localId, refresh: a.refreshToken, email };
   cloud.id = a.idToken; cloud.exp = Date.now() + (+a.expiresIn || 3600) * 1000;
   store.set("cloud", cloud.s);
-  if (created) { try { await fbReq("sendOobCode", { requestType: "VERIFY_EMAIL", idToken: a.idToken }); store.set("mailsent", email); } catch {} }
+  // confirmation letter; its link leads back to the waiting screen with the WhatsApp request and the prices
+  if (created) {
+    const send = extra => fbReq("sendOobCode", { requestType: "VERIFY_EMAIL", idToken: a.idToken, ...extra });
+    try { await send({ continueUrl: location.origin + "/#home" }); store.set("mailsent", email); }
+    catch { try { await send({}); store.set("mailsent", email); } catch {} } // the domain may be missing in Firebase "Authorized domains"
+  }
   await cloudPull();
   await cloudPush();
   cloud.state = "ok";
   await cloudAccess();
+}
+// organizer: ask for a new group (the main teacher approves it in /admin) -> {code, name, status}
+async function cloudGroupRequest(name, email) {
+  const r = await fetch("/api/group-request", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + await fbToken() }, body: JSON.stringify({ name, email }) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || !j.group) throw new Error(j.message || "Не удалось создать группу.");
+  return j.group;
 }
 async function cloudResetPw(email) { await fbReq("sendOobCode", { requestType: "PASSWORD_RESET", email }); }
 
@@ -146,6 +160,7 @@ function cloudBoot(then) {
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden" && cloud.s) cloudPush().catch(() => {}); });
 }
 function cloudErrText(e) {
+  if (e.msg === "NOACC") return "Аккаунт с таким e-mail не найден. Проверьте адрес или зарегистрируйтесь.";
   if (e.msg === "PW") return "Falsches Kennwort für dieses Konto. Passwort vergessen? Klicken Sie unten auf „Kennwort zurücksetzen“.";
   if (/INVALID_EMAIL/.test(e.msg || "")) return "Diese E-Mail-Adresse ist ungültig.";
   if (/TOO_MANY_ATTEMPTS/.test(e.msg || "")) return "Zu viele Versuche. Bitte später noch einmal.";

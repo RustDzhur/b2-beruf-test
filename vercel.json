@@ -4,7 +4,29 @@
   "buildCommand": "",
   "outputDirectory": ".",
   "rewrites": [
-    { "source": "/admin", "destination": "/admin.html" },
-    { "source": "/admin/", "destination": "/admin.html" }
+    {
+      "source": "/api/admin/:path*",
+      "destination": "/api/router?__p=admin/:path*"
+    },
+    {
+      "source": "/api/groups",
+      "destination": "/api/router?__p=groups"
+    },
+    {
+      "source": "/api/group-request",
+      "destination": "/api/router?__p=group-request"
+    },
+    {
+      "source": "/api/access",
+      "destination": "/api/router?__p=access"
+    },
+    {
+      "source": "/admin",
+      "destination": "/admin.html"
+    },
+    {
+      "source": "/admin/",
+      "destination": "/admin.html"
+    }
   ]
 }

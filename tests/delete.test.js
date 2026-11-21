@@ -16,14 +16,15 @@ test("leaderboard: old accounts are in it without approval; a new account appear
   const A = require("../api/_admit.js");
   const { users } = await admin.loadUsers();
   const named = users.filter(u => u.data && u.data.cand && u.data.cand.vor);
-  let lb = await admin.buildLeaderboard("all", "", Date.now() + 61000);
+  const me = named[1].uid; // the leaderboard is per group: look at it as another student of the same (main) group
+  let lb = await admin.buildLeaderboard("all", me, Date.now() + 61000);
   const all = lb.participants;
   assert.ok(all > 1);
   A._memNew.add(named[0].uid); // pretend this one signed up after the switch
-  lb = await admin.buildLeaderboard("all", "", Date.now() + 122000);
+  lb = await admin.buildLeaderboard("all", me, Date.now() + 122000);
   assert.equal(lb.participants, all - 1);
   await A.setAdmitted(named[0].uid, true);
-  lb = await admin.buildLeaderboard("all", "", Date.now() + 183000);
+  lb = await admin.buildLeaderboard("all", me, Date.now() + 183000);
   assert.equal(lb.participants, all);
   assert.equal(await verify.isVerified(named[0].uid), false); // admission does not open the AI
 });
