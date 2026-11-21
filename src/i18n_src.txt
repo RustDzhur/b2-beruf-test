@@ -533,3 +533,5 @@ x99|After payment the administrator opens access, and the trainer works on all y
 x100|Administrator's WhatsApp:|WhatsApp des Administrators:
 x101|Messages only, please do not call.|Bitte nur Nachrichten, nicht anrufen.
 x102|No account with this e-mail. Check the address or sign up.|Kein Konto mit dieser E-Mail gefunden. Prüfen Sie die Adresse oder registrieren Sie sich.
+x103|Open group|Offene Gruppe
+x104|Open group: I study on my own, without a teacher|Offene Gruppe: Ich lerne selbstständig, ohne Lehrkraft

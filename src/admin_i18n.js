@@ -6,6 +6,8 @@ let ADM_LANG = (() => { try { return localStorage.getItem("dtb.adminLang") || "d
 if (!ADM_LANGS[ADM_LANG]) ADM_LANG = "de";
 
 const ADM_I18N = {
+  "Общая группа": ["Open group", "Offene Gruppe", "Groupe ouvert", "Açık grup", "المجموعة العامة", "Gruppo aperto"],
+  "без учителя": ["no teacher", "ohne Lehrkraft", "sans enseignant", "öğretmensiz", "بدون معلم", "senza insegnante"],
   "Кабинет администратора": ["Administrator's office", "Administratorbereich", "Espace administrateur", "Yönetici paneli", "مكتب المسؤول", "Area amministratore"],
   "Вход · Кабинет администратора": ["Login · Administrator's office", "Login · Administratorbereich", "Connexion · Espace administrateur", "Giriş · Yönetici paneli", "الدخول · مكتب المسؤول", "Accesso · Area amministratore"],
   "Кабинет администратора · DTB B2 Beruf": ["Administrator's office · DTB B2 Beruf", "Administratorbereich · DTB B2 Beruf", "Espace administrateur · DTB B2 Beruf", "Yönetici paneli · DTB B2 Beruf", "مكتب المسؤول · DTB B2 Beruf", "Area amministratore · DTB B2 Beruf"],

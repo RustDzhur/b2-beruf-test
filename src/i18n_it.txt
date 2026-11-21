@@ -533,3 +533,5 @@ x99|Dopo il pagamento l'amministratore apre l'accesso e il trainer funziona su t
 x100|WhatsApp dell'amministratore:
 x101|Solo messaggi, per favore non chiamare.
 x102|Nessun account con questa e-mail. Controlla l'indirizzo o registrati.
+x103|Gruppo aperto
+x104|Gruppo aperto: studio da solo, senza insegnante

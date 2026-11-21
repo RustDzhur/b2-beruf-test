@@ -7,6 +7,8 @@ const crypto = require("crypto");
 const admin = require("./_admin.js");
 
 const MAIN = "MAIN";
+const PUBLIC = "PUBLIC"; // open group for people who study on their own, without a teacher (one shared leaderboard)
+const BUILTIN = new Set([MAIN, PUBLIC]);
 const CODE_RE = /^[A-Z0-9]{3,12}$/;
 const fail = (status, code, message) => Object.assign(new Error(message), { status, code });
 const mem = new Map(); // local preview / tests without Firestore
@@ -21,7 +23,7 @@ function newCode(taken) {
   const abc = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   for (;;) {
     let c = ""; for (let i = 0; i < 6; i++) c += abc[crypto.randomInt(abc.length)];
-    if (!taken.has(c) && c !== MAIN) return c;
+    if (!taken.has(c) && !BUILTIN.has(c)) return c;
   }
 }
 function base() {
@@ -51,8 +53,10 @@ async function listGroups(fresh) {
       });
     }
   }
+  if (!list.some(g => g.code === PUBLIC)) list.unshift({ code: PUBLIC, name: "Общая группа", owner: "", email: "", status: "ok", at: 1 });
   if (!list.some(g => g.code === MAIN)) list.unshift({ code: MAIN, name: "Основная группа", owner: "", email: "", status: "ok", at: 0 });
-  list.sort((a, b) => (a.code === MAIN ? -1 : b.code === MAIN ? 1 : a.at - b.at));
+  const rank = c => (c === MAIN ? 0 : c === PUBLIC ? 1 : 2);
+  list.sort((a, b) => rank(a.code) - rank(b.code) || a.at - b.at);
   cache = { at: Date.now(), list };
   return list;
 }
@@ -92,7 +96,7 @@ async function updateGroup(code, { name, status }) {
 }
 async function deleteGroup(code) {
   code = normCode(code);
-  if (code === MAIN) throw fail(400, "main", "Основную группу удалить нельзя.");
+  if (BUILTIN.has(code)) throw fail(400, "main", "Основную и общую группу удалить нельзя.");
   if (useMem()) mem.delete(code);
   else {
     const r = await fsFetch(base() + "/" + code, { method: "DELETE" });
@@ -152,4 +156,4 @@ const ownedBy = async uid => (await listGroups(true)).find(g => g.owner === uid)
 const publicGroup = g => ({ code: g.code, name: g.name, status: g.status, email: g.email || "", owner: g.owner || "" });
 const openGroups = async () => (await listGroups()).filter(g => g.status === "ok").map(g => ({ code: g.code, name: g.name }));
 
-module.exports = { MAIN, CODE_RE, normCode, groupOf, listGroups, requestGroup, updateGroup, deleteGroup, ownedBy, publicGroup, openGroups, listMoves, moveUsers, applyMoves, _mem: mem, _moveMem: moveMem };
+module.exports = { MAIN, PUBLIC, CODE_RE, normCode, groupOf, listGroups, requestGroup, updateGroup, deleteGroup, ownedBy, publicGroup, openGroups, listMoves, moveUsers, applyMoves, _mem: mem, _moveMem: moveMem };
