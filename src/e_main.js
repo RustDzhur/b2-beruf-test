@@ -660,6 +660,8 @@ function render() {
   app().replaceChildren(v);
   const top = ["home", "review", "exam", "voice", "learn", "progress", "leaderboard"].includes(sec) ? sec : "home";
   document.querySelectorAll(".nav a").forEach(a => a.classList.toggle("on", a.getAttribute("href") === "#" + (SEC[sec] ? "" : top)));
+  // before sign-in (and while waiting for access) the sections cannot be opened: the header shows only theme and language
+  document.body.classList.toggle("pre", !(cand().done && cloudOn() && cloud.ok));
   refreshAI(); updateNav(); updateWho();
 }
 let lastHash = location.hash;

@@ -78,10 +78,12 @@ function initLang() {
   });
   const top = document.querySelector(".top-in");
   if (top && !top.querySelector(".langsw")) {
-    const sw = h("div", { class: "seg langsw", role: "group", "aria-label": "Language" });
-    const paint = () => sw.querySelectorAll("button").forEach((b) => b.classList.toggle("on", b.dataset.l === curLang()));
-    Object.entries(LANGS).forEach(([k, v]) => sw.append(h("button", { "data-l": k, title: LANG_TITLE[k], onclick: () => { store.set("lang", k); paint(); render(); applyLang(document.body); } }, v)));
-    paint(); top.append(sw);
+    // compact drop-down with all languages, so the header fits one line on any screen
+    const sel = h("select", { class: "langsel", "aria-label": "Language / Sprache / Язык",
+      onchange: (e) => { store.set("lang", e.target.value); render(); applyLang(document.body); } },
+      Object.entries(LANGS).map(([k, v]) => h("option", { value: k, "data-l": k }, LANG_TITLE[k])));
+    sel.value = curLang();
+    top.append(h("label", { class: "langsw", translate: "no" }, h("span", { class: "langsw-ico", "aria-hidden": "true" }, "🌐"), sel));
   }
   applyLang(document.body);
 }

@@ -301,10 +301,13 @@ table.score th { font-size: 12px; color: var(--muted); font-weight: 600; }
 .sheet .eyebrow { color: #333; }
 .sheet .notiz input, .sheet .notiz textarea { border-radius: 0; border: 0; border-bottom: 1px solid #000; background: #fff; }
 
-.langsw { margin-left: 8px; } .langsw button { padding: 4px 9px; font-size: 12.5px; font-family: var(--f-mono); }
+.langsw { margin-left: 8px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 9px; padding: 0 4px 0 9px; background: var(--paper); }
+.langsw-ico { font-size: 14px; line-height: 1; }
+.langsel { border: 0; background: transparent; color: var(--ink); font: 500 13px var(--f-mono); padding: 7px 4px; cursor: pointer; max-width: 150px; }
+.langsel:focus-visible { outline: 2px solid var(--accent, #8b9cff); outline-offset: 2px; border-radius: 6px; }
+.langsel option { color: #111; background: #fff; }
 
 /* Arabic interface: UI mirrors, German exam content stays left-to-right */
-.langsw { flex-wrap: wrap; }
 [dir="rtl"] .langsw { margin-left: 0; margin-right: 8px; }
 [dir="rtl"] textarea, [dir="rtl"] input[type="text"], [dir="rtl"] .letterview, [dir="rtl"] .brand, [dir="rtl"] .sheet .de, [dir="rtl"] .ltr { direction: ltr; text-align: left; }
 [dir="rtl"] .eyebrow, [dir="rtl"] .lead, [dir="rtl"] .note { text-align: right; }
@@ -682,3 +685,10 @@ table.score th { font-size: 12px; color: var(--muted); font-weight: 600; }
 .choice .reg-btn { display: block; text-align: center; text-decoration: none; margin-top: 8px; }
 .choice-pay .reg-btn { margin-top: 0; }
 @media (max-width: 420px) { .choice-pay { grid-template-columns: 1fr; } }
+
+/* before sign-in: brand, theme and language on one line, no section menu */
+body.pre .nav { display: none; }
+body.pre .top-in { flex-wrap: nowrap; }
+body.pre .top-in .theme-toggle { margin-left: auto; }
+body.pre .top-in .who { max-width: 140px; }
+@media (max-width: 400px) { body.pre .brand span { display: none; } .langsel { max-width: 120px; } }
