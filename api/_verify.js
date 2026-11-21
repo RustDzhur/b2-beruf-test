@@ -128,7 +128,16 @@ async function check(authHeader) {
 
 // GET /api/access -> {verified: admitted to the trainer, ai: may use the paid AI, contact}
 // "verified" keeps its old name for the page; it now means admission (see _admit.js), not the AI.
+// PayPal.me link for the payment buttons (PAYPAL_ME, e.g. "YourName"); payments are checked by hand by the administrator
+const payLink = () => {
+  const n = String(process.env.PAYPAL_ME || "RustemDzhuraiev").replace(/^.*paypal\.me\//i, "").replace(/[^A-Za-z0-9_.-]/g, "").slice(0, 60);
+  return n ? "https://paypal.me/" + n : "";
+};
 async function access(authHeader) {
+  const [code, o] = await accessCheck(authHeader);
+  return [code, Object.assign(o, { pay: payLink() })];
+}
+async function accessCheck(authHeader) {
   if (open()) return [200, { verified: true, ai: true, contact: contact() }];
   const m = /^Bearer\s+(\S{20,4096})$/.exec(String(authHeader || ""));
   if (!m) return [200, { verified: false, ai: false, contact: contact() }];

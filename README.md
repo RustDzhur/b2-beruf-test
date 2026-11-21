@@ -182,12 +182,7 @@ git push -u origin main
 
 ## PayPal
 
-Students pay 5 € (trainer) or 10 € (trainer + AI) on the waiting / "subscription ended" screen. The server creates the
-order with the fixed price, captures it and checks status `COMPLETED`, the amount and `EUR` before it admits the
-student and adds one paid month. Every capture is stored once in Firestore `payments/{captureId}`, so repeats never add
-a second month. Routes go through `api/router.js` (`/api/pay/config|create|capture|webhook`), no extra functions.
-
-Vercel settings: `PAYPAL_CLIENT_ID`, `PAYPAL_SECRET` (developer.paypal.com → Apps & Credentials), `PAYPAL_ENV=live`
-for real money (anything else = sandbox), optional `PAYPAL_WEBHOOK_ID` (webhook URL `https://<site>/api/pay/webhook`,
-event "Payment capture completed") as a backup, optional `PAYPAL_ME` (paypal.me name) shown as a plain payment link
-when the API keys are not set; that link does not open access by itself.
+The waiting screen and the "subscription ended" screen show a PayPal.me button under each plan with the amount filled
+in (5 € / 10 €) and a WhatsApp button with a ready message to send the receipt. The administrator checks the payment
+and opens access by hand («Допустить» / «Открыть ИИ» / «+1 месяц»), which starts the month. The site does not check
+payments itself. Optional Vercel setting: `PAYPAL_ME` (paypal.me name; default `RustemDzhuraiev`).

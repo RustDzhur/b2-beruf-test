@@ -545,3 +545,5 @@ x111|Ödeme alındı, erişim açık.
 x112|Ödeme gerçekleşmedi. Tekrar deneyin veya yöneticiye yazın.
 x113|PayPal ile öde
 x114|Bağlantıyla ödedikten sonra yöneticiye WhatsApp'tan yazın: erişim kontrolden sonra açılır.
+x115|PayPal ile ödeyin ve ödemenin ekran görüntüsünü yöneticiye WhatsApp'tan gönderin. Yönetici erişimi açar ve aboneliğiniz o gün başlar.
+x116|Dekontu WhatsApp'tan gönder
