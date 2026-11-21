@@ -547,3 +547,12 @@ x113|Paga con PayPal
 x114|Dopo aver pagato tramite il link, scrivi all'amministratore su WhatsApp: l'accesso si apre dopo la verifica.
 x115|Paga con PayPal e invia uno screenshot del pagamento all'amministratore su WhatsApp. L'amministratore apre l'accesso e il tuo mese inizia da quel giorno.
 x116|Invia la ricevuta su WhatsApp
+x117|Come ottenere l'accesso
+x118|Paga l'abbonamento
+x119|Pagamento con PayPal. L'importo è già inserito.
+x120|Prova gratis per 3 giorni
+x121|Scrivi all'amministratore e attiverà il periodo di prova.
+x122|Richiedi la prova
+x123|Ho già pagato
+x124|Invia uno screenshot del pagamento. L'amministratore lo controlla e apre l'accesso; il tuo mese inizia da quel giorno.
+x125|Attiva il mio accesso

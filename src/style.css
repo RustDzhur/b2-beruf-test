@@ -673,3 +673,12 @@ table.score th { font-size: 12px; color: var(--muted); font-weight: 600; }
 .price-pay .pay-wa { display: block; text-align: center; margin-top: 8px; }
 .reg-note.ok { color: #0f9d58; font-weight: 600; }
 .reg-note.err { color: #d93025; }
+
+.choice { margin: 18px 0; display: grid; gap: 12px; }
+.choice-card { border: 1px solid var(--line, rgba(255,255,255,.12)); border-radius: 14px; padding: 14px; background: rgba(255,255,255,.03); }
+.choice-head { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.choice-num { width: 26px; height: 26px; border-radius: 50%; display: inline-grid; place-items: center; font-weight: 700; font-size: 14px; background: var(--accent, #8b9cff); color: #111; flex: none; }
+.choice-pay { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.choice .reg-btn { display: block; text-align: center; text-decoration: none; margin-top: 8px; }
+.choice-pay .reg-btn { margin-top: 0; }
+@media (max-width: 420px) { .choice-pay { grid-template-columns: 1fr; } }

@@ -547,3 +547,12 @@ x113|Payer avec PayPal
 x114|Après le paiement par le lien, écrivez à l'administrateur sur WhatsApp : l'accès s'ouvre après vérification.
 x115|Payez avec PayPal et envoyez une capture du paiement à l'administrateur sur WhatsApp. L'administrateur ouvre l'accès et votre mois commence ce jour-là.
 x116|Envoyer le justificatif sur WhatsApp
+x117|Comment obtenir l'accès
+x118|Payer l'abonnement
+x119|Paiement via PayPal. Le montant est déjà indiqué.
+x120|Essayer gratuitement 3 jours
+x121|Écrivez à l'administrateur, il activera la période d'essai.
+x122|Demander un essai
+x123|J'ai déjà payé
+x124|Envoyez une capture du paiement. L'administrateur la vérifie et ouvre l'accès ; votre mois commence ce jour-là.
+x125|Activer mon accès

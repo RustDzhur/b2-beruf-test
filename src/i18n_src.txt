@@ -547,3 +547,12 @@ x113|Pay with PayPal|Mit PayPal bezahlen
 x114|After paying via the link, write to the administrator on WhatsApp: access opens once the payment is checked.|Schreiben Sie nach der Zahlung über den Link dem Administrator auf WhatsApp: Der Zugang wird nach der Prüfung freigeschaltet.
 x115|Pay with PayPal and send a screenshot of the payment to the administrator on WhatsApp. The administrator opens access, and your month starts that day.|Bezahlen Sie per PayPal und schicken Sie dem Administrator einen Screenshot der Zahlung auf WhatsApp. Der Administrator schaltet den Zugang frei, und ab diesem Tag läuft Ihr Monat.
 x116|Send the receipt on WhatsApp|Beleg per WhatsApp senden
+x117|How to get access|So erhalten Sie Zugang
+x118|Pay for a subscription|Abo bezahlen
+x119|Payment via PayPal. The amount is already filled in.|Zahlung per PayPal. Der Betrag ist schon eingetragen.
+x120|Try it free for 3 days|3 Tage kostenlos testen
+x121|Write to the administrator and they will switch on the trial.|Schreiben Sie dem Administrator, er schaltet die Testphase frei.
+x122|Ask for a trial|Testphase anfragen
+x123|I have already paid|Ich habe schon bezahlt
+x124|Send a screenshot of the payment. The administrator checks it and opens access; your month starts that day.|Schicken Sie einen Screenshot der Zahlung. Der Administrator prüft ihn und schaltet den Zugang frei, ab diesem Tag läuft Ihr Monat.
+x125|Activate my access|Zugang freischalten
