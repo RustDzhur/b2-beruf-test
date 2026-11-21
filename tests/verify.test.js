@@ -79,3 +79,14 @@ test("uids are validated before they reach Firestore paths", async () => {
   await assert.rejects(() => verify.setVerified("../users/other", true), { code: "bad_uid" });
   await assert.rejects(() => verify.setVerified("", true), { code: "bad_uid" });
 });
+
+test("/api/access: approved -> verified true, not approved -> false with the contact, no token -> false", async () => {
+  stub("student-ok-1", true);
+  let [code, out] = await verify.access(BEARER);
+  assert.equal(code, 200); assert.equal(out.verified, true);
+  stub("student-new-1", false);
+  [code, out] = await verify.access(BEARER);
+  assert.equal(code, 200); assert.equal(out.verified, false); assert.equal(out.contact, "+49 000 0000000");
+  [code, out] = await verify.access(undefined);
+  assert.equal(out.verified, false);
+});

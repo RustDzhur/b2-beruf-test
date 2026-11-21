@@ -199,7 +199,7 @@ async function accessToken() {
   const b64 = o => Buffer.from(typeof o === "string" ? o : JSON.stringify(o)).toString("base64url");
   const unsigned = b64({ alg: "RS256", typ: "JWT" }) + "." + b64({
     iss: sa.client_email,
-    scope: "https://www.googleapis.com/auth/datastore",
+    scope: "https://www.googleapis.com/auth/datastore https://www.googleapis.com/auth/identitytoolkit https://www.googleapis.com/auth/cloud-platform",
     aud: "https://oauth2.googleapis.com/token",
     iat: now,
     exp: now + 3600,
@@ -277,7 +277,7 @@ function fixtureUsers() {
 
 async function loadUsers() {
   const fixtures = fixtureUsers();
-  if (fixtures) return { source: "fixtures", users: fixtures };
+  if (fixtures) return { source: "fixtures", users: fixtures.filter(u => !removedFixtures.has(u.uid)) };
   const sa = serviceAccount();
   if (!sa) throw adminError("no_service_account", 501, "Не настроен ключ Firebase.");
   return { source: "firestore", users: await fetchFirestore(sa.project_id) };
@@ -627,6 +627,54 @@ async function buildDashboard() {
   return out;
 }
 
+/* ------------------------------------------------------------ delete users */
+
+const removedFixtures = new Set(); // local preview only: "deleted" fixture users stay hidden until restart
+
+// Teacher removes strangers: returns a backup of every progress document first, then deletes
+// users/{uid}, verified/{uid} and the Firebase Auth account. Missing pieces are not an error.
+async function deleteUsers(uids) {
+  const UID = /^[A-Za-z0-9_-]{6,128}$/;
+  const list = [...new Set((Array.isArray(uids) ? uids : []).map(String))].filter(u => UID.test(u)).slice(0, 200);
+  if (!list.length) throw adminError("bad_uid", 400, "Не выбран ни один ученик.");
+  const fixtures = fixtureUsers();
+  if (fixtures) {
+    const backup = fixtures.filter(u => list.includes(u.uid));
+    list.forEach(u => removedFixtures.add(u));
+    lbCache = { at: 0 };
+    return { deleted: list, failed: [], backup };
+  }
+  const sa = serviceAccount();
+  if (!sa) throw adminError("no_service_account", 501, "Не настроен ключ Firebase.");
+  const token = await accessToken();
+  const auth = { authorization: "Bearer " + token };
+  const docs = "https://firestore.googleapis.com/v1/projects/" + encodeURIComponent(sa.project_id) + "/databases/(default)/documents/";
+  const backup = [], deleted = [], failed = [];
+  for (const uid of list) {
+    try {
+      const r = await fetch(docs + "users/" + uid, { headers: auth });
+      if (r.ok) backup.push(parseRawDoc(await r.json()));
+      else if (r.status !== 404) throw new Error("Firestore: HTTP " + r.status);
+      for (const col of ["users", "verified"]) {
+        const d = await fetch(docs + col + "/" + uid, { method: "DELETE", headers: auth });
+        if (!d.ok && d.status !== 404) throw new Error("Firestore " + col + ": HTTP " + d.status);
+      }
+      const a = await fetch("https://identitytoolkit.googleapis.com/v1/projects/" + encodeURIComponent(sa.project_id) + "/accounts:delete", {
+        method: "POST", headers: Object.assign({ "content-type": "application/json" }, auth), body: JSON.stringify({ localId: uid }) });
+      if (!a.ok) {
+        const j = await a.json().catch(() => ({}));
+        const m = (j.error && j.error.message) || ("HTTP " + a.status);
+        if (!/USER_NOT_FOUND/.test(m)) throw new Error("Auth: " + m);
+      }
+      deleted.push(uid);
+    } catch (e) {
+      failed.push({ uid, message: String(e.message || e) });
+    }
+  }
+  lbCache = { at: 0 };
+  return { deleted, failed, backup };
+}
+
 /* ------------------------------------------------------------- leaderboard */
 
 function leaderboardStats(raw, period, now) {
@@ -705,7 +753,10 @@ let lbCache = { at: 0, week: null, all: null };
 async function buildLeaderboard(period = "week", uid = "", now = Date.now()) {
   period = period === "all" ? "all" : "week";
   if (!lbCache.week || now - lbCache.at > 60000) {
-    const { users } = await loadUsers();
+    const { users: everyone } = await loadUsers();
+    // only students the teacher has approved appear in the public leaderboard
+    const ok = await require("./_verify.js").listVerified();
+    const users = everyone.filter(u => ok.has(u.uid));
     lbCache = {
       at: now,
       week: leaderboardRows(users, "week", now),
@@ -800,6 +851,7 @@ module.exports = {
   dashboard,
   buildDashboard,
   buildLeaderboard,
+  deleteUsers,
   leaderboardStats,
   leaderboardRows,
   partOf,

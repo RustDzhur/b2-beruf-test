@@ -1282,7 +1282,7 @@ function initLang() {
 /* ---------- optional cloud sync of progress (Firebase Auth + Firestore over REST, no SDK, no own server) ----------
    Called from: e_main.js (viewProfile submit -> cloudConnect, boot -> cloudBoot, updateWho -> cloudOn) and build_web.py (concat before e_main.js).
    Reads/writes: localStorage keys dtb.{res,wrong,nstat,days,drafts,feedback,cand,log} + dtb.cloud (session), dtb.syncts; Firestore doc users/{uid} = {data: JSON string, updated: ms}.
-   The web apiKey is public by design; access is protected by Firestore rules (uid == doc id). Without a password everything stays local. */
+   The web apiKey is public by design; access is protected by Firestore rules (uid == doc id). Sign-up is by e-mail + password; the trainer opens after the teacher approves the account (cloudAccess). */
 const FB = { key: "AIzaSyA5_PmCPlHg-9P1OD9LQFHXXF4Svj6Vajo", project: "prufung-6e9b1" };
 const SYNC_KEYS = ["res", "wrong", "nstat", "days", "drafts", "feedback", "cand", "log"];
 const cloud = { s: store.get("cloud", null), timer: null, state: "" };
@@ -1363,36 +1363,72 @@ function cloudSoon() {
 }
 store.onSet = (k) => { if (cloud.s && SYNC_KEYS.includes(k)) { store.set("syncts", Date.now() - 1); cloudSoon(); } };
 
-// sign in (or create the account on first use), then merge cloud progress with this device and upload the result
+const fbReq = (op, body) => fbApi(`https://identitytoolkit.googleapis.com/v1/accounts:${op}?key=${FB.key}`,
+  { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+const NOT_FOUND = /EMAIL_NOT_FOUND|INVALID_LOGIN_CREDENTIALS|INVALID_PASSWORD|USER_NOT_FOUND/;
+
+// sign in with the student's own e-mail (or create the account on first use and send the confirmation letter),
+// then merge cloud progress with this device and upload the result.
+// Accounts made before the e-mail sign-up used a synthetic address from name + birth date: they still open,
+// and get the real e-mail attached so the next sign-in works by e-mail.
 async function cloudConnect(c, password) {
-  const email = await fbMail(c);
-  let a;
+  const email = String(c.email || "").trim().toLowerCase();
+  let a, created = false;
   try { a = await fbAuth("signInWithPassword", email, password); }
   catch (e) {
-    if (!/EMAIL_NOT_FOUND|INVALID_LOGIN_CREDENTIALS|USER_NOT_FOUND/.test(e.msg)) throw e;
-    try { a = await fbAuth("signUp", email, password); }
-    catch (e2) { if (/EMAIL_EXISTS/.test(e2.msg)) throw Object.assign(new Error("PW"), { msg: "PW" }); throw e2; }
+    if (!NOT_FOUND.test(e.msg)) throw e;
+    if (c.fam && c.vor) {
+      try {
+        a = await fbAuth("signInWithPassword", await fbMail(c), password);
+        try { const u = await fbReq("update", { idToken: a.idToken, email, returnSecureToken: true }); if (u.idToken) a = { ...a, ...u }; } catch {}
+      } catch (e1) { if (!NOT_FOUND.test(e1.msg)) throw e1; a = null; }
+    }
+    if (!a) {
+      try { a = await fbAuth("signUp", email, password); created = true; }
+      catch (e2) { if (/EMAIL_EXISTS/.test(e2.msg)) throw Object.assign(new Error("PW"), { msg: "PW" }); throw e2; }
+    }
   }
   cloud.s = { uid: a.localId, refresh: a.refreshToken, email };
   cloud.id = a.idToken; cloud.exp = Date.now() + (+a.expiresIn || 3600) * 1000;
   store.set("cloud", cloud.s);
+  if (created) { try { await fbReq("sendOobCode", { requestType: "VERIFY_EMAIL", idToken: a.idToken }); store.set("mailsent", email); } catch {} }
   await cloudPull();
   await cloudPush();
   cloud.state = "ok";
+  await cloudAccess();
+}
+async function cloudResetPw(email) { await fbReq("sendOobCode", { requestType: "PASSWORD_RESET", email }); }
+
+// access to the trainer: only after the teacher approved the account in /admin (server checks Firestore `verified`)
+cloud.ok = store.get("approved", false) === true; cloud.contact = store.get("contact", "");
+async function cloudAccess() {
+  if (!cloud.s) { cloud.ok = false; return false; }
+  try {
+    const r = await fetch("/api/access", { headers: { Authorization: "Bearer " + await fbToken() } });
+    const j = await r.json().catch(() => ({}));
+    if (j.contact) { cloud.contact = j.contact; store.set("contact", j.contact); }
+    if (j.verified === true || j.verified === false) { cloud.ok = j.verified; store.set("approved", j.verified); }
+  } catch {} // offline: keep the last known answer
+  cloud.checked = true;
+  return cloud.ok;
 }
 function cloudOff(wipe) {
   clearTimeout(cloud.timer);
   if (wipe) SYNC_KEYS.forEach(k => { try { localStorage.removeItem("dtb." + k); } catch {} });
   try { localStorage.removeItem("dtb.cloud"); localStorage.removeItem("dtb.syncts"); } catch {}
-  cloud.s = null; cloud.id = null;
+  try { localStorage.removeItem("dtb.approved"); } catch {}
+  cloud.s = null; cloud.id = null; cloud.ok = false;
 }
 function cloudBoot(then) {
   if (!cloud.s) return;
+  cloudAccess().then(() => then && then());
   cloudPull().then(() => { cloud.state = "ok"; then && then(); return cloudPush(); }).catch(() => { cloud.state = "err"; });
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden" && cloud.s) cloudPush().catch(() => {}); });
 }
 function cloudErrText(e) {
-  if (e.msg === "PW") return "Falsches Kennwort für dieses Konto.";
+  if (e.msg === "PW") return "Falsches Kennwort für dieses Konto. Passwort vergessen? Klicken Sie unten auf „Kennwort zurücksetzen“.";
+  if (/INVALID_EMAIL/.test(e.msg || "")) return "Diese E-Mail-Adresse ist ungültig.";
+  if (/TOO_MANY_ATTEMPTS/.test(e.msg || "")) return "Zu viele Versuche. Bitte später noch einmal.";
   if (/WEAK_PASSWORD/.test(e.msg || "")) return "Das Kennwort ist zu kurz (mindestens 6 Zeichen).";
   if (/OPERATION_NOT_ALLOWED|CONFIGURATION_NOT_FOUND/.test(e.msg || "")) return "Anmeldung per E-Mail/Kennwort ist in Firebase noch nicht aktiviert. Die Daten bleiben vorerst nur auf diesem Gerät.";
   if (/PERMISSION_DENIED|Missing or insufficient/.test(e.msg || "")) return "Firestore-Regeln fehlen. Die Daten bleiben vorerst nur auf diesem Gerät.";
@@ -2343,8 +2379,8 @@ function viewProfile(first) {
     h("div", { class: "s30-title" }, "Deutsch-Test für den Beruf"),
     h("div", { class: "s30-ver" }, h("span", { class: "boxes4" }), h("b", null, "-S10-"), h("span", { class: "boxes6" }), h("small", null, L7("Testversion", "Test Version", "Version d'examen", "Versione d'esame", "Sınav sürümü", "Тестовая версия"))),
     h("div", { class: "s30-data" },
-      boxIn("fam", L7("Familienname", "Surname", "Nom", "Cognome", "Soyadı", "Фамилия"), 30, { required: true }),
-      boxIn("vor", L7("Vorname", "First Name", "Prénom", "Nome", "Adı", "Имя"), 30, { required: true }),
+      boxIn("fam", L7("Familienname", "Surname", "Nom", "Cognome", "Soyadı", "Фамилия"), 30),
+      boxIn("vor", L7("Vorname", "First Name", "Prénom", "Nome", "Adı", "Имя"), 30),
       dateIn("geb", L7("Geburtsdatum", "Date of Birth", "Date de naissance", "Data di nascita", "Doğum tarihi", "Дата рождения")),
       boxIn("gort", L7("Geburtsort", "Place of Birth", "Lieu de naissance", "Luogo di nascita", "Doğum yeri", "Место рождения"), 30),
       h("label", { class: "cv-row" }, lang, h("small", null, L7("Erstsprache", "First Language", "Langue maternelle", "Madrelingua", "Anadili", "Родной язык"))),
@@ -2353,36 +2389,65 @@ function viewProfile(first) {
       boxIn("ort", L7("Postleitzahl und Ort", "Postcode and town", "Code postal et ville", "CAP e città", "Posta kodu ve şehir", "Индекс и город"), 30),
       boxIn("zentrum", L7("Prüfungszentrum", "Examination Centre", "Centre d'examen", "Centro d'esame", "Sınav merkezi", "Экзаменационное учреждение"), 30),
       dateIn("datum", L7("Prüfungsdatum", "Date of Examination", "Date d'examen", "Data dell'esame", "Sınav tarihi", "Дата экзамена"))),
-    h("label", { class: "cv-row" }, h("input", { class: "datein", type: "email", name: "email", value: c.email || "", autocomplete: "email", placeholder: "name@example.com", maxlength: 120 }), h("small", null, "E-mail")),
-    h("p", { class: "small muted", style: "margin:2px 0 8px" }, "E-mail нужен для верификации: тот же адрес отправьте преподавателю в WhatsApp. ИИ доступен после верификации и символического взноса на оплату API."),
-    h("label", { class: "cv-row" }, h("input", { class: "datein", type: "password", name: "pw", autocomplete: "new-password", placeholder: "••••••", minlength: 6 }), h("small", null, "Kennwort zum Speichern in der Cloud (optional, mindestens 6 Zeichen)")),
+    h("label", { class: "cv-row" }, h("input", { class: "datein", type: "email", name: "email", value: c.email || (cloud.s && cloud.s.email && !/@dtb-trainer\.app$/.test(cloud.s.email) ? cloud.s.email : ""), autocomplete: "email", placeholder: "name@example.com", maxlength: 120, required: true }), h("small", null, "E-mail *")),
+    h("label", { class: "cv-row" }, h("input", { class: "datein", type: "password", name: "pw", autocomplete: "current-password", placeholder: "••••••", minlength: 6, required: !cloudOn() }), h("small", null, cloudOn() ? "Kennwort (nur zum Wechseln des Kontos)" : "Kennwort * (mindestens 6 Zeichen)")),
+    h("p", { class: "small muted", style: "margin:2px 0 8px" }, "Регистрация и вход по e-mail и паролю. После регистрации на e-mail придёт письмо с подтверждением. Доступ к тренажёру открывается после разрешения преподавателя: свяжитесь с ним по WhatsApp или по телефону. Имя и фамилия нужны для рейтинга, их можно не указывать."),
     err,
     h("div", { class: "s30-foot" }, h("b", null, "Antwortbogen S30"), h("span", null, "www.telc.net")));
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
   form.onsubmit = async (e) => {
     e.preventDefault();
     const fd = new FormData(form), x = {};
     for (const [k, v] of fd.entries()) x[k] = String(v).trim();
     const pw = x.pw || ""; delete x.pw;
-    if (!x.fam || !x.vor) { err.textContent = "Укажите фамилию и имя."; err.hidden = false; return; }
-    if (pw && pw.length < 6) { err.textContent = "Das Kennwort ist zu kurz (mindestens 6 Zeichen)."; err.hidden = false; return; }
     x.email = (x.email || "").toLowerCase();
-    // cloud accounts must carry a real e-mail: it is how the teacher recognises the student when verifying
-    if ((pw || cloudOn() || x.email) && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(x.email)) { err.textContent = "Укажите e-mail: он нужен для сохранения прогресса в облаке и для верификации."; err.hidden = false; return; }
-    store.set("cand", { ...x, done: true });
-    if (pw) {
+    if (!EMAIL_RE.test(x.email)) { err.textContent = "Укажите правильный e-mail: по нему проходят регистрация и вход."; err.hidden = false; return; }
+    const sameAccount = cloudOn() && cloud.s.email === x.email;
+    if (!sameAccount && pw.length < 6) { err.textContent = pw ? "Das Kennwort ist zu kurz (mindestens 6 Zeichen)." : "Введите пароль (минимум 6 символов)."; err.hidden = false; return; }
+    const filled = {}; Object.entries(x).forEach(([k, v]) => { if (v) filled[k] = v; });
+    if (!sameAccount) {
       err.hidden = true; const btn = document.querySelector(".btn.primary"); if (btn) btn.disabled = true;
+      if (cloudOn()) cloudOff(true);
+      try { localStorage.removeItem("dtb.cand"); } catch {} // take the name saved in the cloud, if there is one
       try { await cloudConnect({ ...x }, pw); }
-      catch (ex) { if (btn) btn.disabled = false; err.textContent = cloudErrText(ex); err.hidden = false; if (ex.msg === "PW") { store.set("cand", { ...cand(), done: false }); return; } await new Promise(r => setTimeout(r, 2500)); }
+      catch (ex) { if (btn) btn.disabled = false; store.set("cand", { ...x, done: false }); err.textContent = cloudErrText(ex); err.hidden = false; return; }
     }
+    store.set("cand", { ...cand(), ...filled, done: true });
     location.hash = first ? (location.hash && location.hash !== "#profile" ? location.hash : "#home") : "#home";
     render();
   };
-  const del = first ? null : h("button", { type: "button", class: "btn ghost", onclick: () => { cloudOff(cloudOn()); store.set("cand", { fam: "", vor: "" }); render(); } }, "Сменить участника");
+  const reset = h("button", { type: "button", class: "btn ghost", onclick: async () => {
+    const m = String(form.elements.email.value || "").trim().toLowerCase();
+    if (!EMAIL_RE.test(m)) { err.textContent = "Сначала укажите e-mail."; err.hidden = false; return; }
+    try { await cloudResetPw(m); err.textContent = "Письмо для сброса пароля отправлено на " + m + "."; }
+    catch { err.textContent = "Не удалось отправить письмо. Проверьте e-mail."; }
+    err.hidden = false;
+  } }, "Kennwort zurücksetzen");
+  const del = !cloudOn() ? null : h("button", { type: "button", class: "btn ghost", onclick: () => { cloudOff(true); store.set("cand", { fam: "", vor: "" }); render(); } }, "Выйти / сменить аккаунт");
   return h("div", { class: "wrap narrow" },
     first ? null : crumbs(h("a", { href: "#home" }, "Главная"), "Данные участника"),
-    h("p", { class: "lead", style: "margin:0" }, "Как на экзамене: заполните данные участника. Без пароля они и ваш прогресс хранятся только в этом браузере. С паролем прогресс сохраняется в облаке, и на другом устройстве достаточно ввести те же фамилию, имя, дату рождения и пароль."),
+    h("p", { class: "lead", style: "margin:0" }, "Регистрация по e-mail: укажите e-mail и пароль. Прогресс сохраняется в облаке, и на другом устройстве достаточно ввести тот же e-mail и пароль."),
     form,
-    h("div", { class: "row" }, h("button", { class: "btn primary", onclick: () => form.requestSubmit() }, first ? "Начать тренировку" : "Сохранить"), del));
+    h("div", { class: "row" }, h("button", { class: "btn primary", onclick: () => form.requestSubmit() }, first ? "Зарегистрироваться / войти" : "Сохранить"), reset, del));
+}
+// waiting room: the account exists, but the teacher has not approved it yet
+function viewPending() {
+  const c = cand(), mail = (cloud.s && cloud.s.email) || c.email || "";
+  const sent = store.get("mailsent", "") === mail;
+  const contact = cloud.contact;
+  const msg = h("p", { class: "small muted", hidden: true });
+  if (!cloud.checked) { cloudAccess().then(() => { cloud.checked = true; render(); }); return h("div", { class: "wrap narrow" }, h("p", { class: "lead" }, "Проверяем доступ…")); }
+  return h("div", { class: "wrap narrow" },
+    h("h1", null, "Ожидает разрешения"),
+    h("p", { class: "lead" }, sent ? `Регистрация прошла. Мы отправили письмо с подтверждением на ${mail}.` : `Вы вошли как ${mail}.`),
+    h("div", { class: "card" },
+      h("p", null, "Тренажёр открыт только для участников группы. Чтобы получить доступ, свяжитесь с преподавателем по WhatsApp или по телефону и попросите разрешение на подключение. Назовите e-mail, с которым вы зарегистрировались."),
+      contact ? h("p", null, h("b", null, "WhatsApp / телефон: "), contact) : null,
+      h("p", { class: "small muted" }, "Sie haben sich registriert. Für den Zugang kontaktieren Sie bitte Ihre Lehrkraft per WhatsApp oder Telefon und bitten Sie um Freischaltung.")),
+    msg,
+    h("div", { class: "row" },
+      h("button", { class: "btn primary", onclick: async () => { msg.hidden = false; msg.textContent = "Проверяем…"; if (await cloudAccess()) render(); else msg.textContent = "Доступ ещё не подтверждён."; } }, "Проверить снова"),
+      h("a", { class: "btn ghost", href: "#profile" }, "Сменить аккаунт")));
 }
 // header badge: who is signed in on this device
 function updateWho() {
@@ -2391,7 +2456,7 @@ function updateWho() {
   const c = cand();
   if (!c.done) { if (a) a.remove(); return; }
   if (!a) { a = h("a", { class: "who", href: "#profile", title: "Данные участника" }); top.insertBefore(a, top.querySelector(".langsw")); }
-  const kids = [h("span", { class: "who-ico", "aria-hidden": "true" }, "👤"), h("span", null, `${c.vor} ${c.fam}`)];
+  const kids = [h("span", { class: "who-ico", "aria-hidden": "true" }, "👤"), h("span", null, (c.vor || c.fam) ? `${c.vor || ""} ${c.fam || ""}`.trim() : (c.email || ""))];
   if (cloudOn()) kids.push(h("span", { class: "who-ico", title: "Cloud", "aria-hidden": "true" }, "☁"));
   a.replaceChildren(...kids);
 }
@@ -2400,8 +2465,9 @@ function render() {
   const r = (location.hash || "#home").slice(1);
   const [sec, idx] = r.split(".");
   let v;
-  if (!cand().done && sec !== "profile") v = viewProfile(true);
-  else if (sec === "profile") v = viewProfile(false);
+  if ((!cand().done || !cloudOn()) && sec !== "profile") v = viewProfile(true);
+  else if (sec === "profile") v = viewProfile(!cloudOn());
+  else if (!cloud.ok) v = viewPending();
   else if (sec === "review") v = viewReview();
   else if (sec === "exam") v = viewExam();
   else if (sec === "voice") v = viewVoice();
