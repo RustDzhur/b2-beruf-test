@@ -486,3 +486,18 @@ x52|The teacher's number has not been set yet.|Die Nummer der Lehrkraft ist noch
 x53|Message on WhatsApp|Per WhatsApp schreiben
 x54|Call|Anrufen
 x55|Reset password|Kennwort zurücksetzen
+x56|I am a student|Ich bin Lernende/r
+x57|I organize a group|Ich leite eine Gruppe
+x58|— choose your group —|— Gruppe wählen —
+x59|Your group *|Ihre Gruppe *
+x60|Name of your group *|Name Ihrer Gruppe *
+x61|Who are you? *|Wer sind Sie? *
+x62|Enter the name of the group.|Geben Sie den Namen der Gruppe ein.
+x63|Choose your group.|Wählen Sie Ihre Gruppe.
+x64|Could not create the group.|Die Gruppe konnte nicht angelegt werden.
+x65|A group with this name already exists.|Eine Gruppe mit diesem Namen gibt es bereits.
+x66|Your group is waiting for the main administrator's approval:|Ihre Gruppe wartet auf die Freigabe durch den Hauptadministrator:
+x67|After approval the trainer opens, and your group cabinet is at /admin (sign in as “Group organizer” with your e-mail and password).|Nach der Freigabe öffnet sich der Trainer, und das Gruppenkabinett finden Sie unter /admin (Anmeldung „Gruppenleitung“ mit Ihrer E-Mail und Ihrem Kennwort).
+x68|Your group:|Ihre Gruppe:
+x69|Group cabinet|Gruppenkabinett
+x70|Main group|Hauptgruppe

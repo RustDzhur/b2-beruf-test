@@ -637,7 +637,7 @@ function groupsCard() {
   const pending = list.filter(g => g.status !== "ok").length;
   return el("section", { class: "adm-card", style: "margin-bottom:14px" },
     el("div", { class: "adm-card-head" }, el("div", null, el("h2", null, "Группы"),
-      el("p", null, pending ? "Заявки организаторов ждут одобрения: " + pending : "Организатор регистрируется в тренажёре и указывает название группы. Здесь вы одобряете группу, после этого у организатора открывается свой кабинет."))),
+      el("p", null, pending ? "Заявки организаторов ждут одобрения · " + pending : "Организатор регистрируется в тренажёре и указывает название группы. Здесь вы одобряете группу, после этого у организатора открывается свой кабинет."))),
     el("div", { class: "adm-table-wrap" }, el("table", { class: "adm-table" },
       el("thead", null, el("tr", null, ["Группа", "Организатор", "Учеников", "Статус", ""].map(h => el("th", null, h)))),
       el("tbody", null, list.map(g => el("tr", null,
@@ -648,7 +648,7 @@ function groupsCard() {
         el("td", null, el("span", { style: "display:inline-flex;gap:6px;flex-wrap:wrap" },
           g.status !== "ok" ? el("button", { class: "adm-btn primary", onclick: () => groupAction({ code: g.code, status: "ok" }) }, "Одобрить") : null,
           el("button", { class: "adm-btn", onclick: () => { const n = prompt("Новое название группы", g.name); if (n && n.trim()) groupAction({ code: g.code, name: n.trim() }); } }, "Переименовать"),
-          g.code === "MAIN" ? null : el("button", { class: "adm-btn danger", onclick: () => groupAction({ code: g.code, remove: true }, "Удалить группу «" + g.name + "»? Ученики группы останутся в базе и будут видны только вам (в «Все группы»).") }, g.status === "ok" ? "Удалить" : "Отклонить"))))))))));
+          g.code === "MAIN" ? null : el("button", { class: "adm-btn danger", onclick: () => groupAction({ code: g.code, remove: true }, "Удалить группу «" + g.name + "»? Ученики группы останутся в базе и будут видны только вам (в «Все группы»).") }, g.status === "ok" ? "Удалить" : "Отклонить")))))))));
 }
 
 function renderDashboard() {

@@ -486,3 +486,18 @@ x52|Öğretmenin numarası henüz girilmedi.
 x53|WhatsApp'tan yaz
 x54|Ara
 x55|Şifreyi sıfırla
+x56|Öğrenciyim
+x57|Grup organizatörüyüm
+x58|— grubunuzu seçin —
+x59|Grubunuz *
+x60|Grubunuzun adı *
+x61|Siz kimsiniz? *
+x62|Grubun adını girin.
+x63|Grubunuzu seçin.
+x64|Grup oluşturulamadı.
+x65|Bu adla bir grup zaten var.
+x66|Grubunuz ana yöneticinin onayını bekliyor:
+x67|Onaydan sonra eğitmen açılır; grup paneli /admin adresindedir (e-posta ve şifrenizle “Grup organizatörü” olarak giriş yapın).
+x68|Grubunuz:
+x69|Grup paneli
+x70|Ana grup

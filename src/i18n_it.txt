@@ -486,3 +486,18 @@ x52|Il numero dell'insegnante non è ancora indicato.
 x53|Scrivi su WhatsApp
 x54|Chiama
 x55|Reimposta password
+x56|Sono uno studente
+x57|Organizzo un gruppo
+x58|— scegli il tuo gruppo —
+x59|Il tuo gruppo *
+x60|Nome del tuo gruppo *
+x61|Chi sei? *
+x62|Indica il nome del gruppo.
+x63|Scegli il tuo gruppo.
+x64|Impossibile creare il gruppo.
+x65|Esiste già un gruppo con questo nome.
+x66|Il tuo gruppo attende l'approvazione dell'amministratore principale:
+x67|Dopo l'approvazione si apre il trainer e lo spazio del gruppo è su /admin (accesso «Organizzatore del gruppo» con la tua e-mail e password).
+x68|Il tuo gruppo:
+x69|Spazio del gruppo
+x70|Gruppo principale
