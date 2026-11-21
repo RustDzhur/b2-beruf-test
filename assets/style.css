@@ -667,3 +667,8 @@ table.score th { font-size: 12px; color: var(--muted); font-weight: 600; }
   .reg-grid, .price-grid { grid-template-columns: 1fr; }
   .price-card.best { margin-top: 6px; }
 }
+
+.price-pay { margin-top: 10px; min-height: 0; }
+.price-pay .pay-link { display: block; text-align: center; text-decoration: none; }
+.reg-note.ok { color: #0f9d58; font-weight: 600; }
+.reg-note.err { color: #d93025; }

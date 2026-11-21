@@ -540,3 +540,8 @@ x106|L'abbonamento è scaduto
 x107|L'accesso è chiuso, i tuoi progressi sono salvati.
 x108|Per continuare paga 5 € al mese (senza IA) o 10 € al mese (con IA) e scrivi all'amministratore su WhatsApp.
 x109|Per favore non chiamare, solo un messaggio.
+x110|Paga online: l'accesso si apre subito dopo il pagamento.
+x111|Pagamento ricevuto, l'accesso è aperto.
+x112|Il pagamento non è andato a buon fine. Riprova o scrivi all'amministratore.
+x113|Paga con PayPal
+x114|Dopo aver pagato tramite il link, scrivi all'amministratore su WhatsApp: l'accesso si apre dopo la verifica.
