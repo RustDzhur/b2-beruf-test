@@ -138,3 +138,32 @@ test("an old account signed in by name gets its real e-mail attached (and never 
   assert.equal(r.status, 401);
   admin.authAdmin.update = null;
 });
+
+test("main administrator attaches an e-mail; ADMIN_EMAILS owner gets the admin cabinet, admission and AI", async () => {
+  const calls = [];
+  admin.authAdmin.update = async (uid, email) => { calls.push([uid, email]); };
+  let r = await call("POST", "/api/admin/login", { password: "main-teacher-pw" });
+  const superCookie = cookieOf(r);
+  r = await call("POST", "/api/admin/link-email", { uid: "olduid123", email: "Boss@Example.com" }, superCookie);
+  assert.equal(r.status, 200); assert.deepEqual(calls.pop(), ["olduid123", "boss@example.com"]);
+  admin.authAdmin.update = null;
+
+  process.env.ADMIN_EMAILS = "boss@example.com, other@example.com";
+  admin.orgAuth.account = async () => ({ uid: "bossuid1", verified: false });
+  r = await call("POST", "/api/admin/login", { email: "boss@example.com", password: "x" });
+  assert.equal(r.status, 403);
+  admin.orgAuth.account = async () => ({ uid: "bossuid1", verified: true });
+  r = await call("POST", "/api/admin/login", { email: "boss@example.com", password: "x" });
+  assert.equal(r.json.role, "super");
+  admin.orgAuth.account = async () => null;
+  r = await call("POST", "/api/admin/login", { email: "boss@example.com", password: "bad" });
+  assert.equal(r.status, 401);
+
+  verify._hooks.lookupUid = async () => "bossuid1";
+  verify.emails.set("bossuid1", "boss@example.com"); verify.mailOk.set("bossuid1", true);
+  const [code, a] = await verify.access("Bearer " + "t".repeat(40));
+  assert.equal(code, 200); assert.equal(a.verified, true); assert.equal(a.ai, true);
+  verify.mailOk.set("bossuid1", false); // unconfirmed address: no owner rights
+  assert.equal(verify.isOwner("bossuid1"), false);
+  delete process.env.ADMIN_EMAILS;
+});

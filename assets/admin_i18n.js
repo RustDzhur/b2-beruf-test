@@ -6,6 +6,8 @@ let ADM_LANG = (() => { try { return localStorage.getItem("dtb.adminLang") || "d
 if (!ADM_LANGS[ADM_LANG]) ADM_LANG = "de";
 
 const ADM_I18N = {
+  "Привязать e-mail для входа": ["Attach sign-in e-mail", "Anmelde-E-Mail verknüpfen", "Associer l'e-mail de connexion", "Giriş e-postası bağla", "ربط بريد الدخول", "Collega e-mail di accesso"],
+  "Если ученик (или вы сами) не может войти по e-mail: привяжите адрес, потом на сайте «Забыли пароль?».": ["If a student (or you) cannot sign in by e-mail: attach the address, then use “Forgot password?” on the site.", "Wenn sich jemand (auch Sie selbst) nicht per E-Mail anmelden kann: Adresse verknüpfen, dann auf der Seite „Kennwort vergessen?“.", "Si un élève (ou vous) ne peut pas se connecter par e-mail : associez l'adresse, puis « Mot de passe oublié ? » sur le site.", "Bir öğrenci (veya siz) e-postayla giremiyorsa: adresi bağlayın, sonra sitede “Şifreyi mi unuttunuz?”.", "إذا لم يستطع طالب (أو أنت) الدخول بالبريد: اربط العنوان ثم استخدم «نسيت كلمة المرور؟» في الموقع.", "Se uno studente (o tu) non riesce ad accedere via e-mail: collega l'indirizzo, poi «Password dimenticata?» sul sito."],
   "Общая группа": ["Open group", "Offene Gruppe", "Groupe ouvert", "Açık grup", "المجموعة العامة", "Gruppo aperto"],
   "без учителя": ["no teacher", "ohne Lehrkraft", "sans enseignant", "öğretmensiz", "بدون معلم", "senza insegnante"],
   "Кабинет администратора": ["Administrator's office", "Administratorbereich", "Espace administrateur", "Yönetici paneli", "مكتب المسؤول", "Area amministratore"],

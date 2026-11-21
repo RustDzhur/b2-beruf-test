@@ -665,12 +665,12 @@ async function assertRole(uids, role) {
 // protection is on.) Only a synthetic address is ever replaced.
 const SYNTH_RE = /@dtb-trainer\.app$/;
 const authAdmin = { update: null }; // tests: replace with a fake
-async function linkEmail(uid, current, email) {
+async function linkEmail(uid, current, email, force) {
   email = cleanEmail(email);
   if (!email) throw adminError("bad_email", 400, "Некорректный e-mail.");
   current = String(current || "").toLowerCase();
   if (current === email) return { ok: true, linked: false };
-  if (current && !SYNTH_RE.test(current)) throw adminError("has_email", 409, "У аккаунта уже есть e-mail.");
+  if (!force && current && !SYNTH_RE.test(current)) throw adminError("has_email", 409, "У аккаунта уже есть e-mail.");
   if (authAdmin.update) { await authAdmin.update(uid, email); return { ok: true, linked: true }; }
   const sa = serviceAccount();
   if (!sa) throw adminError("no_service_account", 501, "Не настроен ключ Firebase.");
@@ -893,6 +893,20 @@ const orgAuth = {
     } catch { throw adminError("google_unreachable", 502, "Нет связи с Google."); }
     return r.ok && j.localId ? j.localId : null;
   },
+  // e-mail + password -> {uid, verified} (verified = the e-mail was confirmed through Firebase's letter)
+  async account(email, password) {
+    const key = process.env.FIREBASE_WEB_API_KEY || "AIzaSyA5_PmCPlHg-9P1OD9LQFHXXF4Svj6Vajo";
+    try {
+      const r = await fetch("https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" + encodeURIComponent(key), {
+        method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email, password, returnSecureToken: true }) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok || !j.idToken) return null;
+      const l = await fetch("https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=" + encodeURIComponent(key), {
+        method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ idToken: j.idToken }) });
+      const u = ((await l.json().catch(() => ({}))).users || [])[0] || {};
+      return { uid: j.localId, verified: u.emailVerified === true };
+    } catch { throw adminError("google_unreachable", 502, "Нет связи с Google."); }
+  },
 };
 async function login(body) {
   body = body && typeof body === "object" ? body : { password: body };
@@ -901,6 +915,13 @@ async function login(body) {
   if (!email) {
     if (!adminPassword()) throw adminError("no_password", 503, "ADMIN_PASSWORD не задан на сервере.");
     if (!passwordMatches(password)) throw adminError("bad_password", 401, "Неверный пароль.");
+    return "super";
+  }
+  // the site owner (ADMIN_EMAILS) may sign in as the main administrator with the trainer account
+  if (require("./_verify.js").adminEmails().includes(email)) {
+    const acc = await orgAuth.account(email, password);
+    if (!acc) throw adminError("bad_password", 401, "Неверный e-mail или пароль.");
+    if (!acc.verified) throw adminError("email_unverified", 403, "Сначала подтвердите e-mail по ссылке из письма Firebase.");
     return "super";
   }
   const uid = await orgAuth.uid(email, password);

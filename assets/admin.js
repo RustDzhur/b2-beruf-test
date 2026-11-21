@@ -465,6 +465,15 @@ function moveSelect() {
   return el("select", { class: "adm-select", id: "adm-move", "aria-label": "Перенести в группу", disabled: !S.picked.size, onchange: e => movePicked(e.target) },
     el("option", { value: "" }, "Перенести в группу…"), open.map(g => el("option", { value: g.code }, g.name)));
 }
+// old accounts were made by name + birth date without a real e-mail; the main administrator attaches one,
+// then the student uses "Забыли пароль?" on the site and gets the letter from Firebase
+async function linkEmailFor(s) {
+  const email = prompt("E-mail для входа: " + s.name, s.email || "");
+  if (!email) return;
+  try { await api("/api/admin/link-email", { method: "POST", body: JSON.stringify({ uid: s.uid, email: email.trim() }) }); }
+  catch (e) { alert(e.message || "Не удалось привязать e-mail."); return; }
+  alert("Готово. Теперь на сайте откройте «Вход», нажмите «Забыли пароль?» и укажите " + email.trim() + ". Придёт письмо для нового пароля.");
+}
 function saveJson(obj, name) {
   const blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
   const a = el("a", { href: URL.createObjectURL(blob), download: name });
@@ -975,6 +984,8 @@ function renderDrawerFor(uid) {
       stat(fmt(s.failures), "ошибок"),
       stat(fmt(s.streak.longest), "лучшая серия")),
     el("p", { class: "adm-drawer-note" }, "Сейчас (с учётом пересдач): " + pctText(s.currentPct) + " · лучший: " + pctText(s.bestPct) + " · успешных заданий: " + fmt(s.successTasks) + " из " + fmt(s.tasks) + " · ошибок к повтору: " + fmt(s.failures)),
+    isSuper() ? el("div", { class: "adm-drawer-note" }, el("button", { class: "adm-btn", onclick: () => linkEmailFor(s) }, "Привязать e-mail для входа"),
+      el("div", { class: "adm-email" }, "Если ученик (или вы сами) не может войти по e-mail: привяжите адрес, потом на сайте «Забыли пароль?».")) : null,
     el("div", { class: "adm-drawer-note" }, el("span", null, "Доступ"), ": ", verifyControl(s, true), s.email ? el("div", { class: "adm-email" }, s.email) : null, s.phone ? el("div", { class: "adm-email", dir: "ltr" }, el("a", { href: "https://wa.me/" + s.phone.replace(/\D/g, ""), target: "_blank", rel: "noopener" }, "WhatsApp " + s.phone)) : null),
     el("p", { class: "adm-drawer-note" }, s.allRank ? "Общий рейтинг: #" + s.allRank + " · " + fmt(s.allPoints) + " очков" : "Общий рейтинг: —"),
     s.answers && s.answers.total ? el("p", { class: "adm-drawer-note" }, el("span", null, "Верных ответов"), ": " + fmt(s.answers.correct) + " / " + fmt(s.answers.total) + (s.answers.pct != null ? " · " + pctText(s.answers.pct) : "")) : null,
