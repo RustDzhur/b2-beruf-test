@@ -36,6 +36,10 @@ test("admitting starts a month; when it is over, the trainer and the AI close by
   subs._mem.clear();
   let [, a] = await verify.access(BEARER);
   assert.equal(a.verified, true); assert.equal(a.sub, null); // old students: no term
+  assert.equal(a.pay, "https://paypal.me/RustemDzhuraiev"); // payment link for the buttons (PAYPAL_ME overrides)
+  process.env.PAYPAL_ME = "paypal.me/Other_Name";
+  assert.equal((await verify.access(BEARER))[1].pay, "https://paypal.me/Other_Name");
+  delete process.env.PAYPAL_ME;
 
   let r = await call("POST", "/api/admin/login", { password: "main-teacher-pw" });
   const su = cookieOf(r);

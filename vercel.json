@@ -25,10 +25,6 @@
       "destination": "/api/router?__p=link-email"
     },
     {
-      "source": "/api/pay/:path*",
-      "destination": "/api/router?__p=pay/:path*"
-    },
-    {
       "source": "/api/cron/:path*",
       "destination": "/api/router?__p=cron/:path*"
     },

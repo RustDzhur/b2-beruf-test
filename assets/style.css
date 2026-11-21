@@ -670,5 +670,6 @@ table.score th { font-size: 12px; color: var(--muted); font-weight: 600; }
 
 .price-pay { margin-top: 10px; min-height: 0; }
 .price-pay .pay-link { display: block; text-align: center; text-decoration: none; }
+.price-pay .pay-wa { display: block; text-align: center; margin-top: 8px; }
 .reg-note.ok { color: #0f9d58; font-weight: 600; }
 .reg-note.err { color: #d93025; }

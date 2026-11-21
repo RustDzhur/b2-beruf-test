@@ -545,3 +545,5 @@ x111|Payment received, access is open.|Zahlung erhalten, der Zugang ist freigesc
 x112|The payment did not go through. Try again or write to the administrator.|Die Zahlung hat nicht geklappt. Versuchen Sie es erneut oder schreiben Sie dem Administrator.
 x113|Pay with PayPal|Mit PayPal bezahlen
 x114|After paying via the link, write to the administrator on WhatsApp: access opens once the payment is checked.|Schreiben Sie nach der Zahlung über den Link dem Administrator auf WhatsApp: Der Zugang wird nach der Prüfung freigeschaltet.
+x115|Pay with PayPal and send a screenshot of the payment to the administrator on WhatsApp. The administrator opens access, and your month starts that day.|Bezahlen Sie per PayPal und schicken Sie dem Administrator einen Screenshot der Zahlung auf WhatsApp. Der Administrator schaltet den Zugang frei, und ab diesem Tag läuft Ihr Monat.
+x116|Send the receipt on WhatsApp|Beleg per WhatsApp senden
