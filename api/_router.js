@@ -44,6 +44,11 @@ async function route({ method, path, headers, body, ip }) {
     await verify.setVerified(b.uid, !!b.verified);
     return out(200, { ok: true, uid: String(b.uid), verified: !!b.verified });
   }
+  if (path === "/api/admin/admit" && method === "POST") { // admission to the trainer (not the AI)
+    await admin.assertRole([b.uid], need(role));
+    await require("./_admit.js").setAdmitted(b.uid, !!b.admitted);
+    return out(200, { ok: true, uid: String(b.uid), admitted: !!b.admitted });
+  }
   if (path === "/api/admin/delete" && method === "POST") {
     const uids = Array.isArray(b.uids) ? b.uids : [];
     await admin.assertRole(uids, need(role));
@@ -59,7 +64,7 @@ async function route({ method, path, headers, body, ip }) {
       if (role !== "super") return out(403, { code: "forbidden", message: "Группами управляет главный администратор." });
       if (b.remove) { await groups.deleteGroup(b.code); return out(200, { ok: true }); }
       const g = await groups.updateGroup(b.code, { name: b.name, status: b.status });
-      if (b.status === "ok" && g.owner) await verify.setVerified(g.owner, true); // the organizer may use the trainer too
+      if (b.status === "ok" && g.owner) await require("./_admit.js").setAdmitted(g.owner, true); // the organizer may use the trainer too (the AI stays closed)
       return out(200, { ok: true, group: groups.publicGroup(g) });
     }
   }

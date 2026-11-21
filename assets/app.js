@@ -1397,6 +1397,13 @@ async function cloudConnect(c, password) {
   cloud.state = "ok";
   await cloudAccess();
 }
+// organizer: ask for a new group (the main teacher approves it in /admin) -> {code, name, status}
+async function cloudGroupRequest(name, email) {
+  const r = await fetch("/api/group-request", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + await fbToken() }, body: JSON.stringify({ name, email }) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || !j.group) throw new Error(j.message || "Не удалось создать группу.");
+  return j.group;
+}
 async function cloudResetPw(email) { await fbReq("sendOobCode", { requestType: "PASSWORD_RESET", email }); }
 
 // access to the trainer: only after the teacher approved the account in /admin (server checks Firestore `verified`)
@@ -2374,6 +2381,21 @@ function viewProfile(first) {
   const sex = ["m", "w"].map(v => h("label", { class: "cv-sex" }, h("input", { type: "radio", name: "geschl", value: v, checked: c.geschl === v }),
     v === "m" ? L7("männlich", "male", "masculin", "maschile", "erkek", "мужской") : L7("weiblich", "female", "féminin", "femminile", "kadın", "женский")));
   const err = h("p", { class: "cv-err", hidden: true }, "Укажите фамилию и имя.");
+  // who are you: a student picks a group from the list; an organizer names a new group (approved by the main teacher)
+  const fixed = cloudOn() && c.done && !!c.role; // an existing account keeps its role and group
+  const role0 = c.role || "student";
+  const roleRadios = [["student", "Я ученик"], ["org", "Я организатор группы"]].map(([v, l]) => h("label", { class: "cv-sex" },
+    h("input", { type: "radio", name: "role", value: v, checked: role0 === v, disabled: fixed, onchange: () => syncWho() }), h("span", null, l)));
+  const grpSel = h("select", { class: "datein", name: "group", disabled: fixed, style: "min-width:16em" }, h("option", { value: "" }, "— выберите группу —"),
+    c.group ? h("option", { value: c.group, selected: true }, c.groupName || c.group) : null);
+  const grpRow = h("label", { class: "cv-row" }, grpSel, h("small", null, "Ваша группа *"));
+  const orgRow = h("label", { class: "cv-row" }, h("input", { class: "datein", name: "gname", value: c.groupName || "", maxlength: 60, disabled: fixed, style: "min-width:16em" }), h("small", null, "Название вашей группы *"));
+  const whoBox = h("div", null, h("div", { class: "cv-row" }, h("div", { class: "cv-sexes" }, roleRadios), h("small", null, "Кто вы? *")), grpRow, orgRow);
+  const syncWho = () => { const org = (form.querySelector("input[name=role]:checked") || {}).value === "org"; grpRow.hidden = org; orgRow.hidden = !org; };
+  if (!fixed) fetch("/api/groups").then(r => r.json()).then(j => {
+    const list = (j && j.groups) || [];
+    list.forEach(g => { if (g.code !== c.group) grpSel.append(h("option", { value: g.code, selected: list.length === 1 && !c.group }, g.name)); });
+  }).catch(() => {});
   const form = h("form", { class: "s30", autocomplete: "off" },
     h("div", { class: "s30-top" }, h("span", { class: "s30-code" }, "1 0 1 3"), h("span", { class: "s30-bar", "aria-hidden": "true" })),
     h("div", { class: "s30-title" }, "Deutsch-Test für den Beruf"),
@@ -2389,6 +2411,7 @@ function viewProfile(first) {
       boxIn("ort", L7("Postleitzahl und Ort", "Postcode and town", "Code postal et ville", "CAP e città", "Posta kodu ve şehir", "Индекс и город"), 30),
       boxIn("zentrum", L7("Prüfungszentrum", "Examination Centre", "Centre d'examen", "Centro d'esame", "Sınav merkezi", "Экзаменационное учреждение"), 30),
       dateIn("datum", L7("Prüfungsdatum", "Date of Examination", "Date d'examen", "Data dell'esame", "Sınav tarihi", "Дата экзамена"))),
+    whoBox,
     h("label", { class: "cv-row" }, h("input", { class: "datein", type: "email", name: "email", value: c.email || (cloud.s && cloud.s.email && !/@dtb-trainer\.app$/.test(cloud.s.email) ? cloud.s.email : ""), autocomplete: "email", placeholder: "name@example.com", maxlength: 120, required: true }), h("small", null, L7("E-Mail *", "E-mail *", "E-mail *", "E-mail *", "E-posta *", "E-mail *"))),
     h("label", { class: "cv-row" }, h("input", { class: "datein", type: "password", name: "pw", autocomplete: "current-password", placeholder: "••••••", minlength: 6, required: !cloudOn() }), h("small", null, cloudOn() ? L7("Kennwort (nur zum Wechseln des Kontos)", "Password (only to switch account)", "Mot de passe (seulement pour changer de compte)", "Password (solo per cambiare account)", "Şifre (yalnızca hesap değiştirmek için)", "Пароль (только для смены аккаунта)") : L7("Kennwort * (mindestens 6 Zeichen)", "Password * (at least 6 characters)", "Mot de passe * (au moins 6 caractères)", "Password * (almeno 6 caratteri)", "Şifre * (en az 6 karakter)", "Пароль * (минимум 6 символов)"))),
     h("p", { class: "small muted", style: "margin:2px 0 8px" }, "Регистрация и вход по e-mail и паролю. После регистрации на e-mail придёт письмо с подтверждением. Доступ к тренажёру открывается после разрешения преподавателя: свяжитесь с ним по WhatsApp или по телефону. Имя и фамилия нужны для рейтинга, их можно не указывать."),
@@ -2404,6 +2427,14 @@ function viewProfile(first) {
     if (!EMAIL_RE.test(x.email)) { err.textContent = "Укажите правильный e-mail: по нему проходят регистрация и вход."; err.hidden = false; return; }
     const sameAccount = cloudOn() && cloud.s.email === x.email;
     if (!sameAccount && pw.length < 6) { err.textContent = pw ? "Das Kennwort ist zu kurz (mindestens 6 Zeichen)." : "Введите пароль (минимум 6 символов)."; err.hidden = false; return; }
+    if (!fixed) {
+      if (x.role === "org" && !x.gname) { err.textContent = "Укажите название группы."; err.hidden = false; return; }
+      if (x.role !== "org" && !x.group) { err.textContent = "Выберите свою группу."; err.hidden = false; return; }
+    }
+    const who = fixed ? null : x.role === "org"
+      ? { role: "org", groupName: x.gname }
+      : { role: "student", group: x.group, groupName: (grpSel.selectedOptions[0] || {}).textContent || "" };
+    delete x.role; delete x.group; delete x.gname;
     const filled = {}; Object.entries(x).forEach(([k, v]) => { if (v) filled[k] = v; });
     if (!sameAccount) {
       err.hidden = true; const btn = document.querySelector(".btn.primary"); if (btn) btn.disabled = true;
@@ -2412,7 +2443,14 @@ function viewProfile(first) {
       try { await cloudConnect({ ...x }, pw); }
       catch (ex) { if (btn) btn.disabled = false; store.set("cand", { ...x, done: false }); err.textContent = cloudErrText(ex); err.hidden = false; return; }
     }
-    store.set("cand", { ...cand(), ...filled, done: true });
+    const cc = cand();
+    let next = { ...cc, ...filled };
+    if (who && !(cc.role && (cc.group || cc.role === "org"))) next = { ...next, ...who }; // an account from the cloud keeps its own group
+    if (next.role === "org" && !next.group) {
+      try { const g = await cloudGroupRequest(next.groupName, x.email); next.group = g.code; next.groupName = g.name; }
+      catch (ex) { store.set("cand", { ...next, done: false }); err.textContent = ex.message || "Не удалось создать группу."; err.hidden = false; return; }
+    }
+    store.set("cand", { ...next, done: true });
     location.hash = first ? (location.hash && location.hash !== "#profile" ? location.hash : "#home") : "#home";
     render();
   };
@@ -2424,6 +2462,7 @@ function viewProfile(first) {
     err.hidden = false;
   } }, "Сбросить пароль");
   const del = !cloudOn() ? null : h("button", { type: "button", class: "btn ghost", onclick: () => { cloudOff(true); store.set("cand", { fam: "", vor: "" }); render(); } }, "Выйти / сменить аккаунт");
+  requestAnimationFrame(syncWho);
   return h("div", { class: "wrap narrow" },
     first ? null : crumbs(h("a", { href: "#home" }, "Главная"), "Данные участника"),
     h("p", { class: "lead", style: "margin:0" }, "Регистрация по e-mail: укажите e-mail и пароль. Прогресс сохраняется в облаке, и на другом устройстве достаточно ввести тот же e-mail и пароль."),
@@ -2440,7 +2479,10 @@ function viewPending() {
     h("h1", null, "Ожидает разрешения"),
     h("p", { class: "lead" }, h("span", null, sent ? "Регистрация прошла. Мы отправили письмо с подтверждением на адрес:" : "Вы вошли как:"), " ", h("b", { dir: "ltr" }, mail)),
     h("div", { class: "card" },
-      h("p", null, "Тренажёр открыт только для участников группы. Чтобы получить доступ, свяжитесь с преподавателем по WhatsApp или по телефону и попросите разрешение на подключение. Назовите e-mail, с которым вы зарегистрировались."),
+      c.role === "org"
+        ? h("p", null, h("span", null, "Ваша группа ждёт одобрения главного администратора:"), " ", h("b", null, c.groupName || ""), ". ", h("span", null, "После одобрения откроется тренажёр, а кабинет группы будет по адресу /admin (вход «Организатор группы» с вашим e-mail и паролем)."))
+        : h("p", null, "Тренажёр открыт только для участников группы. Чтобы получить доступ, свяжитесь с преподавателем по WhatsApp или по телефону и попросите разрешение на подключение. Назовите e-mail, с которым вы зарегистрировались."),
+      c.role !== "org" && c.groupName ? h("p", null, h("span", null, "Ваша группа:"), " ", h("b", null, c.groupName)) : null,
       contactBlock(cloud.contact)),
     msg,
     h("div", { class: "row" },
@@ -2469,6 +2511,9 @@ function updateWho() {
   const kids = [h("span", { class: "who-ico", "aria-hidden": "true" }, "👤"), h("span", null, (c.vor || c.fam) ? `${c.vor || ""} ${c.fam || ""}`.trim() : (c.email || ""))];
   if (cloudOn()) kids.push(h("span", { class: "who-ico", title: "Cloud", "aria-hidden": "true" }, "☁"));
   a.replaceChildren(...kids);
+  let cab = top.querySelector(".who-cab");
+  if (c.role === "org" && cloud.ok) { if (!cab) { cab = h("a", { class: "who who-cab", href: "/admin" }, "👥 ", h("span", null, "Кабинет группы")); a.after(cab); } }
+  else if (cab) cab.remove();
 }
 function render() {
   stopAll();
