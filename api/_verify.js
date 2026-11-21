@@ -9,7 +9,11 @@ const admin = require("./_admin.js");
 const WEB_KEY = process.env.FIREBASE_WEB_API_KEY || "AIzaSyA5_PmCPlHg-9P1OD9LQFHXXF4Svj6Vajo"; // public by design (same key as in the page)
 const UID_RE = /^[A-Za-z0-9_-]{6,128}$/;
 const TOKEN_TTL = 5 * 60 * 1000, VERIFIED_TTL = 60 * 1000;
-const tokenCache = new Map(), verifiedCache = new Map(), created = new Map(), emails = new Map();
+const tokenCache = new Map(), verifiedCache = new Map(), created = new Map(), emails = new Map(), mailOk = new Map();
+// ADMIN_EMAILS (comma separated): the site owner's own accounts. With a confirmed e-mail they are always admitted,
+// get the AI and may sign in to /admin as the main administrator (see _admin.js login).
+const adminEmails = () => String(process.env.ADMIN_EMAILS || "").toLowerCase().split(/[\s,;]+/).filter(Boolean);
+const isOwner = uid => { const e = emails.get(uid); return !!e && mailOk.get(uid) === true && adminEmails().includes(e); };
 const mem = new Set(); // used only with ADMIN_FIXTURES (no Firestore), so the cabinet can be tried locally
 
 const contact = () => String(process.env.VERIFY_CONTACT || "").slice(0, 120);
@@ -42,6 +46,7 @@ async function lookupUid(idToken) {
   if (tokenCache.size > 2000) tokenCache.clear();
   tokenCache.set(key, { uid, exp: Date.now() + TOKEN_TTL });
   emails.set(uid, String(j.users[0].email || "").toLowerCase()); // the sign-in address (old accounts: u…@dtb-trainer.app)
+  mailOk.set(uid, j.users[0].emailVerified === true);
   created.set(uid, Number(j.users[0].createdAt || 0)); // account creation time: old accounts are admitted automatically
   return uid;
 }
@@ -109,7 +114,7 @@ async function check(authHeader) {
   try {
     const uid = await impl.lookupUid(m[1]);
     if (!uid) return { ok: false, status: 403, code: "not_verified" };
-    if (!(await impl.isVerified(uid))) return { ok: false, status: 403, code: "not_verified" };
+    if (!isOwner(uid) && !(await impl.isVerified(uid))) return { ok: false, status: 403, code: "not_verified" };
     return { ok: true, uid };
   } catch (e) {
     return { ok: false, status: e.status || 503, code: e.code || "verify_unavailable" };
@@ -125,6 +130,7 @@ async function access(authHeader) {
   try {
     const uid = await impl.lookupUid(m[1]);
     if (!uid) return [200, { verified: false, ai: false, contact: contact() }];
+    if (isOwner(uid)) return [200, { verified: true, ai: true, owner: true, contact: contact() }];
     const admitted = await impl.isAdmitted(uid, created.get(uid));
     const ai = admitted ? await impl.isVerified(uid) : false;
     return [200, { verified: admitted, ai, contact: contact() }];
@@ -133,4 +139,4 @@ async function access(authHeader) {
   }
 }
 
-module.exports = { emails, check, access, setVerified, listVerified, isVerified, contact, UID_RE, _hooks: impl };
+module.exports = { emails, mailOk, adminEmails, isOwner, check, access, setVerified, listVerified, isVerified, contact, UID_RE, _hooks: impl };
