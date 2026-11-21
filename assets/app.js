@@ -2514,32 +2514,55 @@ function viewProfile(first) {
 // prices: the trainer alone, or the trainer with the AI that checks homework
 // payment under a price card: the PayPal.me link with the amount filled in, then the receipt to the administrator on
 // WhatsApp. The administrator checks the payment and opens access by hand; the month starts then.
-function payButton(plan) {
-  if (!cloud.pay) return null;
-  const sum = plan === "ai" ? 10 : 5, c = cand(), mail = (cloud.s && cloud.s.email) || c.email || "";
+// the administrator's PayPal.me (the server may send another one as `pay`, PAYPAL_ME) and WhatsApp with a ready text
+const PAY_ME = "https://paypal.me/RustemDzhuraiev";
+const payMe = () => cloud.pay || PAY_ME;
+function waHref(text) {
   const m = String(cloud.contact || "").match(/\+?\d[\d\s().\/-]{5,}\d/), digits = m ? m[0].replace(/\D/g, "") : "";
-  const text = "Hallo! Ich habe " + sum + " € per PayPal bezahlt (Tarif: " + (plan === "ai" ? "Trainer + KI" : "Trainer") + ", 1 Monat). Der Beleg ist im Anhang.\nName: " +
-    [c.fam, c.vor].filter(Boolean).join(" ") + "\nE-Mail: " + mail;
-  return h("div", { class: "price-pay" },
-    h("a", { class: "reg-btn pay-link", href: cloud.pay + "/" + sum + "EUR", target: "_blank", rel: "noopener" }, h("span", null, "Оплатить через PayPal"), " · " + sum + " €"),
-    digits ? h("a", { class: "reg-link pay-wa", href: "https://wa.me/" + digits + "?text=" + encodeURIComponent(text), target: "_blank", rel: "noopener" }, "Отправить подтверждение в WhatsApp") : null);
+  return digits ? "https://wa.me/" + digits + "?text=" + encodeURIComponent(text) : "";
+}
+function whoText() {
+  const c = cand(), mail = (cloud.s && cloud.s.email) || c.email || "";
+  return "\nName: " + [c.fam, c.vor].filter(Boolean).join(" ") + "\nE-Mail: " + mail + (c.groupName ? "\nGruppe: " + c.groupName : "");
+}
+function waBtn(text, label, cls) {
+  const href = waHref(text);
+  return href ? h("a", { class: "reg-btn wa " + (cls || ""), href, target: "_blank", rel: "noopener" }, label)
+    : h("p", { class: "reg-note" }, "Номер администратора пока не указан.");
+}
+// the first thing a new student sees: pay now, ask for a free trial, or say "I have paid, please activate"
+function accessChoice(expired) {
+  const opt = (n, title, note, ...body) => h("div", { class: "choice-card" },
+    h("div", { class: "choice-head" }, h("span", { class: "choice-num" }, String(n)), h("b", null, title)),
+    note ? h("p", { class: "reg-note" }, note) : null, ...body);
+  let n = 0;
+  return h("div", { class: "choice" },
+    h("div", { class: "price-head" }, "Как получить доступ"),
+    opt(++n, "Оплатить подписку", "Оплата через PayPal. Сумма уже подставлена.",
+      h("div", { class: "choice-pay" },
+        h("a", { class: "reg-btn pay-link", href: payMe() + "/5EUR", target: "_blank", rel: "noopener" }, h("span", null, "Тренажёр"), " · 5 €"),
+        h("a", { class: "reg-btn pay-link best", href: payMe() + "/10EUR", target: "_blank", rel: "noopener" }, h("span", null, "Тренажёр + ИИ"), " · 10 €"))),
+    expired ? null : opt(++n, "Попробовать бесплатно 3 дня", "Напишите администратору, и он включит пробный период.",
+      waBtn("Hallo! Ich möchte den DTB-B2-Beruf-Trainer 3 Tage kostenlos testen." + whoText(), "Запросить пробный период", "ghost")),
+    opt(++n, "Я уже оплатил(а)", "Отправьте скриншот оплаты. Администратор проверит его и откроет доступ, с этого дня начнётся месяц подписки.",
+      waBtn("Hallo! Ich habe per PayPal bezahlt. Bitte schalten Sie meinen Zugang frei, der Beleg ist im Anhang." + whoText(), "Активируйте мой доступ", "ghost")),
+    h("p", { class: "contact-warn" }, "📵 ", h("span", null, "Только сообщения, пожалуйста, не звоните.")));
 }
 function priceBox(pay) {
   return h("div", { class: "price" },
     h("div", { class: "price-head" }, "Стоимость подписки"),
-    pay && cloud.pay ? h("p", { class: "reg-note" }, "Оплатите через PayPal и отправьте скриншот оплаты администратору в WhatsApp. Администратор откроет доступ, и с этого дня начнётся месяц подписки.") : null,
     h("div", { class: "price-grid" },
       h("div", { class: "price-card" },
         h("div", { class: "price-name" }, "Тренажёр"),
         h("div", { class: "price-sum", dir: "ltr" }, h("b", null, "5 €"), h("span", null, " / ", h("span", null, "месяц"))),
         h("p", null, "Все задания экзамена, проверка ответов, работа над ошибками и рейтинг группы. Без ИИ."),
-        pay ? payButton("basic") : null),
+        null),
       h("div", { class: "price-card best" },
         h("span", { class: "price-tag" }, "Лучшая подготовка"),
         h("div", { class: "price-name" }, "Тренажёр + ИИ"),
         h("div", { class: "price-sum", dir: "ltr" }, h("b", null, "10 €"), h("span", null, " / ", h("span", null, "месяц"))),
         h("p", null, "Всё из тарифа «Тренажёр» и ИИ, который проверяет домашние задания, письма и устные ответы и помогает лучше подготовиться к экзамену."),
-        pay ? payButton("ai") : null)));
+        null)));
 }
 // waiting room: the account exists, but the teacher has not admitted it yet
 function viewPending() {
@@ -2554,17 +2577,13 @@ function viewPending() {
       h("h1", null, cloud.expired ? (cloud.sub && cloud.sub.trial ? "Пробный период закончился" : "Подписка закончилась") : "Ожидает разрешения"),
       cloud.expired ? h("p", { class: "reg-sub" }, "Доступ закрыт, ваш прогресс сохранён.") : null,
       h("p", { class: "reg-sub" }, h("span", null, sent ? "Регистрация прошла. Мы отправили письмо с подтверждением на адрес:" : "Вы вошли как:"), " ", h("b", { dir: "ltr" }, mail)),
-      cloud.expired
-        ? h("p", null, h("b", null, "Чтобы продолжить, оплатите 5 € в месяц (без ИИ) или 10 € в месяц (с ИИ) и напишите администратору в WhatsApp."), " ", h("span", null, "Пожалуйста, не звоните, только сообщение."))
-        : org
-        ? h("p", null, h("span", null, "Ваша группа ждёт одобрения главного администратора:"), " ", h("b", null, c.groupName || ""), ". ", h("span", null, "После одобрения откроется тренажёр, а кабинет группы будет по адресу /admin (вход «Организатор группы» с вашим e-mail и паролем)."))
-        : h("ol", { class: "reg-steps" },
-            h("li", null, "Подтвердите e-mail: откройте письмо и нажмите на ссылку."),
-            h("li", null, h("b", null, "Напишите администратору в WhatsApp."), " ", h("span", null, "Пожалуйста, не звоните: только сообщение с запросом на доступ. Укажите фамилию, имя, e-mail регистрации и выбранный тариф.")),
-            h("li", null, "После оплаты администратор откроет доступ, и тренажёр заработает на всех ваших устройствах.")),
+      cloud.expired ? h("p", null, "Чтобы продолжить, оплатите 5 € в месяц (без ИИ) или 10 € в месяц (с ИИ) и напишите администратору в WhatsApp.") : null,
+      org ? h("p", null, h("span", null, "Ваша группа ждёт одобрения главного администратора:"), " ", h("b", null, c.groupName || ""), ". ", h("span", null, "После одобрения откроется тренажёр, а кабинет группы будет по адресу /admin (вход «Организатор группы» с вашим e-mail и паролем)."))
+        : accessChoice(cloud.expired),
+      !org && !cloud.expired && sent ? h("p", { class: "reg-note" }, "Подтвердите e-mail: откройте письмо и нажмите на ссылку.") : null,
       !org && c.groupName ? h("p", { class: "reg-note" }, h("span", null, "Ваша группа:"), " ", h("b", null, c.groupName)) : null,
       contactBlock(cloud.contact, c, mail),
-      org ? null : priceBox(true),
+      org ? null : priceBox(),
       msg,
       h("div", { class: "reg-actions" },
         h("button", { class: "reg-btn", onclick: async () => { msg.hidden = false; msg.textContent = "Проверяем…"; if (await cloudAccess()) render(); else msg.textContent = "Доступ ещё не подтверждён."; } }, "Проверить снова"),

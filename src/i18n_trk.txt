@@ -547,3 +547,12 @@ x113|PayPal ile öde
 x114|Bağlantıyla ödedikten sonra yöneticiye WhatsApp'tan yazın: erişim kontrolden sonra açılır.
 x115|PayPal ile ödeyin ve ödemenin ekran görüntüsünü yöneticiye WhatsApp'tan gönderin. Yönetici erişimi açar ve aboneliğiniz o gün başlar.
 x116|Dekontu WhatsApp'tan gönder
+x117|Erişim nasıl alınır
+x118|Aboneliği öde
+x119|PayPal ile ödeme. Tutar zaten girilmiş.
+x120|3 gün ücretsiz deneyin
+x121|Yöneticiye yazın, deneme süresini açsın.
+x122|Deneme iste
+x123|Zaten ödedim
+x124|Ödemenin ekran görüntüsünü gönderin. Yönetici kontrol edip erişimi açar; aboneliğiniz o gün başlar.
+x125|Erişimimi aç
