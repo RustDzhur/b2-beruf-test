@@ -474,7 +474,7 @@ function viewProfile(first) {
       ? h("div", { class: "reg-grid" }, field("E-mail *", emailIn, true), field("Пароль *", pwIn, true))
       : h("div", null, roleSeg, person, reg ? h("div", { class: "reg-grid" }, field("Пароль * (минимум 6 символов)", pwIn, true)) : null, grpRow, orgRow, sheet),
     reg ? priceBox() : null,
-    reg ? h("p", { class: "reg-note" }, "После регистрации на e-mail придёт письмо с подтверждением. Доступ откроется после разрешения преподавателя: напишите ему в WhatsApp. Пожалуйста, только сообщение, не звоните.") : null,
+    reg ? h("p", { class: "reg-note" }, "После регистрации на e-mail придёт письмо с подтверждением. Доступ откроется после разрешения администратора: напишите ему в WhatsApp. Пожалуйста, только сообщение, не звоните.") : null,
     err,
     h("button", { class: "reg-btn", type: "submit" }, mode === "login" ? "Войти" : reg ? "Зарегистрироваться" : "Сохранить"));
 
@@ -563,8 +563,8 @@ function viewPending() {
         ? h("p", null, h("span", null, "Ваша группа ждёт одобрения главного администратора:"), " ", h("b", null, c.groupName || ""), ". ", h("span", null, "После одобрения откроется тренажёр, а кабинет группы будет по адресу /admin (вход «Организатор группы» с вашим e-mail и паролем)."))
         : h("ol", { class: "reg-steps" },
             h("li", null, "Подтвердите e-mail: откройте письмо и нажмите на ссылку."),
-            h("li", null, h("b", null, "Напишите преподавателю в WhatsApp."), " ", h("span", null, "Пожалуйста, не звоните: только сообщение с запросом на доступ. Укажите фамилию, имя, e-mail регистрации и выбранный тариф.")),
-            h("li", null, "После оплаты преподаватель откроет доступ, и тренажёр заработает на всех ваших устройствах.")),
+            h("li", null, h("b", null, "Напишите администратору в WhatsApp."), " ", h("span", null, "Пожалуйста, не звоните: только сообщение с запросом на доступ. Укажите фамилию, имя, e-mail регистрации и выбранный тариф.")),
+            h("li", null, "После оплаты администратор откроет доступ, и тренажёр заработает на всех ваших устройствах.")),
       !org && c.groupName ? h("p", { class: "reg-note" }, h("span", null, "Ваша группа:"), " ", h("b", null, c.groupName)) : null,
       contactBlock(cloud.contact, c, mail),
       org ? null : priceBox(),
@@ -576,12 +576,12 @@ function viewPending() {
 // teacher's WhatsApp from VERIFY_CONTACT, shown in full; the button opens WhatsApp with a ready request (no call button: write, don't call)
 function contactBlock(contact, c, mail) {
   contact = String(contact || "").trim();
-  if (!contact) return h("p", { class: "reg-note" }, "Номер преподавателя пока не указан.");
+  if (!contact) return h("p", { class: "reg-note" }, "Номер администратора пока не указан.");
   const m = contact.match(/\+?\d[\d\s().\/-]{5,}\d/), digits = m ? m[0].replace(/\D/g, "") : "";
   c = c || {};
   const text = "Hallo! Ich bitte um Zugang zum DTB-B2-Beruf-Trainer.\nName: " + [c.fam, c.vor].filter(Boolean).join(" ") + "\nE-Mail: " + (mail || "") + (c.groupName ? "\nGruppe: " + c.groupName : "") + "\nTarif: 5 € / 10 € (mit KI)";
   return h("div", { class: "contact-box" },
-    h("div", { class: "contact-label" }, "WhatsApp преподавателя:"),
+    h("div", { class: "contact-label" }, "WhatsApp администратора:"),
     h("div", { class: "contact-num", dir: "ltr" }, contact),
     h("div", { class: "contact-warn" }, "📵 ", h("span", null, "Только сообщения, пожалуйста, не звоните.")),
     digits ? h("a", { class: "reg-btn wa", href: "https://wa.me/" + digits + "?text=" + encodeURIComponent(text), target: "_blank", rel: "noopener" }, "Написать в WhatsApp") : null);

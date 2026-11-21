@@ -482,7 +482,7 @@ x48|Access has not been approved yet.|Der Zugang ist noch nicht freigegeben.
 x49|Check again|Erneut prüfen
 x50|Switch account|Konto wechseln
 x51|Checking access…|Zugang wird geprüft…
-x52|The teacher's number has not been set yet.|Die Nummer der Lehrkraft ist noch nicht hinterlegt.
+x52|The administrator's number is not set yet.|Die Nummer des Administrators ist noch nicht hinterlegt.
 x53|Message on WhatsApp|Per WhatsApp schreiben
 x54|Call|Anrufen
 x55|Reset password|Kennwort zurücksetzen
@@ -507,7 +507,7 @@ x73|First name *|Vorname *
 x74|Phone (WhatsApp) *|Telefon (WhatsApp) *
 x75|Password *|Kennwort *
 x76|Password * (at least 6 characters)|Kennwort * (mindestens 6 Zeichen)
-x77|After signing up you will get a confirmation e-mail. Access opens once the teacher allows it: write to the teacher on WhatsApp. Please send a message only, do not call.|Nach der Registrierung erhalten Sie eine Bestätigungs-E-Mail. Der Zugang wird freigeschaltet, sobald die Lehrkraft zustimmt: Schreiben Sie ihr auf WhatsApp. Bitte nur eine Nachricht, nicht anrufen.
+x77|After signing up you will get a confirmation e-mail. Access opens once the administrator allows it: write to the administrator on WhatsApp. Please send a message only, do not call.|Nach der Registrierung erhalten Sie eine Bestätigungs-E-Mail. Der Zugang wird freigeschaltet, sobald der Administrator zustimmt: Schreiben Sie ihm auf WhatsApp. Bitte nur eine Nachricht, nicht anrufen.
 x78|Sign in|Anmelden
 x79|Sign up|Registrieren
 x80|Enter a phone number with WhatsApp, e.g. +49 151 2345678.|Geben Sie eine Telefonnummer mit WhatsApp an, z. B. +49 151 2345678.
@@ -527,9 +527,9 @@ x93|Best preparation|Beste Vorbereitung
 x94|Trainer + AI|Trainer + KI
 x95|Everything in “Trainer” plus AI that checks your homework, letters and spoken answers and helps you prepare better for the exam.|Alles aus „Trainer“ plus KI, die Hausaufgaben, Briefe und mündliche Antworten prüft und Ihnen hilft, sich besser auf die Prüfung vorzubereiten.
 x96|Confirm your e-mail: open the letter and click the link.|Bestätigen Sie Ihre E-Mail: Öffnen Sie die Nachricht und klicken Sie auf den Link.
-x97|Write to the teacher on WhatsApp.|Schreiben Sie der Lehrkraft auf WhatsApp.
+x97|Write to the administrator on WhatsApp.|Schreiben Sie dem Administrator auf WhatsApp.
 x98|Please do not call: send a message asking for access. Include your surname, first name, sign-up e-mail and the plan you chose.|Bitte nicht anrufen: nur eine Nachricht mit der Bitte um Zugang. Geben Sie Familienname, Vorname, Ihre Registrierungs-E-Mail und den gewählten Tarif an.
-x99|After payment the teacher opens access, and the trainer works on all your devices.|Nach der Zahlung schaltet die Lehrkraft den Zugang frei, und der Trainer funktioniert auf allen Ihren Geräten.
-x100|Teacher's WhatsApp:|WhatsApp der Lehrkraft:
+x99|After payment the administrator opens access, and the trainer works on all your devices.|Nach der Zahlung schaltet der Administrator den Zugang frei, und der Trainer funktioniert auf allen Ihren Geräten.
+x100|Administrator's WhatsApp:|WhatsApp des Administrators:
 x101|Messages only, please do not call.|Bitte nur Nachrichten, nicht anrufen.
 x102|No account with this e-mail. Check the address or sign up.|Kein Konto mit dieser E-Mail gefunden. Prüfen Sie die Adresse oder registrieren Sie sich.

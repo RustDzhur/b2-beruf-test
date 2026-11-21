@@ -482,7 +482,7 @@ x48|Erişim henüz onaylanmadı.
 x49|Tekrar kontrol et
 x50|Hesap değiştir
 x51|Erişim kontrol ediliyor…
-x52|Öğretmenin numarası henüz girilmedi.
+x52|Yöneticinin numarası henüz girilmedi.
 x53|WhatsApp'tan yaz
 x54|Ara
 x55|Şifreyi sıfırla
@@ -507,7 +507,7 @@ x73|Adı *
 x74|Telefon (WhatsApp) *
 x75|Şifre *
 x76|Şifre * (en az 6 karakter)
-x77|Kayıttan sonra onay e-postası gelir. Erişim, öğretmen izin verdiğinde açılır: öğretmene WhatsApp'tan yazın. Lütfen sadece mesaj gönderin, aramayın.
+x77|Kayıttan sonra onay e-postası gelir. Erişim, yönetici izin verdiğinde açılır: yöneticiye WhatsApp'tan yazın. Lütfen sadece mesaj gönderin, aramayın.
 x78|Giriş yap
 x79|Kayıt ol
 x80|WhatsApp'lı bir telefon numarası girin, örn. +49 151 2345678.
@@ -527,9 +527,9 @@ x93|En iyi hazırlık
 x94|Alıştırma + yapay zekâ
 x95|“Alıştırma” paketindeki her şey ve ödevlerinizi, mektuplarınızı ve sözlü cevaplarınızı kontrol eden, sınava daha iyi hazırlanmanıza yardım eden yapay zekâ.
 x96|E-postanızı onaylayın: mesajı açıp bağlantıya tıklayın.
-x97|Öğretmene WhatsApp'tan yazın.
+x97|Yöneticiye WhatsApp'tan yazın.
 x98|Lütfen aramayın: erişim isteyen bir mesaj gönderin. Soyadınızı, adınızı, kayıt e-postanızı ve seçtiğiniz paketi yazın.
-x99|Ödemeden sonra öğretmen erişimi açar ve alıştırma tüm cihazlarınızda çalışır.
-x100|Öğretmenin WhatsApp'ı:
+x99|Ödemeden sonra yönetici erişimi açar ve alıştırma tüm cihazlarınızda çalışır.
+x100|Yöneticinin WhatsApp'ı:
 x101|Sadece mesaj, lütfen aramayın.
 x102|Bu e-postayla bir hesap bulunamadı. Adresi kontrol edin veya kayıt olun.

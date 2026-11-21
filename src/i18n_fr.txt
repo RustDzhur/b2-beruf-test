@@ -482,7 +482,7 @@ x48|L'accès n'est pas encore autorisé.
 x49|Vérifier à nouveau
 x50|Changer de compte
 x51|Vérification de l'accès…
-x52|Le numéro de l'enseignant n'est pas encore indiqué.
+x52|Le numéro de l'administrateur n'est pas encore indiqué.
 x53|Écrire sur WhatsApp
 x54|Appeler
 x55|Réinitialiser le mot de passe
@@ -507,7 +507,7 @@ x73|Prénom *
 x74|Téléphone (WhatsApp) *
 x75|Mot de passe *
 x76|Mot de passe * (au moins 6 caractères)
-x77|Après l'inscription, vous recevrez un e-mail de confirmation. L'accès s'ouvre après l'accord de l'enseignant : écrivez-lui sur WhatsApp. Merci d'envoyer uniquement un message, sans appeler.
+x77|Après l'inscription, vous recevrez un e-mail de confirmation. L'accès s'ouvre après l'accord de l'administrateur : écrivez-lui sur WhatsApp. Merci d'envoyer uniquement un message, sans appeler.
 x78|Se connecter
 x79|S'inscrire
 x80|Indiquez un numéro avec WhatsApp, par ex. +49 151 2345678.
@@ -527,9 +527,9 @@ x93|Meilleure préparation
 x94|Entraîneur + IA
 x95|Tout le forfait « Entraîneur » plus l'IA, qui corrige vos devoirs, lettres et réponses orales et vous aide à mieux préparer l'examen.
 x96|Confirmez votre e-mail : ouvrez le message et cliquez sur le lien.
-x97|Écrivez à l'enseignant sur WhatsApp.
+x97|Écrivez à l'administrateur sur WhatsApp.
 x98|Merci de ne pas appeler : envoyez un message pour demander l'accès. Indiquez nom, prénom, e-mail d'inscription et le forfait choisi.
-x99|Après le paiement, l'enseignant ouvre l'accès et l'entraîneur fonctionne sur tous vos appareils.
-x100|WhatsApp de l'enseignant :
+x99|Après le paiement, l'administrateur ouvre l'accès et l'entraîneur fonctionne sur tous vos appareils.
+x100|WhatsApp de l'administrateur :
 x101|Messages uniquement, merci de ne pas appeler.
 x102|Aucun compte avec cet e-mail. Vérifiez l'adresse ou inscrivez-vous.
