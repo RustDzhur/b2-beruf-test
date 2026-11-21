@@ -12,7 +12,7 @@ const TOKEN_TTL = 5 * 60 * 1000, VERIFIED_TTL = 60 * 1000;
 const tokenCache = new Map(), verifiedCache = new Map();
 const mem = new Set(); // used only with ADMIN_FIXTURES (no Firestore), so the cabinet can be tried locally
 
-const contact = () => String(process.env.VERIFY_CONTACT || "").slice(0, 60);
+const contact = () => String(process.env.VERIFY_CONTACT || "").slice(0, 120);
 const open = () => process.env.AI_OPEN === "1"; // escape hatch for local work: everybody may use the AI
 const useMem = () => { try { return !admin.serviceAccount() && !!admin.fixtureUsers(); } catch { return false; } };
 const fail = (status, code, message) => Object.assign(new Error(message), { status, code });

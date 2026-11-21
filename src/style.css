@@ -601,3 +601,7 @@ table.score th { font-size: 12px; color: var(--muted); font-weight: 600; }
   .pg-badge-grid { grid-template-columns: repeat(3, 1fr); }
   .pg-kpi .v { font-size: 22px; }
 }
+
+/* waiting-for-approval screen: the teacher's number, large and selectable */
+.contact-box{margin-top:14px;padding:14px 16px;border:1px solid var(--line, #3335);border-radius:12px}
+.contact-num{font-size:clamp(22px,5vw,30px);font-weight:700;letter-spacing:.02em;word-break:break-word;user-select:all;margin-top:4px}

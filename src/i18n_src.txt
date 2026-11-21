@@ -463,3 +463,26 @@ x31|The e-mail is needed for verification: send the same address to the teacher 
 x32|Enter an e-mail: it is needed to save progress in the cloud and for verification.|Geben Sie eine E-Mail an: Sie wird zum Speichern in der Cloud und für die Verifizierung benötigt.
 r29|From {~1}|Ab {~1}
 r30|The trainer is a volunteer project and stays free. Only the AI costs money: every answer it gives is paid for through the API. That is why full access to the AI is open to those who make a symbolic contribution towards it. To get access, register in the cloud (profile: e-mail and password) and write on WhatsApp: {1}. They will tell you how to make the contribution. Once you are confirmed, all tools will open up and you can prepare for the exam fully.|Der Trainer ist ein ehrenamtliches Projekt und bleibt kostenlos. Nur die KI kostet Geld: Für jede ihrer Antworten muss die API bezahlt werden. Deshalb steht der volle KI-Zugang denjenigen offen, die einen symbolischen Beitrag dazu leisten. Um Zugang zu erhalten, registrieren Sie sich in der Cloud (Anmeldebogen: E-Mail und Kennwort) und schreiben Sie per WhatsApp: {1}. Dort erfahren Sie, wie Sie den Beitrag leisten können. Nach der Bestätigung stehen Ihnen alle Werkzeuge zur Verfügung, und Sie können sich vollständig auf die Prüfung vorbereiten.
+x33|Sign up with your e-mail: enter your e-mail and a password. Your progress is saved in the cloud, and on another device you only need the same e-mail and password.|Registrierung per E-Mail: Geben Sie Ihre E-Mail-Adresse und ein Kennwort ein. Ihr Fortschritt wird in der Cloud gespeichert; auf einem anderen Gerät genügen dieselbe E-Mail-Adresse und dasselbe Kennwort.
+x34|Sign-up and sign-in with e-mail and password. After signing up you will receive a confirmation e-mail. Access to the trainer opens once the teacher approves it: contact the teacher via WhatsApp or by phone. First name and surname are only used for the ranking and are optional.|Registrierung und Anmeldung mit E-Mail und Kennwort. Nach der Registrierung erhalten Sie eine Bestätigungs-E-Mail. Der Zugang zum Trainer wird nach Freigabe durch die Lehrkraft geöffnet: Kontaktieren Sie sie per WhatsApp oder Telefon. Vor- und Nachname werden nur für die Rangliste verwendet und sind freiwillig.
+x35|Enter a valid e-mail: it is used to sign up and sign in.|Geben Sie eine gültige E-Mail-Adresse ein: Sie dient zur Registrierung und Anmeldung.
+x36|Enter a password (at least 6 characters).|Geben Sie ein Kennwort ein (mindestens 6 Zeichen).
+x37|First enter your e-mail.|Geben Sie zuerst Ihre E-Mail-Adresse ein.
+x38|Password reset e-mail sent to:|E-Mail zum Zurücksetzen des Kennworts gesendet an:
+x39|Could not send the e-mail. Check the address.|Die E-Mail konnte nicht gesendet werden. Prüfen Sie die Adresse.
+x40|Sign up / sign in|Registrieren / anmelden
+x41|Sign out / switch account|Abmelden / Konto wechseln
+x42|Waiting for approval|Warten auf Freischaltung
+x43|You are registered. We have sent a confirmation e-mail to:|Die Registrierung war erfolgreich. Wir haben eine Bestätigungs-E-Mail gesendet an:
+x44|Signed in as:|Angemeldet als:
+x45|The trainer is open only to members of the group. To get access, contact the teacher via WhatsApp or by phone and ask for permission to join. Give the e-mail you registered with.|Der Trainer ist nur für Teilnehmende der Gruppe freigegeben. Um Zugang zu erhalten, kontaktieren Sie die Lehrkraft per WhatsApp oder Telefon und bitten Sie um Freischaltung. Nennen Sie die E-Mail-Adresse, mit der Sie sich registriert haben.
+x46|WhatsApp / phone:|WhatsApp / Telefon:
+x47|Checking…|Wird geprüft…
+x48|Access has not been approved yet.|Der Zugang ist noch nicht freigegeben.
+x49|Check again|Erneut prüfen
+x50|Switch account|Konto wechseln
+x51|Checking access…|Zugang wird geprüft…
+x52|The teacher's number has not been set yet.|Die Nummer der Lehrkraft ist noch nicht hinterlegt.
+x53|Message on WhatsApp|Per WhatsApp schreiben
+x54|Call|Anrufen
+x55|Reset password|Kennwort zurücksetzen
