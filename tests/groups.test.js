@@ -141,11 +141,15 @@ test("an old account signed in by name gets its real e-mail attached (and never 
 
 test("main administrator attaches an e-mail; ADMIN_EMAILS owner gets the admin cabinet, admission and AI", async () => {
   const calls = [];
-  admin.authAdmin.update = async (uid, email) => { calls.push([uid, email]); };
+  admin.authAdmin.update = async (uid, email, password) => { calls.push([uid, email, password]); };
   let r = await call("POST", "/api/admin/login", { password: "main-teacher-pw" });
   const superCookie = cookieOf(r);
   r = await call("POST", "/api/admin/link-email", { uid: "olduid123", email: "Boss@Example.com" }, superCookie);
-  assert.equal(r.status, 200); assert.deepEqual(calls.pop(), ["olduid123", "boss@example.com"]);
+  assert.equal(r.status, 200); assert.deepEqual(calls.pop(), ["olduid123", "boss@example.com", ""]);
+  r = await call("POST", "/api/admin/link-email", { uid: "olduid123", email: "boss@example.com", password: "123" }, superCookie);
+  assert.equal(r.status, 400); assert.equal(calls.length, 0);
+  r = await call("POST", "/api/admin/link-email", { uid: "olduid123", email: "boss@example.com", password: "secret77" }, superCookie);
+  assert.equal(r.status, 200); assert.equal(r.json.password, true); assert.deepEqual(calls.pop(), ["olduid123", "boss@example.com", "secret77"]);
   admin.authAdmin.update = null;
 
   process.env.ADMIN_EMAILS = "boss@example.com, other@example.com";
