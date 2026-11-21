@@ -1,4 +1,4 @@
-// One handler for the teacher and group API, shared by server.js (local) and the Vercel functions in api/admin/*.js, api/groups.js, api/group-request.js.
+// One handler for the teacher and group API, shared by server.js (local) and the single Vercel function api/router.js.
 // handle({method, path, headers, body, ip}) -> {status, json, headers}
 const admin = require("./_admin.js");
 const verify = require("./_verify.js");
@@ -9,6 +9,7 @@ const need = role => { if (!role) throw Object.assign(new Error("Войдите 
 
 async function route({ method, path, headers, body, ip }) {
   headers = headers || {};
+  if (path === "/api/access") { const [c, o] = await verify.access(headers.authorization); return out(c, o); }
   if (path === "/api/groups" && method === "GET") return out(200, { groups: await groups.openGroups() }); // public list for the sign-up form
   if (path === "/api/group-request" && method === "POST") { // a signed-in organizer asks for a group
     const m = /^Bearer\s+(\S{20,4096})$/.exec(String(headers.authorization || ""));
@@ -76,10 +77,22 @@ async function handle(req) {
   catch (e) { return out(e.status || 500, { code: e.code || "error", message: e.message || "Ошибка сервера." }); }
 }
 
-// Vercel function wrapper (the same file serves every api/admin/* path)
+// Real API path of a Vercel request. vercel.json rewrites /api/admin/*, /api/groups, /api/group-request and /api/access
+// to the single function api/router.js with ?__p=<rest>, because the Hobby plan allows at most 12 functions.
+function vercelPath(rawUrl) {
+  const u = new URL("http://x" + (String(rawUrl || "/").startsWith("/") ? rawUrl : "/" + rawUrl));
+  const p = u.searchParams.get("__p");
+  u.searchParams.delete("__p");
+  const path = p != null && /^\/api\/router\/?$/.test(u.pathname) ? "/api/" + p.replace(/^\/+/, "") : u.pathname;
+  const q = u.searchParams.toString();
+  return { path, url: path + (q ? "?" + q : "") };
+}
+
+// Vercel function wrapper (api/router.js serves every routed path)
 async function vercel(req, res) {
-  const h = Object.assign({}, req.headers || {}, { "x-url": req.url });
-  const r = await handle({ method: req.method, path: String(req.url || "").split("?")[0], headers: h, body: req.body,
+  const { path, url } = vercelPath(req.url);
+  const h = Object.assign({}, req.headers || {}, { "x-url": url });
+  const r = await handle({ method: req.method, path, headers: h, body: req.body,
     ip: admin.clientIp(req.headers || {}, req.socket && req.socket.remoteAddress) });
   res.statusCode = r.status;
   res.setHeader("Cache-Control", "no-store");
@@ -88,4 +101,4 @@ async function vercel(req, res) {
   res.end(JSON.stringify(r.json));
 }
 
-module.exports = { handle, vercel };
+module.exports = { handle, vercel, vercelPath };
