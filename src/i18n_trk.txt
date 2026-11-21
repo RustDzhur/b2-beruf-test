@@ -463,3 +463,26 @@ x31|E-posta doğrulama için gereklidir: aynı adresi WhatsApp'tan öğretmene g
 x32|E-posta girin: ilerlemeyi bulutta saklamak ve doğrulama için gereklidir.
 r29|{~1} itibaren
 r30|Eğitmen gönüllü bir projedir ve ücretsiz kalır. Yalnızca yapay zekâ para gerektirir: verdiği her yanıt için API ücreti ödenir. Bu yüzden yapay zekâya tam erişim, buna sembolik bir katkı sağlayanlara açılır. Erişim için bulutta kayıt olun (form: e-posta ve şifre) ve WhatsApp'tan yazın: {1}. Katkıyı nasıl yapacağınızı orada size anlatacaklar. Onaylandıktan sonra tüm araçlar açılır ve sınava tam olarak hazırlanabilirsiniz.
+x33|E-posta ile kayıt: e-posta adresinizi ve bir şifre girin. İlerlemeniz bulutta saklanır; başka bir cihazda aynı e-posta ve şifreyi girmeniz yeterlidir.
+x34|E-posta ve şifre ile kayıt ve giriş. Kayıttan sonra bir onay e-postası alacaksınız. Eğitmene erişim öğretmen onayladıktan sonra açılır: öğretmenle WhatsApp veya telefonla iletişime geçin. Ad ve soyad yalnızca sıralama için kullanılır ve isteğe bağlıdır.
+x35|Geçerli bir e-posta girin: kayıt ve giriş onunla yapılır.
+x36|Bir şifre girin (en az 6 karakter).
+x37|Önce e-postanızı girin.
+x38|Şifre sıfırlama e-postası gönderildi:
+x39|E-posta gönderilemedi. Adresi kontrol edin.
+x40|Kayıt ol / giriş yap
+x41|Çıkış / hesap değiştir
+x42|Onay bekleniyor
+x43|Kayıt tamamlandı. Onay e-postasını şu adrese gönderdik:
+x44|Giriş yapılan hesap:
+x45|Eğitmen yalnızca grup üyelerine açıktır. Erişim için öğretmenle WhatsApp veya telefonla iletişime geçin ve bağlanma izni isteyin. Kayıt olduğunuz e-posta adresini belirtin.
+x46|WhatsApp / telefon:
+x47|Kontrol ediliyor…
+x48|Erişim henüz onaylanmadı.
+x49|Tekrar kontrol et
+x50|Hesap değiştir
+x51|Erişim kontrol ediliyor…
+x52|Öğretmenin numarası henüz girilmedi.
+x53|WhatsApp'tan yaz
+x54|Ara
+x55|Şifreyi sıfırla

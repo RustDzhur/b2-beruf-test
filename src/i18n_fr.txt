@@ -463,3 +463,26 @@ x31|L'e-mail sert à la vérification : envoyez la même adresse à l'enseignant
 x32|Indiquez un e-mail : il est nécessaire pour sauvegarder la progression dans le cloud et pour la vérification.
 r29|À partir de {~1}
 r30|L'entraîneur est un projet bénévole et reste gratuit. Seule l'IA coûte de l'argent : chacune de ses réponses est payée via l'API. C'est pourquoi l'accès complet à l'IA est ouvert à ceux qui versent une contribution symbolique. Pour y accéder, inscrivez-vous dans le cloud (fiche : e-mail et mot de passe) et écrivez sur WhatsApp: {1}. On vous y expliquera comment verser la contribution. Une fois votre accès confirmé, tous les outils seront disponibles et vous pourrez vous préparer pleinement à l'examen.
+x33|Inscription par e-mail : saisissez votre adresse e-mail et un mot de passe. Votre progression est enregistrée dans le cloud ; sur un autre appareil, il suffit de saisir le même e-mail et le même mot de passe.
+x34|Inscription et connexion avec e-mail et mot de passe. Après l'inscription, vous recevrez un e-mail de confirmation. L'accès à l'entraîneur s'ouvre après l'autorisation de l'enseignant : contactez-le par WhatsApp ou par téléphone. Le prénom et le nom servent uniquement au classement et sont facultatifs.
+x35|Saisissez une adresse e-mail valide : elle sert à l'inscription et à la connexion.
+x36|Saisissez un mot de passe (au moins 6 caractères).
+x37|Saisissez d'abord votre e-mail.
+x38|E-mail de réinitialisation envoyé à :
+x39|Impossible d'envoyer l'e-mail. Vérifiez l'adresse.
+x40|S'inscrire / se connecter
+x41|Se déconnecter / changer de compte
+x42|En attente d'autorisation
+x43|Inscription réussie. Nous avons envoyé un e-mail de confirmation à :
+x44|Connecté en tant que :
+x45|L'entraîneur est réservé aux membres du groupe. Pour obtenir l'accès, contactez l'enseignant par WhatsApp ou par téléphone et demandez l'autorisation de vous connecter. Indiquez l'e-mail avec lequel vous vous êtes inscrit.
+x46|WhatsApp / téléphone :
+x47|Vérification…
+x48|L'accès n'est pas encore autorisé.
+x49|Vérifier à nouveau
+x50|Changer de compte
+x51|Vérification de l'accès…
+x52|Le numéro de l'enseignant n'est pas encore indiqué.
+x53|Écrire sur WhatsApp
+x54|Appeler
+x55|Réinitialiser le mot de passe

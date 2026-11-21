@@ -463,3 +463,26 @@ x31|L'e-mail serve per la verifica: invia lo stesso indirizzo all'insegnante su 
 x32|Inserisci un'e-mail: serve per salvare i progressi nel cloud e per la verifica.
 r29|Da {~1}
 r30|Il trainer è un progetto di volontariato e resta gratuito. Solo l'IA costa: ogni sua risposta si paga tramite l'API. Per questo l'accesso completo all'IA è aperto a chi dà un contributo simbolico. Per ottenerlo, registrati nel cloud (scheda: e-mail e password) e scrivi su WhatsApp: {1}. Lì ti spiegheranno come versare il contributo. Dopo la conferma si apriranno tutti gli strumenti e potrai prepararti pienamente all'esame.
+x33|Registrazione via e-mail: inserisci la tua e-mail e una password. I tuoi progressi vengono salvati nel cloud; su un altro dispositivo bastano la stessa e-mail e la stessa password.
+x34|Registrazione e accesso con e-mail e password. Dopo la registrazione riceverai un'e-mail di conferma. L'accesso al trainer si apre dopo l'autorizzazione dell'insegnante: contattalo via WhatsApp o per telefono. Nome e cognome servono solo per la classifica e sono facoltativi.
+x35|Inserisci un'e-mail valida: serve per la registrazione e l'accesso.
+x36|Inserisci una password (almeno 6 caratteri).
+x37|Inserisci prima la tua e-mail.
+x38|E-mail per reimpostare la password inviata a:
+x39|Impossibile inviare l'e-mail. Controlla l'indirizzo.
+x40|Registrati / accedi
+x41|Esci / cambia account
+x42|In attesa di autorizzazione
+x43|Registrazione completata. Abbiamo inviato un'e-mail di conferma a:
+x44|Accesso effettuato come:
+x45|Il trainer è riservato ai membri del gruppo. Per ottenere l'accesso, contatta l'insegnante via WhatsApp o per telefono e chiedi l'autorizzazione a collegarti. Indica l'e-mail con cui ti sei registrato.
+x46|WhatsApp / telefono:
+x47|Verifica in corso…
+x48|L'accesso non è ancora stato autorizzato.
+x49|Verifica di nuovo
+x50|Cambia account
+x51|Verifica dell'accesso…
+x52|Il numero dell'insegnante non è ancora indicato.
+x53|Scrivi su WhatsApp
+x54|Chiama
+x55|Reimposta password
