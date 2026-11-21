@@ -3,6 +3,8 @@
 const admin = require("./_admin.js");
 const verify = require("./_verify.js");
 const groups = require("./_groups.js");
+const subs = require("./_subs.js");
+const crypto = require("crypto");
 
 const out = (status, json, headers) => ({ status, json, headers: headers || {} });
 // only the main administrator changes anything; a group teacher just looks at the progress of the own group
@@ -26,6 +28,13 @@ async function route({ method, path, headers, body, ip }) {
     const uid = m ? await verify._hooks.lookupUid(m[1]) : null;
     if (!uid) return out(401, { code: "unauthorized", message: "Войдите в аккаунт." });
     return out(200, await admin.linkEmail(uid, verify.emails.get(uid), admin.bodyOf(body).email));
+  }
+  if (path === "/api/cron/subs") { // Vercel Cron, once a day: reminders and "subscription ended" letters
+    const secret = String(process.env.CRON_SECRET || "");
+    if (!secret) return out(501, { code: "no_cron_secret", message: "CRON_SECRET is not set." });
+    const a = Buffer.from(String(headers.authorization || "")), e = Buffer.from("Bearer " + secret);
+    if (a.length !== e.length || !crypto.timingSafeEqual(a, e)) return out(401, { code: "unauthorized" });
+    return out(200, Object.assign({ ok: true }, await subs.runDaily()));
   }
   if (!admin.sameOrigin(headers)) return out(403, { code: "origin", message: "forbidden origin" });
   const secure = admin.isSecure(headers);
@@ -51,12 +60,14 @@ async function route({ method, path, headers, body, ip }) {
   if (path === "/api/admin/verify" && method === "POST") {
     superOnly(role);
     await verify.setVerified(b.uid, !!b.verified);
-    return out(200, { ok: true, uid: String(b.uid), verified: !!b.verified });
+    if (b.verified) await subs.start(b.uid, "ai"); else await subs.downgrade(b.uid); // payment for the AI plan starts a month
+    return out(200, { ok: true, uid: String(b.uid), verified: !!b.verified, sub: await subs.get(b.uid) });
   }
   if (path === "/api/admin/admit" && method === "POST") { // admission to the trainer (not the AI)
     superOnly(role);
     await require("./_admit.js").setAdmitted(b.uid, !!b.admitted);
-    return out(200, { ok: true, uid: String(b.uid), admitted: !!b.admitted });
+    const sub = b.admitted ? await subs.start(b.uid, "basic") : null; // payment confirmed: one month starts now
+    return out(200, { ok: true, uid: String(b.uid), admitted: !!b.admitted, sub });
   }
   if (path === "/api/admin/delete" && method === "POST") {
     superOnly(role);
@@ -67,6 +78,18 @@ async function route({ method, path, headers, body, ip }) {
     superOnly(role);
     if (!require("./_verify.js").UID_RE.test(String(b.uid || ""))) return out(400, { code: "bad_uid", message: "Некорректный UID." });
     return out(200, await admin.linkEmail(String(b.uid), "", b.email, true, b.password));
+  }
+  if (path === "/api/admin/sub" && method === "POST") { // paid month, trial or unlimited, set by the main administrator
+    superOnly(role);
+    const plan = b.plan === "ai" ? "ai" : "basic";
+    let sub;
+    if (b.action === "month") sub = await subs.extend(b.uid, plan);
+    else if (b.action === "trial") sub = await subs.trial(b.uid, b.days, plan);
+    else if (b.action === "unlimited") return out(200, { ok: true, sub: await subs.clear(b.uid) });
+    else return out(400, { code: "bad_action", message: "Неизвестное действие." });
+    await require("./_admit.js").setAdmitted(b.uid, true);
+    await verify.setVerified(b.uid, plan === "ai");
+    return out(200, { ok: true, sub });
   }
   if (path === "/api/admin/move" && method === "POST") { // move students to another group
     superOnly(role);

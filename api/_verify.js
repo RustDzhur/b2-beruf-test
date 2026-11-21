@@ -104,7 +104,10 @@ async function listVerified() {
 }
 
 // hooks so tests can run without Google
-const impl = { lookupUid, isVerified, isAdmitted: (uid, createdAt) => require("./_admit.js").isAdmitted(uid, createdAt) };
+// sub(uid): the subscription term (see _subs.js); a Firestore hiccup must not lock everybody out, so it counts as "no term"
+const impl = { lookupUid, isVerified, isAdmitted: (uid, createdAt) => require("./_admit.js").isAdmitted(uid, createdAt),
+  sub: async uid => { try { return await require("./_subs.js").get(uid); } catch { return null; } } };
+const isExpired = sub => require("./_subs.js").expired(sub);
 
 // Authorization header -> {ok:true, uid} or {ok:false, status, code}
 async function check(authHeader) {
@@ -114,7 +117,9 @@ async function check(authHeader) {
   try {
     const uid = await impl.lookupUid(m[1]);
     if (!uid) return { ok: false, status: 403, code: "not_verified" };
-    if (!isOwner(uid) && !(await impl.isVerified(uid))) return { ok: false, status: 403, code: "not_verified" };
+    if (isOwner(uid)) return { ok: true, uid };
+    if (!(await impl.isVerified(uid))) return { ok: false, status: 403, code: "not_verified" };
+    if (isExpired(await impl.sub(uid))) return { ok: false, status: 403, code: "expired" }; // the paid month or the trial is over
     return { ok: true, uid };
   } catch (e) {
     return { ok: false, status: e.status || 503, code: e.code || "verify_unavailable" };
@@ -132,8 +137,11 @@ async function access(authHeader) {
     if (!uid) return [200, { verified: false, ai: false, contact: contact() }];
     if (isOwner(uid)) return [200, { verified: true, ai: true, owner: true, contact: contact() }];
     const admitted = await impl.isAdmitted(uid, created.get(uid));
+    const sub = admitted ? await impl.sub(uid) : null;
+    const term = sub && sub.until > 0 ? { until: sub.until, trial: !!sub.trial, plan: sub.plan } : null;
+    if (isExpired(sub)) return [200, { verified: false, ai: false, expired: true, sub: term, contact: contact() }]; // closes by itself
     const ai = admitted ? await impl.isVerified(uid) : false;
-    return [200, { verified: admitted, ai, contact: contact() }];
+    return [200, { verified: admitted, ai, sub: term, contact: contact() }];
   } catch (e) {
     return [e.status || 503, { code: e.code || "verify_unavailable", verified: null, contact: contact() }];
   }

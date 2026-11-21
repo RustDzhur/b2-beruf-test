@@ -535,3 +535,8 @@ x101|Sadece mesaj, lütfen aramayın.
 x102|E-posta veya şifre yanlış. Şifreyi “Şifreyi mi unuttunuz?” ile sıfırlayabilirsiniz. E-postayla girişten önce burada çalıştıysanız “Kayıt” sekmesini açın ve aynı soyadı, adı ve şifreyi girin: eski ilerlemeniz bulunur ve e-posta ona bağlanır.
 x103|Açık grup
 x104|Açık grup: kendi başıma, öğretmensiz çalışıyorum
+x105|Deneme süreniz sona erdi
+x106|Aboneliğiniz sona erdi
+x107|Erişim kapandı, ilerlemeniz kayıtlı.
+x108|Devam etmek için ayda 5 € (yapay zekâsız) veya ayda 10 € (yapay zekâlı) ödeyin ve yöneticiye WhatsApp'tan yazın.
+x109|Lütfen aramayın, sadece mesaj gönderin.

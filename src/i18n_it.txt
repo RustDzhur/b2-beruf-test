@@ -535,3 +535,8 @@ x101|Solo messaggi, per favore non chiamare.
 x102|E-mail o password errati. Puoi reimpostare la password con «Password dimenticata?». Se studiavi qui prima dell'accesso via e-mail, apri «Registrazione» e inserisci gli stessi cognome, nome e password: i vecchi progressi verranno trovati e l'e-mail collegata.
 x103|Gruppo aperto
 x104|Gruppo aperto: studio da solo, senza insegnante
+x105|Il periodo di prova è terminato
+x106|L'abbonamento è scaduto
+x107|L'accesso è chiuso, i tuoi progressi sono salvati.
+x108|Per continuare paga 5 € al mese (senza IA) o 10 € al mese (con IA) e scrivi all'amministratore su WhatsApp.
+x109|Per favore non chiamare, solo un messaggio.

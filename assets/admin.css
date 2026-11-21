@@ -716,3 +716,7 @@ body.adm-lock { overflow: hidden; }
 .adm-student-name span.adm-email { color: var(--ink); opacity: .75; word-break: break-all; }
 .adm-verify { display: inline-flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .adm-verify .adm-btn { padding: 4px 10px; font-size: 12px; }
+
+.adm-sub p { margin: 0 0 6px; }
+.adm-sub-end b { color: var(--bad); }
+.adm-sub-btns { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }

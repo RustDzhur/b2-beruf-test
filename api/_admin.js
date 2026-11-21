@@ -532,10 +532,17 @@ function computeStudent(raw, now = Date.now()) {
   };
 }
 
-function dashboard(rawUsers, now = Date.now(), verified = null, admitted = null) {
+function dashboard(rawUsers, now = Date.now(), verified = null, admitted = null, subs = null) {
   const students = (rawUsers || []).map(u => computeStudent(u, now));
   if (verified) students.forEach(s => { s.verified = verified.has(s.uid); });
   if (admitted) students.forEach(s => { s.admitted = admitted.has(s.uid); });
+  if (subs) { // the paid month / trial (see _subs.js); no entry or until 0 = unlimited
+    const S = require("./_subs.js");
+    students.forEach(s => {
+      const t = subs.get(s.uid);
+      s.sub = t ? { plan: t.plan, until: t.until, trial: !!t.trial, trialUsed: !!t.trialUsed, days: S.daysLeft(t, now), expired: S.expired(t, now) } : null;
+    });
+  }
   const withData = students.filter(s => s.tasks > 0 || s.days > 0);
   const withScore = students.filter(s => s.scorePct != null);
   const d7 = dayKey(-6), d30 = dayKey(-29);
@@ -634,7 +641,9 @@ async function buildDashboard(role = "super", only = "") {
   try { verified = await require("./_verify.js").listVerified(); } catch (e) { verifyError = e.message || "verify"; }
   let admitted = null;
   try { admitted = await require("./_admit.js").listAdmitted(); } catch (e) { verifyError = verifyError || e.message || "admit"; }
-  const out = dashboard(users, Date.now(), verified, admitted);
+  let subs = null;
+  try { subs = await require("./_subs.js").list(); } catch (e) { verifyError = verifyError || e.message || "subs"; }
+  const out = dashboard(users, Date.now(), verified, admitted, subs);
   out.verifyError = verifyError; // the cabinet warns instead of showing everybody as unverified by mistake
   out.source = source;
   out.role = role;
