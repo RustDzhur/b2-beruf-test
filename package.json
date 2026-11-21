@@ -7,7 +7,7 @@
     "start": "node server.js",
     "build": "python3 src/build_web.py",
     "audio": "python3 src/gen_audio.py",
-    "test": "node --test tests/admin.test.js tests/repeat.test.js tests/i18n.test.js tests/verify.test.js tests/delete.test.js tests/groups.test.js tests/syntax.test.js tests/vercel.test.js"
+    "test": "node --test tests/admin.test.js tests/repeat.test.js tests/i18n.test.js tests/verify.test.js tests/delete.test.js tests/groups.test.js tests/syntax.test.js tests/vercel.test.js tests/subs.test.js"
   },
   "license": "UNLICENSED"
 }

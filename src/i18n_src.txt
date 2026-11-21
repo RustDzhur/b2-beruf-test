@@ -535,3 +535,8 @@ x101|Messages only, please do not call.|Bitte nur Nachrichten, nicht anrufen.
 x102|Wrong e-mail or password. You can reset the password with “Forgot password?”. If you studied here before e-mail sign-in existed, open “Sign up” and enter the same surname, first name and password: your old progress will be found and the e-mail linked to it.|Falsche E-Mail oder falsches Kennwort. Das Kennwort können Sie mit „Kennwort vergessen?“ zurücksetzen. Wenn Sie schon vor der Anmeldung per E-Mail hier gelernt haben, öffnen Sie „Registrierung“ und geben Sie denselben Familiennamen, Vornamen und dasselbe Kennwort ein: Ihr alter Fortschritt wird gefunden und die E-Mail damit verknüpft.
 x103|Open group|Offene Gruppe
 x104|Open group: I study on my own, without a teacher|Offene Gruppe: Ich lerne selbstständig, ohne Lehrkraft
+x105|Your trial period has ended|Ihre Testphase ist vorbei
+x106|Your subscription has ended|Ihr Abo ist abgelaufen
+x107|Access is closed, your progress is saved.|Der Zugang ist gesperrt, Ihr Fortschritt bleibt gespeichert.
+x108|To continue, pay €5 per month (without AI) or €10 per month (with AI) and write to the administrator on WhatsApp.|Um weiterzumachen, zahlen Sie 5 € pro Monat (ohne KI) oder 10 € pro Monat (mit KI) und schreiben Sie dem Administrator auf WhatsApp.
+x109|Please do not call, send a message only.|Bitte nicht anrufen, nur eine Nachricht.

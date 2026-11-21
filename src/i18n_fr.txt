@@ -535,3 +535,8 @@ x101|Messages uniquement, merci de ne pas appeler.
 x102|E-mail ou mot de passe incorrect. Vous pouvez réinitialiser le mot de passe avec « Mot de passe oublié ? ». Si vous étudiiez ici avant la connexion par e-mail, ouvrez « Inscription » et saisissez les mêmes nom, prénom et mot de passe : votre ancienne progression sera retrouvée et l'e-mail y sera lié.
 x103|Groupe ouvert
 x104|Groupe ouvert : j’apprends seul, sans enseignant
+x105|Votre période d'essai est terminée
+x106|Votre abonnement est terminé
+x107|L'accès est fermé, votre progression est conservée.
+x108|Pour continuer, payez 5 € par mois (sans IA) ou 10 € par mois (avec IA) et écrivez à l'administrateur sur WhatsApp.
+x109|Merci de ne pas appeler, uniquement un message.

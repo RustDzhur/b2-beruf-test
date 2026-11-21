@@ -365,31 +365,78 @@ function studentCell(s) {
 /* access to the trainer (and the AI): the teacher confirms a student by hand after the WhatsApp request (stored server-side in Firestore `verified`) */
 async function toggleVerify(s, reopen) {
   const want = !s.verified;
+  let r;
   try {
-    await api("/api/admin/verify", { method: "POST", body: JSON.stringify({ uid: s.uid, verified: want }) });
+    r = await api("/api/admin/verify", { method: "POST", body: JSON.stringify({ uid: s.uid, verified: want }) });
   } catch (e) { alert(e.message || "Не удалось сохранить."); return; }
   s.verified = want;
+  setSubLocal(s, r && r.sub);
   renderStudentList(); syncFilterButtons();
   if (reopen) renderDrawerFor(s.uid);
 }
 // two separate things: admission to the trainer (new sign-ups wait for it; old accounts have it automatically)
 // and the paid AI (opened by hand for students who contribute)
 async function toggleAdmit(s, reopen) {
-  try { await api("/api/admin/admit", { method: "POST", body: JSON.stringify({ uid: s.uid, admitted: !s.admitted }) }); }
+  let r;
+  try { r = await api("/api/admin/admit", { method: "POST", body: JSON.stringify({ uid: s.uid, admitted: !s.admitted }) }); }
   catch (e) { alert(e.message || "Не удалось сохранить."); return; }
   s.admitted = !s.admitted;
+  if (r && r.sub) setSubLocal(s, r.sub);
   renderStudentList(); syncFilterButtons();
   if (reopen) renderDrawerFor(s.uid);
+}
+/* subscriptions: a paid month (5 € trainer, 10 € with AI) or a 2-3 day trial; the server closes access when it ends */
+const DAY_MS = 24 * 3600 * 1000;
+function setSubLocal(s, t) {
+  const now = Date.now();
+  s.sub = t ? { plan: t.plan, until: t.until || 0, trial: !!t.trial, trialUsed: !!t.trialUsed,
+    days: t.until > 0 ? Math.max(0, Math.ceil((t.until - now) / DAY_MS)) : null, expired: t.until > 0 && t.until <= now } : null;
+}
+const subDate = ms => new Date(ms).toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric" });
+// short state for the list: "до 21.12", "пробный · 2 дн.", "срок истёк"; nothing for unlimited access
+function subChip(s) {
+  const t = s.sub;
+  if (!t || !(t.until > 0)) return null;
+  if (t.expired) return el("span", { class: "adm-chip warn" }, t.trial ? "Пробный закончился" : "Срок истёк");
+  return el("span", { class: "adm-chip" + (t.days <= 3 ? " warn" : "") }, el("span", null, t.trial ? "Пробный" : "до"), " ", t.trial ? String(t.days) : subDate(t.until).slice(0, 5), t.trial ? " " : null, t.trial ? el("span", null, "дн.") : null);
+}
+async function subAction(s, body, reopen) {
+  let r;
+  try { r = await api("/api/admin/sub", { method: "POST", body: JSON.stringify(Object.assign({ uid: s.uid }, body)) }); }
+  catch (e) { alert(e.message || "Не удалось сохранить."); return; }
+  setSubLocal(s, r && r.sub);
+  if (body.action !== "unlimited") { s.admitted = true; s.verified = body.plan === "ai"; }
+  renderStudentList(); syncFilterButtons();
+  if (reopen) renderDrawerFor(s.uid);
+}
+function giveTrial(s, days, reopen) {
+  const ai = confirm("Пробный период на " + days + " дн. для " + s.name + ".\nОК: с ИИ. Отмена: без ИИ.");
+  subAction(s, { action: "trial", days, plan: ai ? "ai" : "basic" }, reopen);
+}
+function subBlock(s) {
+  const t = s.sub, has = t && t.until > 0;
+  const state = !has ? el("p", null, el("b", null, "Подписка:"), " ", el("span", null, "бессрочно"))
+    : t.expired ? el("p", { class: "adm-sub-end" }, el("b", null, t.trial ? "Пробный период закончился" : "Подписка закончилась"), " ", subDate(t.until))
+    : el("p", null, el("b", null, t.trial ? "Пробный период до" : "Оплачено до"), " ", subDate(t.until), " · ",
+        el("span", null, t.plan === "ai" ? "Тренажёр + ИИ" : "Тренажёр"), " · ", el("span", null, "осталось дней:"), " " + t.days);
+  return el("div", { class: "adm-drawer-note adm-sub" }, state,
+    el("div", { class: "adm-sub-btns" },
+      el("button", { class: "adm-btn primary", onclick: () => subAction(s, { action: "month", plan: "basic" }, true) }, "+1 месяц · 5 €"),
+      el("button", { class: "adm-btn primary", onclick: () => subAction(s, { action: "month", plan: "ai" }, true) }, "+1 месяц с ИИ · 10 €"),
+      t && t.trialUsed ? null : el("button", { class: "adm-btn", onclick: () => giveTrial(s, 2, true) }, "Пробный 2 дня"),
+      t && t.trialUsed ? null : el("button", { class: "adm-btn", onclick: () => giveTrial(s, 3, true) }, "Пробный 3 дня"),
+      has ? el("button", { class: "adm-btn", onclick: () => { if (confirm("Сделать доступ " + s.name + " бессрочным?")) subAction(s, { action: "unlimited" }, true); } }, "Бессрочно") : null),
+    el("div", { class: "adm-email" }, "Оплата месяца включает доступ сразу. Когда срок кончится, доступ закроется сам, а ученику придёт письмо."));
 }
 function verifyControl(s, reopen) {
   // a group teacher only sees the state; every change is made by the main administrator
   if (!isSuper()) return el("span", { class: "adm-verify" },
-    el("span", { class: "adm-chip " + (s.admitted ? (s.verified ? "ok" : "") : "warn") }, !s.admitted ? "Нет доступа" : s.verified ? "ИИ открыт" : "ИИ закрыт"));
+    el("span", { class: "adm-chip " + (s.admitted ? (s.verified ? "ok" : "") : "warn") }, !s.admitted ? "Нет доступа" : s.verified ? "ИИ открыт" : "ИИ закрыт"), subChip(s));
   if (!s.admitted) return el("span", { class: "adm-verify" },
     el("span", { class: "adm-chip warn" }, "Ждёт допуска"),
     el("button", { class: "adm-btn primary", onclick: e => { e.stopPropagation(); toggleAdmit(s, reopen); } }, "Допустить"));
   return el("span", { class: "adm-verify" },
-    el("span", { class: "adm-chip " + (s.verified ? "ok" : "") }, s.verified ? "ИИ открыт" : "ИИ закрыт"),
+    el("span", { class: "adm-chip " + (s.verified ? "ok" : "") }, s.verified ? "ИИ открыт" : "ИИ закрыт"), subChip(s),
     el("button", { class: "adm-btn", onclick: e => { e.stopPropagation(); toggleVerify(s, reopen); } }, s.verified ? "Закрыть ИИ" : "Открыть ИИ"),
     reopen ? el("button", { class: "adm-btn danger", onclick: e => { e.stopPropagation(); if (confirm("Заблокировать " + s.name + "? Тренажёр и ИИ закроются, прогресс сохранится.")) toggleAdmit(s, reopen); } }, "Заблокировать") : null);
 }
@@ -428,7 +475,7 @@ async function approvePicked() {
   const btn = document.getElementById("adm-approve"); if (btn) { btn.disabled = true; btn.textContent = "Допускаем…"; }
   let failed = 0;
   for (const s of chosen) {
-    try { await api("/api/admin/admit", { method: "POST", body: JSON.stringify({ uid: s.uid, admitted: true }) }); s.admitted = true; S.picked.delete(s.uid); }
+    try { const r = await api("/api/admin/admit", { method: "POST", body: JSON.stringify({ uid: s.uid, admitted: true }) }); s.admitted = true; setSubLocal(s, r && r.sub); S.picked.delete(s.uid); }
     catch { failed++; }
   }
   if (failed) alert("Не удалось допустить: " + failed);
@@ -987,6 +1034,7 @@ function renderDrawerFor(uid) {
       stat(fmt(s.failures), "ошибок"),
       stat(fmt(s.streak.longest), "лучшая серия")),
     el("p", { class: "adm-drawer-note" }, "Сейчас (с учётом пересдач): " + pctText(s.currentPct) + " · лучший: " + pctText(s.bestPct) + " · успешных заданий: " + fmt(s.successTasks) + " из " + fmt(s.tasks) + " · ошибок к повтору: " + fmt(s.failures)),
+    isSuper() ? subBlock(s) : null,
     isSuper() ? el("div", { class: "adm-drawer-note" }, el("button", { class: "adm-btn", onclick: () => linkEmailFor(s) }, "E-mail и пароль для входа"),
       el("div", { class: "adm-email" }, "Если ученик (или вы сами) не может войти: укажите e-mail и новый пароль, письмо не нужно.")) : null,
     el("div", { class: "adm-drawer-note" }, el("span", null, "Доступ"), ": ", verifyControl(s, true), s.email ? el("div", { class: "adm-email" }, s.email) : null, s.phone ? el("div", { class: "adm-email", dir: "ltr" }, el("a", { href: "https://wa.me/" + s.phone.replace(/\D/g, ""), target: "_blank", rel: "noopener" }, "WhatsApp " + s.phone)) : null),

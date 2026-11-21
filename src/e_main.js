@@ -561,9 +561,12 @@ function viewPending() {
   return h("div", { class: "reg" },
     h("div", { class: "reg-card wide" },
       h("div", { class: "reg-top" }, h("span", { class: "reg-mark" }, "DTB"), h("span", { class: "reg-brand" }, h("b", null, "DTB B2 Beruf"), h("span", null, "Тренажёр к экзамену telc"))),
-      h("h1", null, "Ожидает разрешения"),
+      h("h1", null, cloud.expired ? (cloud.sub && cloud.sub.trial ? "Пробный период закончился" : "Подписка закончилась") : "Ожидает разрешения"),
+      cloud.expired ? h("p", { class: "reg-sub" }, "Доступ закрыт, ваш прогресс сохранён.") : null,
       h("p", { class: "reg-sub" }, h("span", null, sent ? "Регистрация прошла. Мы отправили письмо с подтверждением на адрес:" : "Вы вошли как:"), " ", h("b", { dir: "ltr" }, mail)),
-      org
+      cloud.expired
+        ? h("p", null, h("b", null, "Чтобы продолжить, оплатите 5 € в месяц (без ИИ) или 10 € в месяц (с ИИ) и напишите администратору в WhatsApp."), " ", h("span", null, "Пожалуйста, не звоните, только сообщение."))
+        : org
         ? h("p", null, h("span", null, "Ваша группа ждёт одобрения главного администратора:"), " ", h("b", null, c.groupName || ""), ". ", h("span", null, "После одобрения откроется тренажёр, а кабинет группы будет по адресу /admin (вход «Организатор группы» с вашим e-mail и паролем)."))
         : h("ol", { class: "reg-steps" },
             h("li", null, "Подтвердите e-mail: откройте письмо и нажмите на ссылку."),

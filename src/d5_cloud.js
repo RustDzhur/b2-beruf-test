@@ -145,7 +145,7 @@ async function cloudAccess() {
     const r = await fetch("/api/access", { headers: { Authorization: "Bearer " + await fbToken() } });
     const j = await r.json().catch(() => ({}));
     if (j.contact) { cloud.contact = j.contact; store.set("contact", j.contact); }
-    if (j.verified === true || j.verified === false) { cloud.ok = j.verified; store.set("approved", j.verified); }
+    if (j.verified === true || j.verified === false) { cloud.ok = j.verified; store.set("approved", j.verified); cloud.expired = j.expired === true; cloud.sub = j.sub || null; }
   } catch {} // offline: keep the last known answer
   cloud.checked = true;
   return cloud.ok;

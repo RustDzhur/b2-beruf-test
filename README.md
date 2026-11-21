@@ -168,3 +168,14 @@ git push -u origin main
 
 - Ответы заданий Lesen и Hören проверяются по заложенным ключам; при сомнении сверяйтесь с материалами курса.
 - Кабинет `/admin` и рейтинг работают на Vercel (нужны serverless-функции `api/admin/*` и `api/leaderboard`). На GitHub Pages без функций они не откроются; прогресс и тема работают и без сервера.
+
+## Subscriptions and trials
+
+- «Допустить» in /admin starts one paid month on the trainer plan (5 €), «Открыть ИИ» one month on the AI plan (10 €).
+  In a student's profile: «+1 месяц · 5 €», «+1 месяц с ИИ · 10 €», «Пробный 2/3 дня» (once per account), «Бессрочно».
+- When the term ends the server closes the trainer and the AI by itself (Firestore `subs/{uid}`). Students without a
+  `subs` document (everybody admitted before this feature) keep unlimited access.
+- Letters: Vercel Cron calls `/api/cron/subs` once a day (08:00 UTC) and sends a reminder 3 days before the end of a
+  paid month and a notice when a month or a trial has ended. Set in **one** Vercel project only:
+  `CRON_SECRET` (any long random string), `RESEND_API_KEY` (resend.com), `MAIL_FROM` (e.g. `DTB Trainer <abo@your-domain>`,
+  the domain verified in Resend). Without them access still closes on time, only the letters are not sent.
