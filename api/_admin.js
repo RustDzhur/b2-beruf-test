@@ -658,6 +658,34 @@ async function assertRole(uids, role) {
   for (const u of uids) if (!mine.has(String(u))) throw adminError("forbidden", 403, "Этот ученик не из вашей группы.");
 }
 
+/* ------------------------------------------------------------- link e-mail */
+// Old accounts were made with a synthetic address (u…@dtb-trainer.app from name + birth date). After the student
+// signs in that old way, the server attaches the real e-mail with the service account, so the next sign-in works
+// by e-mail. (The browser cannot do it itself: Firebase blocks direct e-mail changes when e-mail enumeration
+// protection is on.) Only a synthetic address is ever replaced.
+const SYNTH_RE = /@dtb-trainer\.app$/;
+const authAdmin = { update: null }; // tests: replace with a fake
+async function linkEmail(uid, current, email) {
+  email = cleanEmail(email);
+  if (!email) throw adminError("bad_email", 400, "Некорректный e-mail.");
+  current = String(current || "").toLowerCase();
+  if (current === email) return { ok: true, linked: false };
+  if (current && !SYNTH_RE.test(current)) throw adminError("has_email", 409, "У аккаунта уже есть e-mail.");
+  if (authAdmin.update) { await authAdmin.update(uid, email); return { ok: true, linked: true }; }
+  const sa = serviceAccount();
+  if (!sa) throw adminError("no_service_account", 501, "Не настроен ключ Firebase.");
+  const r = await fetch("https://identitytoolkit.googleapis.com/v1/projects/" + encodeURIComponent(sa.project_id) + "/accounts:update", {
+    method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + await accessToken() },
+    body: JSON.stringify({ localId: uid, email, emailVerified: false }) });
+  if (!r.ok) {
+    const j = await r.json().catch(() => ({}));
+    const m = (j.error && j.error.message) || ("HTTP " + r.status);
+    if (/EMAIL_EXISTS/.test(m)) throw adminError("email_exists", 409, "Этот e-mail уже занят другим аккаунтом.");
+    throw adminError("auth_failed", 502, "Firebase Auth: " + m);
+  }
+  return { ok: true, linked: true };
+}
+
 /* ------------------------------------------------------------ delete users */
 
 const removedFixtures = new Set(); // local preview only: "deleted" fixture users stay hidden until restart
@@ -885,6 +913,8 @@ async function login(body) {
 
 module.exports = {
   resetLeaderboardCache,
+  linkEmail,
+  authAdmin,
   COOKIE,
   SESSION_MS,
   ACHIEVEMENTS,

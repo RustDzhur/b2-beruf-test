@@ -9,7 +9,7 @@ const admin = require("./_admin.js");
 const WEB_KEY = process.env.FIREBASE_WEB_API_KEY || "AIzaSyA5_PmCPlHg-9P1OD9LQFHXXF4Svj6Vajo"; // public by design (same key as in the page)
 const UID_RE = /^[A-Za-z0-9_-]{6,128}$/;
 const TOKEN_TTL = 5 * 60 * 1000, VERIFIED_TTL = 60 * 1000;
-const tokenCache = new Map(), verifiedCache = new Map(), created = new Map();
+const tokenCache = new Map(), verifiedCache = new Map(), created = new Map(), emails = new Map();
 const mem = new Set(); // used only with ADMIN_FIXTURES (no Firestore), so the cabinet can be tried locally
 
 const contact = () => String(process.env.VERIFY_CONTACT || "").slice(0, 120);
@@ -41,6 +41,7 @@ async function lookupUid(idToken) {
   if (!uid) return null;
   if (tokenCache.size > 2000) tokenCache.clear();
   tokenCache.set(key, { uid, exp: Date.now() + TOKEN_TTL });
+  emails.set(uid, String(j.users[0].email || "").toLowerCase()); // the sign-in address (old accounts: u…@dtb-trainer.app)
   created.set(uid, Number(j.users[0].createdAt || 0)); // account creation time: old accounts are admitted automatically
   return uid;
 }
@@ -132,4 +133,4 @@ async function access(authHeader) {
   }
 }
 
-module.exports = { check, access, setVerified, listVerified, isVerified, contact, UID_RE, _hooks: impl };
+module.exports = { emails, check, access, setVerified, listVerified, isVerified, contact, UID_RE, _hooks: impl };

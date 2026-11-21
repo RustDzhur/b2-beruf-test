@@ -21,6 +21,12 @@ async function route({ method, path, headers, body, ip }) {
     const g = await groups.requestGroup(uid, bb.email, bb.name);
     return out(200, { ok: true, group: { code: g.code, name: g.name, status: g.status } });
   }
+  if (path === "/api/link-email" && method === "POST") { // old account signed in by name: attach the real e-mail
+    const m = /^Bearer\s+(\S{20,4096})$/.exec(String(headers.authorization || ""));
+    const uid = m ? await verify._hooks.lookupUid(m[1]) : null;
+    if (!uid) return out(401, { code: "unauthorized", message: "Войдите в аккаунт." });
+    return out(200, await admin.linkEmail(uid, verify.emails.get(uid), admin.bodyOf(body).email));
+  }
   if (!admin.sameOrigin(headers)) return out(403, { code: "origin", message: "forbidden origin" });
   const secure = admin.isSecure(headers);
   const b = admin.bodyOf(body);

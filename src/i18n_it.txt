@@ -532,6 +532,6 @@ x98|Per favore non chiamare: invia un messaggio per chiedere l'accesso. Indica c
 x99|Dopo il pagamento l'amministratore apre l'accesso e il trainer funziona su tutti i tuoi dispositivi.
 x100|WhatsApp dell'amministratore:
 x101|Solo messaggi, per favore non chiamare.
-x102|Nessun account con questa e-mail. Controlla l'indirizzo o registrati.
+x102|E-mail o password errati. Puoi reimpostare la password con «Password dimenticata?». Se studiavi qui prima dell'accesso via e-mail, apri «Registrazione» e inserisci gli stessi cognome, nome e password: i vecchi progressi verranno trovati e l'e-mail collegata.
 x103|Gruppo aperto
 x104|Gruppo aperto: studio da solo, senza insegnante
