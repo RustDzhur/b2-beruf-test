@@ -533,3 +533,5 @@ x99|Ödemeden sonra yönetici erişimi açar ve alıştırma tüm cihazlarınız
 x100|Yöneticinin WhatsApp'ı:
 x101|Sadece mesaj, lütfen aramayın.
 x102|Bu e-postayla bir hesap bulunamadı. Adresi kontrol edin veya kayıt olun.
+x103|Açık grup
+x104|Açık grup: kendi başıma, öğretmensiz çalışıyorum
