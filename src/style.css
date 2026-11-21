@@ -603,5 +603,67 @@ table.score th { font-size: 12px; color: var(--muted); font-weight: 600; }
 }
 
 /* waiting-for-approval screen: the teacher's number, large and selectable */
-.contact-box{margin-top:14px;padding:14px 16px;border:1px solid var(--line, #3335);border-radius:12px}
-.contact-num{font-size:clamp(22px,5vw,30px);font-weight:700;letter-spacing:.02em;word-break:break-word;user-select:all;margin-top:4px}
+
+/* ---------- sign-up / sign-in card and waiting screen ---------- */
+.reg { position: relative; display: grid; place-items: start center; padding: 28px 16px 48px; min-height: calc(100vh - 60px);
+  background: radial-gradient(520px 360px at 15% 0%, var(--accent-soft), transparent 70%), radial-gradient(480px 360px at 90% 100%, rgba(14, 138, 112, .14), transparent 70%); }
+.reg-card { position: relative; z-index: 1; width: min(560px, 100%); background: var(--paper); border: 1px solid var(--line); border-radius: 22px;
+  padding: 30px 30px 24px; box-shadow: 0 30px 80px -40px rgba(16, 24, 40, .55); }
+.reg-card.wide { width: min(640px, 100%); }
+.reg-top { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.reg-mark { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 13px; background: linear-gradient(145deg, var(--accent), #5b74ff);
+  color: #fff; font: 700 12.5px/1 var(--f-mono); letter-spacing: .06em; box-shadow: 0 8px 20px -8px var(--accent); flex: none; }
+.reg-brand { display: grid; line-height: 1.25; }
+.reg-brand b { font-family: var(--f-display); font-weight: 600; font-size: 15px; }
+.reg-brand span { font-size: 12px; color: var(--muted); }
+.reg-card h1 { font-family: var(--f-display); font-size: 26px; font-weight: 600; letter-spacing: -.02em; margin: 0 0 6px; }
+.reg-sub { color: var(--muted); font-size: 14px; margin: 0 0 18px; line-height: 1.55; }
+.reg-seg { display: flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 11px; background: var(--bg); margin-bottom: 18px; }
+.reg-seg button { flex: 1; border: 0; background: transparent; color: var(--muted); font: 600 13.5px var(--f-ui); padding: 9px 10px; border-radius: 8px; cursor: pointer; transition: background .15s, color .15s; }
+.reg-seg button:hover { color: var(--ink); }
+.reg-seg button.on { background: var(--paper); color: var(--ink); box-shadow: 0 1px 3px rgba(16, 24, 40, .15); }
+.reg-who .reg-seg { margin: 6px 0 16px; }
+.reg-label { font-size: 12px; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.reg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+.reg-field { display: grid; gap: 6px; margin-bottom: 14px; min-width: 0; }
+.reg-field.wide { grid-column: 1 / -1; }
+.reg-field > span { font-size: 12px; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.reg-input { width: 100%; min-width: 0; border: 1px solid var(--line); background: var(--bg); border-radius: 11px; padding: 11px 13px; font: 500 15px var(--f-ui); color: var(--ink);
+  transition: border-color .15s, box-shadow .15s, background .15s; }
+.reg-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); background: var(--paper); }
+.reg-input[readonly], .reg-input:disabled { opacity: .75; }
+.reg-more { border: 1px dashed var(--line); border-radius: 12px; padding: 10px 14px; margin: 2px 0 16px; }
+.reg-more summary { cursor: pointer; font-size: 13.5px; color: var(--muted); font-weight: 600; }
+.reg-more[open] summary { margin-bottom: 12px; }
+.reg-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink);
+  border-radius: 11px; padding: 12px 16px; font: 650 15px var(--f-ui); cursor: pointer; text-decoration: none; box-shadow: 0 8px 18px -12px var(--accent); }
+.reg-btn:hover { filter: brightness(1.06); }
+.reg-btn:disabled { opacity: .55; cursor: default; }
+.reg-btn.wa { background: #1fa855; border-color: #1fa855; color: #fff; box-shadow: 0 8px 18px -12px #1fa855; margin-top: 12px; }
+.reg-links, .reg-actions { display: flex; flex-wrap: wrap; gap: 6px 16px; justify-content: center; margin-top: 14px; }
+.reg-actions .reg-btn { width: auto; min-width: 200px; }
+.reg-link { border: 0; background: none; color: var(--muted); font: 500 13.5px var(--f-ui); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; padding: 4px; }
+.reg-link:hover { color: var(--ink); }
+.reg-note { font-size: 13px; color: var(--muted); line-height: 1.55; margin: 12px 0; }
+.reg-error { margin: 0 0 14px; padding: 10px 12px; border-radius: 9px; border-left: 3px solid var(--bad); background: var(--bad-soft); color: var(--bad); font-size: 13px; line-height: 1.45; }
+.reg-steps { margin: 4px 0 14px; padding-inline-start: 22px; display: grid; gap: 8px; line-height: 1.5; }
+.price { margin: 6px 0 14px; }
+.price-head { font-size: 12px; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.price-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.price-card { position: relative; border: 1px solid var(--line); border-radius: 14px; padding: 14px; background: var(--bg); }
+.price-card.best { border-color: var(--accent); background: var(--accent-soft); box-shadow: 0 10px 24px -18px var(--accent); }
+.price-card p { margin: 6px 0 0; font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+.price-name { font-weight: 650; font-size: 14px; }
+.price-sum { margin-top: 4px; color: var(--muted); font-size: 13px; }
+.price-sum b { font-family: var(--f-display); font-size: 24px; color: var(--ink); font-weight: 600; }
+.price-tag { position: absolute; top: -10px; inset-inline-end: 12px; background: var(--accent); color: var(--accent-ink); font-size: 11px; font-weight: 700; border-radius: 99px; padding: 2px 9px; }
+.contact-box { border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin: 12px 0 14px; background: var(--bg); }
+.contact-label { font-size: 12px; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.contact-num { font-family: var(--f-mono); font-size: 20px; font-weight: 700; margin-top: 4px; word-break: break-all; }
+.contact-warn { margin-top: 8px; font-size: 13px; color: var(--bad); font-weight: 600; }
+@media (max-width: 560px) {
+  .reg { padding: 16px 16px 32px; }
+  .reg-card { padding: 22px 16px 18px; border-radius: 18px; }
+  .reg-grid, .price-grid { grid-template-columns: 1fr; }
+  .price-card.best { margin-top: 6px; }
+}

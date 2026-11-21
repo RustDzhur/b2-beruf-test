@@ -101,8 +101,55 @@ async function deleteGroup(code) {
   cache = { at: 0, list: null };
 }
 
+// main teacher moves students to another group: Firestore `moves/{uid}` = {group}. It wins over cand.group,
+// which the student's own app keeps writing, so a move survives the next cloud save.
+const moveMem = new Map();
+const movesBase = () => base().replace(/\/groups$/, "/moves");
+let movesCache = { at: 0, map: null };
+async function listMoves() {
+  if (useMem()) return new Map(moveMem);
+  if (movesCache.map && Date.now() - movesCache.at < 15000) return movesCache.map;
+  const map = new Map();
+  let page = "", n = 0;
+  do {
+    const r = await fsFetch(movesBase() + "?pageSize=300" + (page ? "&pageToken=" + encodeURIComponent(page) : ""));
+    if (r.status === 404) break;
+    if (!r.ok) throw fail(502, "firestore_failed", "Firestore moves: HTTP " + r.status);
+    const j = await r.json().catch(() => ({}));
+    for (const d of (j.documents || [])) { const g = normCode(str((d.fields || {}).group)); if (g) map.set(String(d.name || "").split("/").pop(), g); }
+    page = j.nextPageToken || "";
+  } while (page && ++n < 50);
+  movesCache = { at: Date.now(), map };
+  return map;
+}
+async function moveUsers(uids, code) {
+  code = normCode(code);
+  const g = (await listGroups(true)).find(x => x.code === code && x.status === "ok");
+  if (!g) throw fail(404, "no_group", "Группа не найдена или ещё не одобрена.");
+  for (const uid of uids) {
+    if (!/^[A-Za-z0-9_-]{6,128}$/.test(String(uid))) throw fail(400, "bad_uid", "Некорректный UID.");
+    if (useMem()) { moveMem.set(String(uid), code); continue; }
+    const r = await fsFetch(movesBase() + "/" + uid, { method: "PATCH", body: JSON.stringify({ fields: { group: { stringValue: code }, at: { integerValue: String(Date.now()) } } }) });
+    if (!r.ok) throw fail(502, "firestore_failed", "Firestore moves: HTTP " + r.status);
+  }
+  movesCache = { at: 0, map: null };
+  return g;
+}
+// apply moves to loaded users (cand.group = moved group)
+async function applyMoves(users) {
+  let moves;
+  try { moves = await listMoves(); } catch { return users; }
+  if (!moves.size) return users;
+  return users.map(u => {
+    const g = moves.get(u.uid);
+    if (!g) return u;
+    const data = Object.assign({}, u.data, { cand: Object.assign({}, u.data && u.data.cand, { group: g }) });
+    return Object.assign({}, u, { data });
+  });
+}
+
 const ownedBy = async uid => (await listGroups(true)).find(g => g.owner === uid) || null;
 const publicGroup = g => ({ code: g.code, name: g.name, status: g.status, email: g.email || "", owner: g.owner || "" });
 const openGroups = async () => (await listGroups()).filter(g => g.status === "ok").map(g => ({ code: g.code, name: g.name }));
 
-module.exports = { MAIN, CODE_RE, normCode, groupOf, listGroups, requestGroup, updateGroup, deleteGroup, ownedBy, publicGroup, openGroups, _mem: mem };
+module.exports = { MAIN, CODE_RE, normCode, groupOf, listGroups, requestGroup, updateGroup, deleteGroup, ownedBy, publicGroup, openGroups, listMoves, moveUsers, applyMoves, _mem: mem, _moveMem: moveMem };

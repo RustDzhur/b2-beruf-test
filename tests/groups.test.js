@@ -62,14 +62,43 @@ test("organizer asks for a group, the main teacher approves it, the organizer se
   assert.equal(r.status, 403);
   r = await call("POST", "/api/admin/groups", { code, status: "pending" }, orgCookie);
   assert.equal(r.status, 403);
+  // a group teacher only looks: no admission, AI, delete or move even for the own students
   r = await call("POST", "/api/admin/admit", { uid: users[1].uid, admitted: true }, orgCookie);
-  assert.equal(r.status, 200);
+  assert.equal(r.status, 403);
+  r = await call("POST", "/api/admin/verify", { uid: users[1].uid, verified: true }, orgCookie);
+  assert.equal(r.status, 403);
+  r = await call("POST", "/api/admin/delete", { uids: [users[1].uid] }, orgCookie);
+  assert.equal(r.status, 403);
+  r = await call("POST", "/api/admin/move", { uids: [users[1].uid], group: "MAIN" }, orgCookie);
+  assert.equal(r.status, 403);
 
   // the main teacher still sees everybody, or one group on request
   r = await call("GET", "/api/admin/dashboard", null, superCookie);
   assert.equal(r.json.students.length, users.length);
   r = await call("GET", "/api/admin/dashboard?group=" + code, null, superCookie);
   assert.equal(r.json.students.length, 2);
+
+  // the main teacher moves a student into the new group; the move wins over cand.group from the app
+  r = await call("POST", "/api/admin/move", { uids: [users[3].uid], group: code }, superCookie);
+  assert.equal(r.status, 200);
+  r = await call("GET", "/api/admin/dashboard?group=" + code, null, superCookie);
+  assert.equal(r.json.students.length, 3);
+  r = await call("GET", "/api/admin/dashboard", null, orgCookie);
+  assert.ok(r.json.students.some(s => s.uid === users[3].uid));
+  r = await call("POST", "/api/admin/move", { uids: [users[3].uid], group: "NOPE99" }, superCookie);
+  assert.equal(r.status, 404);
+  r = await call("POST", "/api/admin/move", { uids: [users[3].uid], group: "MAIN" }, superCookie);
+  assert.equal(r.status, 200);
+
+  // the main teacher blocks an old student (admitted by creation date) and lets them back in
+  const A = require("../api/_admit.js");
+  r = await call("POST", "/api/admin/admit", { uid: users[6].uid, admitted: false }, superCookie);
+  assert.equal(r.status, 200);
+  assert.equal(await A.isAdmitted(users[6].uid, Date.parse("2026-10-01T00:00:00Z")), false);
+  r = await call("GET", "/api/admin/dashboard", null, superCookie);
+  assert.equal(r.json.students.find(s => s.uid === users[6].uid).admitted, false);
+  await call("POST", "/api/admin/admit", { uid: users[6].uid, admitted: true }, superCookie);
+  assert.equal(await A.isAdmitted(users[6].uid, Date.parse("2026-10-01T00:00:00Z")), true);
 
   // leaderboards are per group
   const lbNew = await admin.buildLeaderboard("all", users[1].uid, Date.now() + 61000);

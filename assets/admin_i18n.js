@@ -6,6 +6,14 @@ let ADM_LANG = (() => { try { return localStorage.getItem("dtb.adminLang") || "d
 if (!ADM_LANGS[ADM_LANG]) ADM_LANG = "de";
 
 const ADM_I18N = {
+  "Кабинет администратора": ["Administrator's office", "Administratorbereich", "Espace administrateur", "Yönetici paneli", "مكتب المسؤول", "Area amministratore"],
+  "Вход · Кабинет администратора": ["Login · Administrator's office", "Login · Administratorbereich", "Connexion · Espace administrateur", "Giriş · Yönetici paneli", "الدخول · مكتب المسؤول", "Accesso · Area amministratore"],
+  "Кабинет администратора · DTB B2 Beruf": ["Administrator's office · DTB B2 Beruf", "Administratorbereich · DTB B2 Beruf", "Espace administrateur · DTB B2 Beruf", "Yönetici paneli · DTB B2 Beruf", "مكتب المسؤول · DTB B2 Beruf", "Area amministratore · DTB B2 Beruf"],
+  "Пароль администратора": ["Administrator password", "Administratorpasswort", "Mot de passe administrateur", "Yönetici şifresi", "كلمة مرور المسؤول", "Password amministratore"],
+  "Нет доступа": ["No access", "Kein Zugang", "Pas d'accès", "Erişim yok", "لا وصول", "Nessun accesso"],
+  "Заблокировать": ["Block", "Sperren", "Bloquer", "Engelle", "حظر", "Blocca"],
+  "Перенести в группу…": ["Move to group…", "In Gruppe verschieben…", "Déplacer vers le groupe…", "Gruba taşı…", "نقل إلى مجموعة…", "Sposta nel gruppo…"],
+  "Перенести в группу": ["Move to group", "In Gruppe verschieben", "Déplacer vers le groupe", "Gruba taşı", "نقل إلى مجموعة", "Sposta nel gruppo"],
   "Кабинет преподавателя": ["Teacher's office", "Lehrerkabinett", "Espace enseignant", "Öğretmen paneli", "مكتب المعلم", "Area docente"],
   "Прогресс учеников DTB B2 Beruf: дни занятий, решённые задания, ошибки и достижения — в одном месте.": ["Student progress for DTB B2 Beruf: study days, solved tasks, mistakes and achievements — all in one place.", "Schülerfortschritt DTB B2 Beruf: Lerntage, gelöste Aufgaben, Fehler und Erfolge — alles an einem Ort.", "Progression DTB B2 Beruf : jours d'étude, tâches résolues, erreurs et réussites — au même endroit.", "DTB B2 Beruf öğrenci ilerlemesi: çalışma günleri, çözülen görevler, hatalar ve başarılar — tek yerde.", "تقدم طلاب DTB B2 Beruf: أيام الدراسة والمهام المحلولة والأخطاء والإنجازات — في مكان واحد.", "Progresso studenti DTB B2 Beruf: giorni di studio, attività risolte, errori e successi — in un posto."],
   "Вход · Кабинет преподавателя": ["Login · Teacher's office", "Login · Lehrerkabinett", "Connexion · Espace enseignant", "Giriş · Öğretmen paneli", "الدخول · مكتب المعلم", "Accesso · Area docente"],

@@ -280,10 +280,11 @@ function fixtureUsers() {
 
 async function loadUsers() {
   const fixtures = fixtureUsers();
-  if (fixtures) return { source: "fixtures", users: fixtures.filter(u => !removedFixtures.has(u.uid)) };
+  const G = require("./_groups.js");
+  if (fixtures) return { source: "fixtures", users: await G.applyMoves(fixtures.filter(u => !removedFixtures.has(u.uid))) };
   const sa = serviceAccount();
   if (!sa) throw adminError("no_service_account", 501, "Не настроен ключ Firebase.");
-  return { source: "firestore", users: await fetchFirestore(sa.project_id) };
+  return { source: "firestore", users: await G.applyMoves(await fetchFirestore(sa.project_id)) };
 }
 
 /* ------------------------------------------------------------------ metrics */
@@ -323,6 +324,7 @@ function cleanEmail(s) {
   const t = String(s || "").trim().toLowerCase().slice(0, 120);
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(t) ? t : "";
 }
+const cleanPhone = s => { const t = String(s || "").replace(/[^\d+\s()\/-]/g, "").trim().slice(0, 24); return t.replace(/\D/g, "").length >= 6 ? t : ""; };
 
 // earliest logged attempt per task: Map(vid -> {t, pct})
 function firstAttempts(log) {
@@ -503,7 +505,7 @@ function computeStudent(raw, now = Date.now()) {
   return {
     uid: String((raw && raw.uid) || ""),
     fam, vor, name: name || "Без имени", initials, hasName: !!(fam || vor),
-    email: cleanEmail(cand.email), verified: false, admitted: true, group: require("./_groups.js").groupOf(cand),
+    email: cleanEmail(cand.email), phone: cleanPhone(cand.tel), verified: false, admitted: true, group: require("./_groups.js").groupOf(cand),
     days: days.length,
     tasks,
     attempts,
@@ -778,6 +780,7 @@ function leaderboardRows(users, period, now) {
 }
 
 let lbCache = { at: 0, groups: null, groupOfUid: null };
+function resetLeaderboardCache() { lbCache = { at: 0, groups: null, groupOfUid: null }; }
 
 // the leaderboard a student sees: approved students of the student's own group only
 async function buildLeaderboard(period = "week", uid = "", now = Date.now()) {
@@ -881,6 +884,7 @@ async function login(body) {
 }
 
 module.exports = {
+  resetLeaderboardCache,
   COOKIE,
   SESSION_MS,
   ACHIEVEMENTS,

@@ -5,6 +5,8 @@ const verify = require("./_verify.js");
 const groups = require("./_groups.js");
 
 const out = (status, json, headers) => ({ status, json, headers: headers || {} });
+// only the main administrator changes anything; a group teacher just looks at the progress of the own group
+const superOnly = role => { need(role); if (role !== "super") throw Object.assign(new Error("Это может только главный администратор."), { status: 403, code: "forbidden" }); return role; };
 const need = role => { if (!role) throw Object.assign(new Error("Войдите в кабинет."), { status: 401, code: "unauthorized" }); return role; };
 
 async function route({ method, path, headers, body, ip }) {
@@ -41,19 +43,26 @@ async function route({ method, path, headers, body, ip }) {
     return out(200, await admin.buildDashboard(need(role), only));
   }
   if (path === "/api/admin/verify" && method === "POST") {
-    await admin.assertRole([b.uid], need(role));
+    superOnly(role);
     await verify.setVerified(b.uid, !!b.verified);
     return out(200, { ok: true, uid: String(b.uid), verified: !!b.verified });
   }
   if (path === "/api/admin/admit" && method === "POST") { // admission to the trainer (not the AI)
-    await admin.assertRole([b.uid], need(role));
+    superOnly(role);
     await require("./_admit.js").setAdmitted(b.uid, !!b.admitted);
     return out(200, { ok: true, uid: String(b.uid), admitted: !!b.admitted });
   }
   if (path === "/api/admin/delete" && method === "POST") {
+    superOnly(role);
     const uids = Array.isArray(b.uids) ? b.uids : [];
-    await admin.assertRole(uids, need(role));
     return out(200, Object.assign({ ok: true }, await admin.deleteUsers(uids)));
+  }
+  if (path === "/api/admin/move" && method === "POST") { // move students to another group
+    superOnly(role);
+    const uids = (Array.isArray(b.uids) ? b.uids : []).map(String).slice(0, 500);
+    const g = await groups.moveUsers(uids, b.group);
+    admin.resetLeaderboardCache && admin.resetLeaderboardCache();
+    return out(200, { ok: true, moved: uids, group: { code: g.code, name: g.name } });
   }
   if (path === "/api/admin/groups") {
     need(role);

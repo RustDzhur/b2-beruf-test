@@ -501,3 +501,35 @@ x67|Après l'approbation, l'entraîneur s'ouvre et l'espace du groupe se trouve 
 x68|Votre groupe :
 x69|Espace du groupe
 x70|Groupe principal
+x71|Données pour la feuille de réponses (facultatif)
+x72|Nom *
+x73|Prénom *
+x74|Téléphone (WhatsApp) *
+x75|Mot de passe *
+x76|Mot de passe * (au moins 6 caractères)
+x77|Après l'inscription, vous recevrez un e-mail de confirmation. L'accès s'ouvre après l'accord de l'enseignant : écrivez-lui sur WhatsApp. Merci d'envoyer uniquement un message, sans appeler.
+x78|Se connecter
+x79|S'inscrire
+x80|Indiquez un numéro avec WhatsApp, par ex. +49 151 2345678.
+x81|Mot de passe oublié ?
+x82|Entraîneur pour l'examen telc
+x83|Connexion
+x84|Inscription
+x85|Connectez-vous avec l'e-mail et le mot de passe de votre inscription. Votre progression sera chargée depuis le cloud.
+x86|Créez un compte : votre progression est enregistrée dans le cloud et disponible sur tous vos appareils.
+x87|Votre enseignant voit ces données.
+x88|Retour
+x89|Prix de l'abonnement
+x90|Entraîneur
+x91|mois
+x92|Toutes les tâches de l'examen, la vérification des réponses, le travail sur les erreurs et le classement du groupe. Sans IA.
+x93|Meilleure préparation
+x94|Entraîneur + IA
+x95|Tout le forfait « Entraîneur » plus l'IA, qui corrige vos devoirs, lettres et réponses orales et vous aide à mieux préparer l'examen.
+x96|Confirmez votre e-mail : ouvrez le message et cliquez sur le lien.
+x97|Écrivez à l'enseignant sur WhatsApp.
+x98|Merci de ne pas appeler : envoyez un message pour demander l'accès. Indiquez nom, prénom, e-mail d'inscription et le forfait choisi.
+x99|Après le paiement, l'enseignant ouvre l'accès et l'entraîneur fonctionne sur tous vos appareils.
+x100|WhatsApp de l'enseignant :
+x101|Messages uniquement, merci de ne pas appeler.
+x102|Aucun compte avec cet e-mail. Vérifiez l'adresse ou inscrivez-vous.

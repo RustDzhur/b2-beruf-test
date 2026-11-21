@@ -1371,7 +1371,8 @@ const NOT_FOUND = /EMAIL_NOT_FOUND|INVALID_LOGIN_CREDENTIALS|INVALID_PASSWORD|US
 // then merge cloud progress with this device and upload the result.
 // Accounts made before the e-mail sign-up used a synthetic address from name + birth date: they still open,
 // and get the real e-mail attached so the next sign-in works by e-mail.
-async function cloudConnect(c, password) {
+async function cloudConnect(c, password, opt) {
+  const login = !!(opt && opt.login); // "Вход": never create a new account
   const email = String(c.email || "").trim().toLowerCase();
   let a, created = false;
   try { a = await fbAuth("signInWithPassword", email, password); }
@@ -1383,6 +1384,7 @@ async function cloudConnect(c, password) {
         try { const u = await fbReq("update", { idToken: a.idToken, email, returnSecureToken: true }); if (u.idToken) a = { ...a, ...u }; } catch {}
       } catch (e1) { if (!NOT_FOUND.test(e1.msg)) throw e1; a = null; }
     }
+    if (!a && login) throw Object.assign(new Error("NOACC"), { msg: "NOACC" });
     if (!a) {
       try { a = await fbAuth("signUp", email, password); created = true; }
       catch (e2) { if (/EMAIL_EXISTS/.test(e2.msg)) throw Object.assign(new Error("PW"), { msg: "PW" }); throw e2; }
@@ -1391,7 +1393,12 @@ async function cloudConnect(c, password) {
   cloud.s = { uid: a.localId, refresh: a.refreshToken, email };
   cloud.id = a.idToken; cloud.exp = Date.now() + (+a.expiresIn || 3600) * 1000;
   store.set("cloud", cloud.s);
-  if (created) { try { await fbReq("sendOobCode", { requestType: "VERIFY_EMAIL", idToken: a.idToken }); store.set("mailsent", email); } catch {} }
+  // confirmation letter; its link leads back to the waiting screen with the WhatsApp request and the prices
+  if (created) {
+    const send = extra => fbReq("sendOobCode", { requestType: "VERIFY_EMAIL", idToken: a.idToken, ...extra });
+    try { await send({ continueUrl: location.origin + "/#home" }); store.set("mailsent", email); }
+    catch { try { await send({}); store.set("mailsent", email); } catch {} } // the domain may be missing in Firebase "Authorized domains"
+  }
   await cloudPull();
   await cloudPush();
   cloud.state = "ok";
@@ -1433,6 +1440,7 @@ function cloudBoot(then) {
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden" && cloud.s) cloudPush().catch(() => {}); });
 }
 function cloudErrText(e) {
+  if (e.msg === "NOACC") return "Аккаунт с таким e-mail не найден. Проверьте адрес или зарегистрируйтесь.";
   if (e.msg === "PW") return "Falsches Kennwort für dieses Konto. Passwort vergessen? Klicken Sie unten auf „Kennwort zurücksetzen“.";
   if (/INVALID_EMAIL/.test(e.msg || "")) return "Diese E-Mail-Adresse ist ungültig.";
   if (/TOO_MANY_ATTEMPTS/.test(e.msg || "")) return "Zu viele Versuche. Bitte später noch einmal.";
@@ -2371,135 +2379,182 @@ const LANG_CODES = [["001", "Deutsch"], ["002", "English"], ["003", "Français"]
 const L7_AR = { "E-Mail *": "البريد الإلكتروني *", "Kennwort * (mindestens 6 Zeichen)": "كلمة المرور * (6 أحرف على الأقل)", "Kennwort (nur zum Wechseln des Kontos)": "كلمة المرور (لتغيير الحساب فقط)", "männlich": "ذكر", "weiblich": "أنثى", "Testversion": "نسخة الاختبار", "Familienname": "اللقب", "Vorname": "الاسم الأول", "Geburtsdatum": "تاريخ الميلاد", "Geburtsort": "مكان الميلاد",
   "Erstsprache": "اللغة الأولى", "Geschlecht": "الجنس", "Straße und Hausnummer": "الشارع ورقم المنزل", "Postleitzahl und Ort": "الرمز البريدي والمدينة", "Prüfungszentrum": "مركز الامتحان", "Prüfungsdatum": "تاريخ الامتحان" };
 const L7 = (de, en, fr, it, tr, ru) => { const t = { en, fr, it, tr, ru, ar: L7_AR[de] }[curLang()]; return t ? de + " · " + t : de; };
+// sign-up / sign-in card (and the profile of a signed-in account). Required at sign-up: surname, first name, e-mail, phone, password, group.
+// The Antwortbogen fields (birth date, address, …) are optional and only used for the printed answer sheet.
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const phoneOk = v => /^\+?[\d\s().\/-]{6,24}$/.test(v) && v.replace(/\D/g, "").length >= 7;
+let regMode = "reg"; // "reg" (new account) | "login" (existing account)
 function viewProfile(first) {
   const c = cand();
   const dm = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.exec(c.geb || ""); // older entries were typed as TT.MM.JJJJ
   if (dm) c.geb = `${dm[3]}-${dm[2].padStart(2, "0")}-${dm[1].padStart(2, "0")}`;
-  const boxIn = (k, label, n, extra) => h("label", { class: "cv-row" }, h("input", { class: "boxin", name: k, value: c[k] || "", maxlength: n, autocomplete: "off", spellcheck: "false", style: `--n:${n}`, ...extra }), h("small", null, label));
-  const dateIn = (k, label) => h("label", { class: "cv-row" }, h("input", { class: "datein", type: "date", name: k, value: c[k] || "" }), h("small", null, label));
-  const lang = h("select", { class: "datein", name: "sprache" }, h("option", { value: "" }, "—"), LANG_CODES.map(([v, l]) => h("option", { value: v, selected: c.sprache === v }, `${v} - ${l}`)));
-  const sex = ["m", "w"].map(v => h("label", { class: "cv-sex" }, h("input", { type: "radio", name: "geschl", value: v, checked: c.geschl === v }),
-    v === "m" ? L7("männlich", "male", "masculin", "maschile", "erkek", "мужской") : L7("weiblich", "female", "féminin", "femminile", "kadın", "женский")));
-  const err = h("p", { class: "cv-err", hidden: true }, "Укажите фамилию и имя.");
-  // who are you: a student picks a group from the list; an organizer names a new group (approved by the main teacher)
-  const fixed = cloudOn() && c.done && !!c.role; // an existing account keeps its role and group
-  const role0 = c.role || "student";
-  const roleRadios = [["student", "Я ученик"], ["org", "Я организатор группы"]].map(([v, l]) => h("label", { class: "cv-sex" },
-    h("input", { type: "radio", name: "role", value: v, checked: role0 === v, disabled: fixed, onchange: () => syncWho() }), h("span", null, l)));
-  const grpSel = h("select", { class: "datein", name: "group", disabled: fixed, style: "min-width:16em" }, h("option", { value: "" }, "— выберите группу —"),
+  const signedIn = cloudOn();
+  const mode = signedIn ? "edit" : regMode;
+  const reg = mode === "reg";
+  const fixed = signedIn && c.done && !!c.role; // an existing account keeps its role and group
+  const field = (label, input, wide) => h("label", { class: "reg-field" + (wide ? " wide" : "") }, h("span", null, label), input);
+  const inp = (name, attrs) => h("input", { class: "reg-input", name, value: c[name] || "", ...attrs });
+  const err = h("p", { class: "reg-error", role: "alert", hidden: true });
+  const fail = t => { err.textContent = t; err.hidden = false; err.scrollIntoView({ block: "nearest" }); };
+  const seg = (items, cur, on) => h("div", { class: "reg-seg", role: "group" }, items.map(([v, l]) =>
+    h("button", { type: "button", class: cur === v ? "on" : "", "aria-pressed": cur === v, onclick: () => on(v) }, l)));
+
+  // who are you: a student picks a group; an organizer names a new group (approved by the main administrator)
+  let role = c.role || "student";
+  const grpSel = h("select", { class: "reg-input", name: "group", disabled: fixed }, h("option", { value: "" }, "— выберите группу —"),
     c.group ? h("option", { value: c.group, selected: true }, c.groupName || c.group) : null);
-  const grpRow = h("label", { class: "cv-row" }, grpSel, h("small", null, "Ваша группа *"));
-  const orgRow = h("label", { class: "cv-row" }, h("input", { class: "datein", name: "gname", value: c.groupName || "", maxlength: 60, disabled: fixed, style: "min-width:16em" }), h("small", null, "Название вашей группы *"));
-  const whoBox = h("div", null, h("div", { class: "cv-row" }, h("div", { class: "cv-sexes" }, roleRadios), h("small", null, "Кто вы? *")), grpRow, orgRow);
-  const syncWho = () => { const org = (form.querySelector("input[name=role]:checked") || {}).value === "org"; grpRow.hidden = org; orgRow.hidden = !org; };
-  if (!fixed) fetch("/api/groups").then(r => r.json()).then(j => {
+  const grpRow = field("Ваша группа *", grpSel, true);
+  const orgRow = field("Название вашей группы *", inp("gname", { value: c.groupName || "", maxlength: 60, disabled: fixed, placeholder: "Deutsch B2 Berlin" }), true);
+  const roleSeg = h("div", { class: "reg-who" });
+  const syncWho = () => {
+    roleSeg.replaceChildren(h("span", { class: "reg-label" }, "Кто вы? *"), seg([["student", "Я ученик"], ["org", "Я организатор группы"]], role, v => { if (!fixed) { role = v; syncWho(); } }));
+    grpRow.hidden = role === "org"; orgRow.hidden = role !== "org";
+  };
+  syncWho();
+  if (!fixed && mode !== "login") fetch("/api/groups").then(r => r.json()).then(j => {
     const list = (j && j.groups) || [];
     list.forEach(g => { if (g.code !== c.group) grpSel.append(h("option", { value: g.code, selected: list.length === 1 && !c.group }, g.name)); });
   }).catch(() => {});
-  const form = h("form", { class: "s30", autocomplete: "off" },
-    h("div", { class: "s30-top" }, h("span", { class: "s30-code" }, "1 0 1 3"), h("span", { class: "s30-bar", "aria-hidden": "true" })),
-    h("div", { class: "s30-title" }, "Deutsch-Test für den Beruf"),
-    h("div", { class: "s30-ver" }, h("span", { class: "boxes4" }), h("b", null, "-S10-"), h("span", { class: "boxes6" }), h("small", null, L7("Testversion", "Test Version", "Version d'examen", "Versione d'esame", "Sınav sürümü", "Тестовая версия"))),
-    h("div", { class: "s30-data" },
-      boxIn("fam", L7("Familienname", "Surname", "Nom", "Cognome", "Soyadı", "Фамилия"), 30),
-      boxIn("vor", L7("Vorname", "First Name", "Prénom", "Nome", "Adı", "Имя"), 30),
-      dateIn("geb", L7("Geburtsdatum", "Date of Birth", "Date de naissance", "Data di nascita", "Doğum tarihi", "Дата рождения")),
-      boxIn("gort", L7("Geburtsort", "Place of Birth", "Lieu de naissance", "Luogo di nascita", "Doğum yeri", "Место рождения"), 30),
-      h("label", { class: "cv-row" }, lang, h("small", null, L7("Erstsprache", "First Language", "Langue maternelle", "Madrelingua", "Anadili", "Родной язык"))),
-      h("div", { class: "cv-row" }, h("div", { class: "cv-sexes" }, sex), h("small", null, L7("Geschlecht", "Sex", "Sexe", "Sesso", "Cinsiyeti", "Пол"))),
-      boxIn("str", L7("Straße und Hausnummer", "Street and number", "Rue et numéro", "Via e numero civico", "Sokak ve numara", "Улица и дом"), 30),
-      boxIn("ort", L7("Postleitzahl und Ort", "Postcode and town", "Code postal et ville", "CAP e città", "Posta kodu ve şehir", "Индекс и город"), 30),
-      boxIn("zentrum", L7("Prüfungszentrum", "Examination Centre", "Centre d'examen", "Centro d'esame", "Sınav merkezi", "Экзаменационное учреждение"), 30),
-      dateIn("datum", L7("Prüfungsdatum", "Date of Examination", "Date d'examen", "Data dell'esame", "Sınav tarihi", "Дата экзамена"))),
-    whoBox,
-    h("label", { class: "cv-row" }, h("input", { class: "datein", type: "email", name: "email", value: c.email || (cloud.s && cloud.s.email && !/@dtb-trainer\.app$/.test(cloud.s.email) ? cloud.s.email : ""), autocomplete: "email", placeholder: "name@example.com", maxlength: 120, required: true }), h("small", null, L7("E-Mail *", "E-mail *", "E-mail *", "E-mail *", "E-posta *", "E-mail *"))),
-    h("label", { class: "cv-row" }, h("input", { class: "datein", type: "password", name: "pw", autocomplete: "current-password", placeholder: "••••••", minlength: 6, required: !cloudOn() }), h("small", null, cloudOn() ? L7("Kennwort (nur zum Wechseln des Kontos)", "Password (only to switch account)", "Mot de passe (seulement pour changer de compte)", "Password (solo per cambiare account)", "Şifre (yalnızca hesap değiştirmek için)", "Пароль (только для смены аккаунта)") : L7("Kennwort * (mindestens 6 Zeichen)", "Password * (at least 6 characters)", "Mot de passe * (au moins 6 caractères)", "Password * (almeno 6 caratteri)", "Şifre * (en az 6 karakter)", "Пароль * (минимум 6 символов)"))),
-    h("p", { class: "small muted", style: "margin:2px 0 8px" }, "Регистрация и вход по e-mail и паролю. После регистрации на e-mail придёт письмо с подтверждением. Доступ к тренажёру открывается после разрешения преподавателя: свяжитесь с ним по WhatsApp или по телефону. Имя и фамилия нужны для рейтинга, их можно не указывать."),
+
+  const mail = c.email || (cloud.s && cloud.s.email && !/@dtb-trainer\.app$/.test(cloud.s.email) ? cloud.s.email : "");
+  const emailIn = inp("email", { type: "email", value: mail, autocomplete: "email", placeholder: "name@example.com", maxlength: 120, required: true, readonly: signedIn, dir: "ltr" });
+  const pwIn = h("input", { class: "reg-input", type: "password", name: "pw", autocomplete: reg ? "new-password" : "current-password", placeholder: "••••••", minlength: 6, dir: "ltr" });
+  const lang = h("select", { class: "reg-input", name: "sprache" }, h("option", { value: "" }, "—"), LANG_CODES.map(([v, l]) => h("option", { value: v, selected: c.sprache === v }, `${v} - ${l}`)));
+  const sex = h("select", { class: "reg-input", name: "geschl" }, h("option", { value: "" }, "—"),
+    h("option", { value: "m", selected: c.geschl === "m" }, L7("männlich", "male", "masculin", "maschile", "erkek", "мужской")),
+    h("option", { value: "w", selected: c.geschl === "w" }, L7("weiblich", "female", "féminin", "femminile", "kadın", "женский")));
+  const sheet = h("details", { class: "reg-more" }, h("summary", null, "Данные для бланка ответов (необязательно)"),
+    h("div", { class: "reg-grid" },
+      field(L7("Geburtsdatum", "Date of Birth", "Date de naissance", "Data di nascita", "Doğum tarihi", "Дата рождения"), inp("geb", { type: "date" })),
+      field(L7("Geburtsort", "Place of Birth", "Lieu de naissance", "Luogo di nascita", "Doğum yeri", "Место рождения"), inp("gort", { maxlength: 30 })),
+      field(L7("Erstsprache", "First Language", "Langue maternelle", "Madrelingua", "Anadili", "Родной язык"), lang),
+      field(L7("Geschlecht", "Sex", "Sexe", "Sesso", "Cinsiyeti", "Пол"), sex),
+      field(L7("Straße und Hausnummer", "Street and number", "Rue et numéro", "Via e numero civico", "Sokak ve numara", "Улица и дом"), inp("str", { maxlength: 30 })),
+      field(L7("Postleitzahl und Ort", "Postcode and town", "Code postal et ville", "CAP e città", "Posta kodu ve şehir", "Индекс и город"), inp("ort", { maxlength: 30 })),
+      field(L7("Prüfungszentrum", "Examination Centre", "Centre d'examen", "Centro d'esame", "Sınav merkezi", "Экзаменационное учреждение"), inp("zentrum", { maxlength: 30 })),
+      field(L7("Prüfungsdatum", "Date of Examination", "Date d'examen", "Data dell'esame", "Sınav tarihi", "Дата экзамена"), inp("datum", { type: "date" }))));
+
+  const person = h("div", { class: "reg-grid" },
+    field("Фамилия *", inp("fam", { maxlength: 30, autocomplete: "family-name", required: true })),
+    field("Имя *", inp("vor", { maxlength: 30, autocomplete: "given-name", required: true })),
+    field("E-mail *", emailIn),
+    field("Телефон (WhatsApp) *", inp("tel", { type: "tel", maxlength: 24, autocomplete: "tel", placeholder: "+49 151 2345678", dir: "ltr" })));
+  const form = h("form", { class: "reg-form", autocomplete: "on", novalidate: true },
+    mode === "login"
+      ? h("div", { class: "reg-grid" }, field("E-mail *", emailIn, true), field("Пароль *", pwIn, true))
+      : h("div", null, roleSeg, person, reg ? h("div", { class: "reg-grid" }, field("Пароль * (минимум 6 символов)", pwIn, true)) : null, grpRow, orgRow, sheet),
+    reg ? priceBox() : null,
+    reg ? h("p", { class: "reg-note" }, "После регистрации на e-mail придёт письмо с подтверждением. Доступ откроется после разрешения преподавателя: напишите ему в WhatsApp. Пожалуйста, только сообщение, не звоните.") : null,
     err,
-    h("div", { class: "s30-foot" }, h("b", null, "Antwortbogen S30"), h("span", null, "www.telc.net")));
-  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    h("button", { class: "reg-btn", type: "submit" }, mode === "login" ? "Войти" : reg ? "Зарегистрироваться" : "Сохранить"));
+
   form.onsubmit = async (e) => {
     e.preventDefault();
     const fd = new FormData(form), x = {};
     for (const [k, v] of fd.entries()) x[k] = String(v).trim();
     const pw = x.pw || ""; delete x.pw;
-    x.email = (x.email || "").toLowerCase();
-    if (!EMAIL_RE.test(x.email)) { err.textContent = "Укажите правильный e-mail: по нему проходят регистрация и вход."; err.hidden = false; return; }
-    const sameAccount = cloudOn() && cloud.s.email === x.email;
-    if (!sameAccount && pw.length < 6) { err.textContent = pw ? "Das Kennwort ist zu kurz (mindestens 6 Zeichen)." : "Введите пароль (минимум 6 символов)."; err.hidden = false; return; }
-    if (!fixed) {
-      if (x.role === "org" && !x.gname) { err.textContent = "Укажите название группы."; err.hidden = false; return; }
-      if (x.role !== "org" && !x.group) { err.textContent = "Выберите свою группу."; err.hidden = false; return; }
+    x.email = String(emailIn.value || "").trim().toLowerCase();
+    if (mode !== "login" && (!x.fam || !x.vor)) return fail("Укажите фамилию и имя.");
+    if (!EMAIL_RE.test(x.email)) return fail("Укажите правильный e-mail: по нему проходят регистрация и вход.");
+    if (mode !== "login") {
+      if (!phoneOk(x.tel || "")) return fail("Укажите номер телефона с WhatsApp, например +49 151 2345678.");
+      if (!fixed && role === "org" && !x.gname) return fail("Укажите название группы.");
+      if (!fixed && role !== "org" && !x.group) return fail("Выберите свою группу.");
     }
-    const who = fixed ? null : x.role === "org"
+    if (!signedIn && pw.length < 6) return fail("Введите пароль (минимум 6 символов).");
+    const who = fixed || mode === "login" ? null : role === "org"
       ? { role: "org", groupName: x.gname }
       : { role: "student", group: x.group, groupName: (grpSel.selectedOptions[0] || {}).textContent || "" };
-    delete x.role; delete x.group; delete x.gname;
+    delete x.group; delete x.gname;
     const filled = {}; Object.entries(x).forEach(([k, v]) => { if (v) filled[k] = v; });
-    if (!sameAccount) {
-      err.hidden = true; const btn = document.querySelector(".btn.primary"); if (btn) btn.disabled = true;
-      if (cloudOn()) cloudOff(true);
+    const btn = form.querySelector(".reg-btn");
+    if (!signedIn) {
+      err.hidden = true; btn.disabled = true;
       try { localStorage.removeItem("dtb.cand"); } catch {} // take the name saved in the cloud, if there is one
-      try { await cloudConnect({ ...x }, pw); }
-      catch (ex) { if (btn) btn.disabled = false; store.set("cand", { ...x, done: false }); err.textContent = cloudErrText(ex); err.hidden = false; return; }
+      try { await cloudConnect({ ...x }, pw, { login: mode === "login" }); }
+      catch (ex) { btn.disabled = false; if (mode !== "login") store.set("cand", { ...c, ...x, done: false }); return fail(cloudErrText(ex)); }
     }
     const cc = cand();
-    let next = { ...cc, ...filled };
+    let next = mode === "login" ? { ...cc, email: x.email } : { ...cc, ...filled };
     if (who && !(cc.role && (cc.group || cc.role === "org"))) next = { ...next, ...who }; // an account from the cloud keeps its own group
-    if (next.role === "org" && !next.group) {
+    if (next.role === "org" && !next.group && next.groupName) {
       try { const g = await cloudGroupRequest(next.groupName, x.email); next.group = g.code; next.groupName = g.name; }
-      catch (ex) { store.set("cand", { ...next, done: false }); err.textContent = ex.message || "Не удалось создать группу."; err.hidden = false; return; }
+      catch (ex) { btn.disabled = false; store.set("cand", { ...next, done: false }); return fail(ex.message || "Не удалось создать группу."); }
     }
     store.set("cand", { ...next, done: true });
     location.hash = first ? (location.hash && location.hash !== "#profile" ? location.hash : "#home") : "#home";
     render();
   };
-  const reset = h("button", { type: "button", class: "btn ghost", onclick: async () => {
-    const m = String(form.elements.email.value || "").trim().toLowerCase();
-    if (!EMAIL_RE.test(m)) { err.textContent = "Сначала укажите e-mail."; err.hidden = false; return; }
+  const reset = h("button", { type: "button", class: "reg-link", onclick: async () => {
+    const m = String(emailIn.value || "").trim().toLowerCase();
+    if (!EMAIL_RE.test(m)) return fail("Сначала укажите e-mail.");
     try { await cloudResetPw(m); err.replaceChildren(h("span", null, "Письмо для сброса пароля отправлено:"), " ", h("b", { dir: "ltr" }, m)); }
     catch { err.textContent = "Не удалось отправить письмо. Проверьте e-mail."; }
     err.hidden = false;
-  } }, "Сбросить пароль");
-  const del = !cloudOn() ? null : h("button", { type: "button", class: "btn ghost", onclick: () => { cloudOff(true); store.set("cand", { fam: "", vor: "" }); render(); } }, "Выйти / сменить аккаунт");
-  requestAnimationFrame(syncWho);
-  return h("div", { class: "wrap narrow" },
-    first ? null : crumbs(h("a", { href: "#home" }, "Главная"), "Данные участника"),
-    h("p", { class: "lead", style: "margin:0" }, "Регистрация по e-mail: укажите e-mail и пароль. Прогресс сохраняется в облаке, и на другом устройстве достаточно ввести тот же e-mail и пароль."),
-    form,
-    h("div", { class: "row" }, h("button", { class: "btn primary", onclick: () => form.requestSubmit() }, first ? "Зарегистрироваться / войти" : "Сохранить"), reset, del));
+  } }, "Забыли пароль?");
+  const out = signedIn ? h("button", { type: "button", class: "reg-link", onclick: () => { cloudOff(true); store.set("cand", { fam: "", vor: "" }); regMode = "login"; render(); } }, "Выйти / сменить аккаунт") : null;
+  return h("div", { class: "reg" },
+    h("div", { class: "reg-card" },
+      h("div", { class: "reg-top" }, h("span", { class: "reg-mark" }, "DTB"), h("span", { class: "reg-brand" }, h("b", null, "DTB B2 Beruf"), h("span", null, "Тренажёр к экзамену telc"))),
+      h("h1", null, mode === "login" ? "Вход" : reg ? "Регистрация" : "Данные участника"),
+      h("p", { class: "reg-sub" }, mode === "login" ? "Войдите с e-mail и паролем, которые вы указали при регистрации. Прогресс подтянется из облака." : reg ? "Создайте аккаунт: прогресс сохраняется в облаке и доступен на любом устройстве." : "Эти данные видит ваш преподаватель."),
+      signedIn ? null : seg([["reg", "Регистрация"], ["login", "Вход"]], mode, v => { regMode = v; render(); }),
+      form,
+      h("div", { class: "reg-links" }, mode === "edit" ? null : reset, out, first || signedIn ? null : h("a", { class: "reg-link", href: "#home" }, "Назад"))));
 }
-// waiting room: the account exists, but the teacher has not approved it yet
+// prices: the trainer alone, or the trainer with the AI that checks homework
+function priceBox() {
+  return h("div", { class: "price" },
+    h("div", { class: "price-head" }, "Стоимость подписки"),
+    h("div", { class: "price-grid" },
+      h("div", { class: "price-card" },
+        h("div", { class: "price-name" }, "Тренажёр"),
+        h("div", { class: "price-sum", dir: "ltr" }, h("b", null, "5 €"), h("span", null, " / ", h("span", null, "месяц"))),
+        h("p", null, "Все задания экзамена, проверка ответов, работа над ошибками и рейтинг группы. Без ИИ.")),
+      h("div", { class: "price-card best" },
+        h("span", { class: "price-tag" }, "Лучшая подготовка"),
+        h("div", { class: "price-name" }, "Тренажёр + ИИ"),
+        h("div", { class: "price-sum", dir: "ltr" }, h("b", null, "10 €"), h("span", null, " / ", h("span", null, "месяц"))),
+        h("p", null, "Всё из тарифа «Тренажёр» и ИИ, который проверяет домашние задания, письма и устные ответы и помогает лучше подготовиться к экзамену."))));
+}
+// waiting room: the account exists, but the teacher has not admitted it yet
 function viewPending() {
   const c = cand(), mail = (cloud.s && cloud.s.email) || c.email || "";
   const sent = store.get("mailsent", "") === mail;
-  const msg = h("p", { class: "small muted", hidden: true });
+  const msg = h("p", { class: "reg-note", hidden: true });
   if (!cloud.checked) { cloudAccess().then(() => { cloud.checked = true; render(); }); return h("div", { class: "wrap narrow" }, h("p", { class: "lead" }, "Проверяем доступ…")); }
-  return h("div", { class: "wrap narrow" },
-    h("h1", null, "Ожидает разрешения"),
-    h("p", { class: "lead" }, h("span", null, sent ? "Регистрация прошла. Мы отправили письмо с подтверждением на адрес:" : "Вы вошли как:"), " ", h("b", { dir: "ltr" }, mail)),
-    h("div", { class: "card" },
-      c.role === "org"
+  const org = c.role === "org";
+  return h("div", { class: "reg" },
+    h("div", { class: "reg-card wide" },
+      h("div", { class: "reg-top" }, h("span", { class: "reg-mark" }, "DTB"), h("span", { class: "reg-brand" }, h("b", null, "DTB B2 Beruf"), h("span", null, "Тренажёр к экзамену telc"))),
+      h("h1", null, "Ожидает разрешения"),
+      h("p", { class: "reg-sub" }, h("span", null, sent ? "Регистрация прошла. Мы отправили письмо с подтверждением на адрес:" : "Вы вошли как:"), " ", h("b", { dir: "ltr" }, mail)),
+      org
         ? h("p", null, h("span", null, "Ваша группа ждёт одобрения главного администратора:"), " ", h("b", null, c.groupName || ""), ". ", h("span", null, "После одобрения откроется тренажёр, а кабинет группы будет по адресу /admin (вход «Организатор группы» с вашим e-mail и паролем)."))
-        : h("p", null, "Тренажёр открыт только для участников группы. Чтобы получить доступ, свяжитесь с преподавателем по WhatsApp или по телефону и попросите разрешение на подключение. Назовите e-mail, с которым вы зарегистрировались."),
-      c.role !== "org" && c.groupName ? h("p", null, h("span", null, "Ваша группа:"), " ", h("b", null, c.groupName)) : null,
-      contactBlock(cloud.contact)),
-    msg,
-    h("div", { class: "row" },
-      h("button", { class: "btn primary", onclick: async () => { msg.hidden = false; msg.textContent = "Проверяем…"; if (await cloudAccess()) render(); else msg.textContent = "Доступ ещё не подтверждён."; } }, "Проверить снова"),
-      h("a", { class: "btn ghost", href: "#profile" }, "Сменить аккаунт")));
+        : h("ol", { class: "reg-steps" },
+            h("li", null, "Подтвердите e-mail: откройте письмо и нажмите на ссылку."),
+            h("li", null, h("b", null, "Напишите преподавателю в WhatsApp."), " ", h("span", null, "Пожалуйста, не звоните: только сообщение с запросом на доступ. Укажите фамилию, имя, e-mail регистрации и выбранный тариф.")),
+            h("li", null, "После оплаты преподаватель откроет доступ, и тренажёр заработает на всех ваших устройствах.")),
+      !org && c.groupName ? h("p", { class: "reg-note" }, h("span", null, "Ваша группа:"), " ", h("b", null, c.groupName)) : null,
+      contactBlock(cloud.contact, c, mail),
+      org ? null : priceBox(),
+      msg,
+      h("div", { class: "reg-actions" },
+        h("button", { class: "reg-btn", onclick: async () => { msg.hidden = false; msg.textContent = "Проверяем…"; if (await cloudAccess()) render(); else msg.textContent = "Доступ ещё не подтверждён."; } }, "Проверить снова"),
+        h("a", { class: "reg-link", href: "#profile" }, "Сменить аккаунт"))));
 }
-// teacher's WhatsApp / phone from VERIFY_CONTACT, shown in full with direct WhatsApp and call links when it holds a number
-function contactBlock(contact) {
+// teacher's WhatsApp from VERIFY_CONTACT, shown in full; the button opens WhatsApp with a ready request (no call button: write, don't call)
+function contactBlock(contact, c, mail) {
   contact = String(contact || "").trim();
-  if (!contact) return h("p", { class: "small muted" }, "Номер преподавателя пока не указан.");
+  if (!contact) return h("p", { class: "reg-note" }, "Номер преподавателя пока не указан.");
   const m = contact.match(/\+?\d[\d\s().\/-]{5,}\d/), digits = m ? m[0].replace(/\D/g, "") : "";
+  c = c || {};
+  const text = "Hallo! Ich bitte um Zugang zum DTB-B2-Beruf-Trainer.\nName: " + [c.fam, c.vor].filter(Boolean).join(" ") + "\nE-Mail: " + (mail || "") + (c.groupName ? "\nGruppe: " + c.groupName : "") + "\nTarif: 5 € / 10 € (mit KI)";
   return h("div", { class: "contact-box" },
-    h("div", { class: "small muted" }, "WhatsApp / телефон:"),
+    h("div", { class: "contact-label" }, "WhatsApp преподавателя:"),
     h("div", { class: "contact-num", dir: "ltr" }, contact),
-    digits ? h("div", { class: "row", style: "margin-top:10px" },
-      h("a", { class: "btn primary", href: "https://wa.me/" + digits, target: "_blank", rel: "noopener" }, "Написать в WhatsApp"),
-      h("a", { class: "btn ghost", href: "tel:+" + digits }, "Позвонить")) : null);
+    h("div", { class: "contact-warn" }, "📵 ", h("span", null, "Только сообщения, пожалуйста, не звоните.")),
+    digits ? h("a", { class: "reg-btn wa", href: "https://wa.me/" + digits + "?text=" + encodeURIComponent(text), target: "_blank", rel: "noopener" }, "Написать в WhatsApp") : null);
 }
 // header badge: who is signed in on this device
 function updateWho() {

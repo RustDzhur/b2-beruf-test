@@ -501,3 +501,35 @@ x67|Onaydan sonra eğitmen açılır; grup paneli /admin adresindedir (e-posta v
 x68|Grubunuz:
 x69|Grup paneli
 x70|Ana grup
+x71|Cevap kâğıdı bilgileri (isteğe bağlı)
+x72|Soyadı *
+x73|Adı *
+x74|Telefon (WhatsApp) *
+x75|Şifre *
+x76|Şifre * (en az 6 karakter)
+x77|Kayıttan sonra onay e-postası gelir. Erişim, öğretmen izin verdiğinde açılır: öğretmene WhatsApp'tan yazın. Lütfen sadece mesaj gönderin, aramayın.
+x78|Giriş yap
+x79|Kayıt ol
+x80|WhatsApp'lı bir telefon numarası girin, örn. +49 151 2345678.
+x81|Şifreyi mi unuttunuz?
+x82|telc sınavı için alıştırma
+x83|Giriş
+x84|Kayıt
+x85|Kayıtta kullandığınız e-posta ve şifreyle giriş yapın. İlerlemeniz buluttan yüklenir.
+x86|Bir hesap oluşturun: ilerlemeniz bulutta saklanır ve her cihazda kullanılabilir.
+x87|Bu bilgileri öğretmeniniz görür.
+x88|Geri
+x89|Abonelik ücreti
+x90|Alıştırma
+x91|ay
+x92|Tüm sınav görevleri, cevap kontrolü, hata çalışması ve grup sıralaması. Yapay zekâ olmadan.
+x93|En iyi hazırlık
+x94|Alıştırma + yapay zekâ
+x95|“Alıştırma” paketindeki her şey ve ödevlerinizi, mektuplarınızı ve sözlü cevaplarınızı kontrol eden, sınava daha iyi hazırlanmanıza yardım eden yapay zekâ.
+x96|E-postanızı onaylayın: mesajı açıp bağlantıya tıklayın.
+x97|Öğretmene WhatsApp'tan yazın.
+x98|Lütfen aramayın: erişim isteyen bir mesaj gönderin. Soyadınızı, adınızı, kayıt e-postanızı ve seçtiğiniz paketi yazın.
+x99|Ödemeden sonra öğretmen erişimi açar ve alıştırma tüm cihazlarınızda çalışır.
+x100|Öğretmenin WhatsApp'ı:
+x101|Sadece mesaj, lütfen aramayın.
+x102|Bu e-postayla bir hesap bulunamadı. Adresi kontrol edin veya kayıt olun.
