@@ -117,6 +117,13 @@ async function cloudConnect(c, password) {
   cloud.state = "ok";
   await cloudAccess();
 }
+// organizer: ask for a new group (the main teacher approves it in /admin) -> {code, name, status}
+async function cloudGroupRequest(name, email) {
+  const r = await fetch("/api/group-request", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + await fbToken() }, body: JSON.stringify({ name, email }) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || !j.group) throw new Error(j.message || "Не удалось создать группу.");
+  return j.group;
+}
 async function cloudResetPw(email) { await fbReq("sendOobCode", { requestType: "PASSWORD_RESET", email }); }
 
 // access to the trainer: only after the teacher approved the account in /admin (server checks Firestore `verified`)
