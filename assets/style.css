@@ -47,9 +47,10 @@ a { color: var(--accent); }
 .top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--paper); border-bottom: 1px solid var(--line);
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 .top-in { max-width: 1080px; margin: 0 auto; display: flex; align-items: center; gap: 12px; padding-block: 10px; flex-wrap: wrap; }
-.brand { display: flex; align-items: baseline; gap: 8px; text-decoration: none; color: var(--ink); margin-right: auto; }
-.brand b { font-family: var(--f-display); font-weight: 600; font-size: 15px; letter-spacing: .01em; }
-.brand span { font-size: 12px; color: var(--muted); }
+/* logo in two tight lines: "DTB B2 Beruf" over a smaller "Prüfungstrainer"; fits the one-line header height */
+.brand { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; text-decoration: none; color: var(--ink); margin-right: auto; white-space: nowrap; }
+.brand b { font-family: var(--f-display); font-weight: 600; font-size: 15px; line-height: 1.1; letter-spacing: .01em; }
+.brand span { font-size: 11px; line-height: 1.15; letter-spacing: .03em; color: var(--muted); }
 .nav { display: flex; gap: 4px; flex-wrap: wrap; }
 .nav a { text-decoration: none; color: var(--muted); padding: 6px 10px; border-radius: 8px; font-size: 14px; }
 .nav a.on, .nav a:hover { background: var(--soft); color: var(--ink); }
@@ -692,7 +693,7 @@ body.pre .nav { display: none; }
 body.pre .top-in { flex-wrap: nowrap; }
 body.pre .top-in .theme-toggle { margin-left: auto; }
 body.pre .top-in .who { max-width: 140px; }
-@media (max-width: 400px) { body.pre .brand span { display: none; } .langsel { max-width: 120px; } }
+@media (max-width: 400px) { .langsel { max-width: 120px; } }
 
 /* ---------- compact header (signed in): brand, tabs, "More", theme, account and language on ONE line from ~1000 px ---------- */
 .top-in { max-width: 1080px; gap: 10px; padding-block: 8px; }
@@ -723,7 +724,6 @@ body:not(.pre) .langsw:focus-within { outline: 2px solid var(--accent); outline-
 body:not(.pre) .langsw:hover { background: var(--soft); }
 /* "Learn by heart" sits in the tab row on wide screens and moves into "More" when space runs out */
 .more-menu .nav-narrow { display: none; }
-@media (max-width: 1240px) { body:not(.pre) .brand span { display: none; } }
 @media (max-width: 1090px) { .nav .nav-wide { display: none; } .more-menu .nav-narrow { display: block; } }
 @media (max-width: 1000px) { .nav a, .nav summary { padding: 6px 7px; font-size: 13px; } body:not(.pre) .top-in .who { max-width: 120px; } }
 /* tablet and phone: tabs move to their own scrollable row under the brand, account shrinks to the icon */
