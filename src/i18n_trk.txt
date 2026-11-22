@@ -557,3 +557,58 @@ x123|Zaten ödedim
 x124|Ödemenin ekran görüntüsünü gönderin. Yönetici kontrol edip erişimi açar; aboneliğiniz o gün başlar.
 x125|Erişimimi aç
 x126|Daha fazla
+x127|Ücretsiz kontrol
+x128|Ücretsiz kontrol herkes için, yapay zekâ olmadan çalışır. Yapay zekâ kontrolü (dilbilgisi, B2 seviyesi, düzeltilmiş metin) «Eğitmen + Yapay Zekâ» paketine dahildir, ayda 10 €.
+x129|Tarayıcı konuşma tanımaya izin vermedi. iPhone ve Mac'te Dikte'yi açın (Ayarlar → Klavye → Dikte) ya da cevabınızı yazın.
+x130|Tarayıcı Almancayı tanımıyor. Chrome, Edge veya Safari'yi açın.
+x131|Yan cümlede (weil, dass, obwohl, wenn …) çekimli fiil sona gelir.
+x132|Olası hatalar (kontrol edin)
+x133|Konuşma süresi
+x134|Hareket ve durum değişikliği bildiren fiiller Perfekt'i sein ile kurar.
+x135|Daha akıcı konuşun: sınavda uzun duraklamalar puan kaybettirir.
+x136|Konuş
+x137|Cevap uzunluğu
+x138|Geçmişteki bir süre için seit veya vor kullanılır: seit zwei Jahren, vor zwei Jahren.
+x139|Yan cümleler ekleyin: weil, dass, obwohl, wenn. Bu B2 seviyesinin işaretidir.
+x140|Mikrofon erişimi engellendi. Bu site için mikrofona izin verin (adres çubuğundaki kilit veya mikrofon simgesi) ve düğmeye tekrar basın.
+x141|Burada artikel gerekir: in + dem = im (veya ins).
+x142|Burada dönüşlü fiil gerekir: ich freue mich, ich interessiere mich.
+x143|Yapay zekâ cevabı sınav ölçütlerine göre kontrol ediyor… genellikle 30–90 saniye
+x144|Mikrofon bulunamadı. Bir mikrofon bağlayın veya onu kullanan programı kapatın.
+x145|Daha iyi olabilir
+x146|«Konuş»a basın ve Almanca cevap verin ya da cevabınızı buraya yazın…
+x147|«Konuş»a basın ve Almanca cevap verin. Metin alanda görünür, düzeltebilirsiniz. Tarayıcı neredeyse hiç noktalama işareti koymaz. Ses sunucumuza gönderilmez: konuşmayı tarayıcının kendisi tanır.
+x148|Hiçbir şey duyulmuyor. Daha yüksek sesle veya mikrofona daha yakın konuşun.
+x149|Geliştirilmeli
+x150|Geçmişteki tek bir dönem için wenn değil als kullanılır.
+x151|Tekrarlar
+x152|Örneğin şunu deneyin:
+x153|Modal fiillerden sonra mastar zu olmadan gelir.
+x154|Ücretsiz kontrol et
+x155|Yapay zekâ ile kontrol et
+x156|Bu görünümde yapay zekâ ile cevap kontrolü kullanılamıyor. Ücretsiz kontrolü kullanın ve cevabınızı örnekle karşılaştırın.
+x157|Kurallara dayalı kontrol: görev maddeleri, Redemittel, bağlaçlar, uzunluk, tekrarlar ve tipik hatalar. Dilbilgisinin tamamını kontrol etmez: bunu yapay zekâ yapar.
+x158|Görev maddeleri (anahtar kelimelere göre)
+x159|Tanıma bir hatayla durdu. Mikrofona tekrar basın veya cevabınızı yazın.
+x160|Konuşma tanıma şu anda çalışmıyor: tarayıcının hizmetiyle bağlantı yok. Brave, Opera ve bazı başka tarayıcılarda kapalıdır. Chrome, Edge veya Safari'yi açın ya da cevabınızı yazın.
+x161|Bu maddelere göre konu hakkında yaklaşık 2 dakika (150–260 kelime) konuşun. «Konuş»a basın ve sınavdaki gibi serbestçe konuşun: konuşmanız metne dönüşür. Sonra cevabı ücretsiz veya yapay zekâ ile kontrol edin; yapay zekâ sınav görevlisi sorular sorar.
+x162|Bağlaçlar ve yan cümleler
+x163|Henüz bağlaç yok.
+x164|Eş anlamlılar:
+x165|Konuşmadaki kendi bölümünüzü söyleyin: her maddeye cevap verin, kendi deneyiminizi anlatın ve karşınızdakine 1–2 soru sorun. Aşağıda yapay zekâ muhatabıyla konuşabilirsiniz.
+x166|Konuşmadaki kendi bölümünüzü söyleyin: her madde için bir öneri, gerekçe, olası bir itiraza cevap ve sonunda uzlaşma önerisi. Aşağıda yapay zekâ ortağıyla diyaloğu çalışabilirsiniz.
+x167|Kontrolün faydalı olması için en az 15 kelime söyleyin.
+x168|Yapay zekâ kontrolünün faydalı olması için en az 25 kelime söyleyin.
+x169|Örnekten işe yarayacak kelimeler
+x170|Dolgu kelimeleri:
+x171|Art arda iki kez aynı kelime:
+x172|Karşılaştırma derecesi zaten «daha» anlamına gelir: burada mehr gerekmez.
+x173|Durdur
+x174|İyi cevap
+x175|B2 için hedef:
+x176|Bu madde cevapta yok. Onun hakkında en az 1–2 cümle söyleyin.
+x177|Bu tarayıcı konuşmayı metne çeviremiyor (örneğin Firefox). Sayfayı Chrome, Edge veya Safari'de açın ya da şimdilik cevabınızı yazın.
+x178|yapay zekâ olmadan · yaklaşık
+x179|kelime
+x180|kelime/dakika
+x181|hedef
