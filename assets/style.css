@@ -736,3 +736,21 @@ body:not(.pre) .langsw:hover { background: var(--soft); }
   body:not(.pre) .top-in .who .who-name { display: none; }
   body:not(.pre) .top-in .who { padding: 5px 8px; }
 }
+
+/* Sprechen: microphone dictation (d4_speak.js) and the free rule-based report */
+.mic-box { gap: 8px; }
+.mic-row { gap: 12px; }
+.btn.mic { min-height: 44px; padding-inline: 18px; }
+.mic-ico { width: 14px; height: 14px; border-radius: 50%; background: currentColor; display: inline-block; box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 25%, transparent); }
+.btn.mic.on { background: var(--bad); border-color: var(--bad); }
+.btn.mic.on .mic-ico { border-radius: 3px; animation: micpulse 1.2s ease-in-out infinite; }
+@keyframes micpulse { 0%,100% { opacity: 1 } 50% { opacity: .35 } }
+.mic-time { color: var(--muted); font-size: 14px; }
+.btn.mic.on ~ .mic-time { color: var(--bad); font-weight: 700; }
+.mic-live { flex: 1 1 160px; min-width: 0; color: var(--muted); font-style: italic; font-family: var(--f-read); overflow-wrap: anywhere; }
+textarea.letter.spoken { min-height: 200px; }
+.sp-line { display: flex; gap: 10px; align-items: flex-start; }
+.sp-line > .chip { flex: none; min-width: 30px; text-align: center; justify-content: center; }
+.sp-line > .grow { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.sp-words { gap: 6px; }
+@media (prefers-reduced-motion: reduce) { .btn.mic.on .mic-ico { animation: none; } }

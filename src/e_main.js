@@ -8,6 +8,7 @@ const NO_MODE = { f: 1, bw: 1, sp1: 1, sp2: 1, sp3: 1 };
 const vidOf = (sec, it) => sec === "bw" || sec === "sp1" ? "w-" + it.id : it.id || "w-F" + it.n;
 function bestOf(sec, it) {
   const ids = [vidOf(sec, it)];
+  if (sec === "sp2" || sec === "sp3") ids.push("w-" + it.id); // spoken answer checked by the AI (the chat rating keeps the plain id)
   let r = null;
   ids.forEach(id => { const x = resOf(id); if (x && x.max && (!r || x.best / x.max > r)) r = x.best / x.max; });
   return r;

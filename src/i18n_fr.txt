@@ -557,3 +557,58 @@ x123|J'ai déjà payé
 x124|Envoyez une capture du paiement. L'administrateur la vérifie et ouvre l'accès ; votre mois commence ce jour-là.
 x125|Activer mon accès
 x126|Plus
+x127|Vérification gratuite
+x128|La vérification gratuite fonctionne pour tous, sans IA. La vérification par l’IA (grammaire, niveau B2, version corrigée) fait partie de l’offre « Entraîneur + IA », 10 € par mois.
+x129|Le navigateur n’a pas autorisé la reconnaissance vocale. Sur iPhone et Mac, activez la dictée (Réglages → Clavier → Dictée) ou saisissez votre réponse.
+x130|Le navigateur ne reconnaît pas l’allemand. Ouvrez Chrome, Edge ou Safari.
+x131|Dans une subordonnée (weil, dass, obwohl, wenn …), le verbe conjugué se place à la fin.
+x132|Erreurs possibles (à vérifier)
+x133|Temps de parole
+x134|Les verbes de mouvement et de changement d’état forment le Perfekt avec sein.
+x135|Parlez plus librement : les longues pauses coûtent des points à l’examen.
+x136|Parler
+x137|Longueur de la réponse
+x138|Pour une durée dans le passé, on dit seit ou vor : seit zwei Jahren, vor zwei Jahren.
+x139|Ajoutez des subordonnées : weil, dass, obwohl, wenn. C’est un signe du niveau B2.
+x140|L’accès au micro est bloqué. Autorisez le micro pour ce site (icône de cadenas ou de micro dans la barre d’adresse) et appuyez à nouveau sur le bouton.
+x141|Il faut un article ici : in + dem = im (ou ins).
+x142|Il faut ici un verbe pronominal : ich freue mich, ich interessiere mich.
+x143|L’IA vérifie la réponse selon les critères de l’examen… généralement 30 à 90 secondes
+x144|Aucun micro trouvé. Branchez un micro ou fermez le programme qui l’utilise.
+x145|Peut mieux faire
+x146|Appuyez sur « Parler » et répondez en allemand, ou saisissez votre réponse ici…
+x147|Appuyez sur « Parler » et répondez en allemand. Le texte apparaît dans le champ et vous pouvez le corriger. Le navigateur n’ajoute presque pas de ponctuation. Aucun audio n’est envoyé à notre serveur : c’est le navigateur qui reconnaît la parole.
+x148|On n’entend rien. Parlez plus fort ou plus près du micro.
+x149|À retravailler
+x150|Pour une période unique dans le passé, on dit als et non wenn.
+x151|Répétitions
+x152|Essayez par exemple :
+x153|Après les verbes de modalité, l’infinitif s’emploie sans zu.
+x154|Vérifier gratuitement
+x155|Vérifier avec l’IA
+x156|La vérification par l’IA n’est pas disponible dans cet affichage. Utilisez la vérification gratuite et comparez votre réponse au modèle.
+x157|Vérification par règles : points de la consigne, Redemittel, connecteurs, longueur, répétitions et erreurs typiques. Elle ne vérifie pas toute la grammaire : c’est le rôle de l’IA.
+x158|Points de la consigne (par mots-clés)
+x159|La reconnaissance s’est arrêtée sur une erreur. Appuyez à nouveau sur le micro ou saisissez votre réponse.
+x160|La reconnaissance vocale ne fonctionne pas pour le moment : pas de connexion au service du navigateur. Elle est désactivée dans Brave, Opera et certains autres navigateurs. Ouvrez Chrome, Edge ou Safari, ou saisissez votre réponse.
+x161|Parlez du thème pendant environ 2 minutes (150 à 260 mots) en suivant ces points. Appuyez sur « Parler » et parlez librement, comme à l’examen : votre parole devient du texte. Ensuite, vérifiez la réponse gratuitement ou avec l’IA, et l’examinateur IA vous posera des questions.
+x162|Connecteurs et subordonnées
+x163|Pas encore de connecteurs.
+x164|Synonymes :
+x165|Dites votre partie de la conversation : répondez à chaque point, parlez de votre expérience et posez 1 ou 2 questions en retour. Plus bas, vous pouvez parler avec le partenaire IA.
+x166|Dites votre partie de la conversation : une proposition pour chaque point, une raison, une réponse à une objection possible et, à la fin, une proposition pour vous mettre d’accord. Plus bas, vous pouvez vous entraîner au dialogue avec le partenaire IA.
+x167|Dites au moins 15 mots pour que la vérification soit utile.
+x168|Dites au moins 25 mots pour que la vérification par l’IA soit utile.
+x169|Mots utiles du modèle
+x170|Mots de remplissage :
+x171|Mot deux fois de suite :
+x172|Le comparatif signifie déjà « plus » : mehr est inutile ici.
+x173|Stop
+x174|Bonne réponse
+x175|Objectif pour B2 :
+x176|Ce point manque dans la réponse. Dites au moins 1 ou 2 phrases à son sujet.
+x177|Ce navigateur ne sait pas transformer la parole en texte (par exemple Firefox). Ouvrez la page dans Chrome, Edge ou Safari, ou saisissez votre réponse en attendant.
+x178|sans IA · indicatif
+x179|mots
+x180|mots par minute
+x181|objectif

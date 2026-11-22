@@ -557,3 +557,58 @@ x123|Ho già pagato
 x124|Invia uno screenshot del pagamento. L'amministratore lo controlla e apre l'accesso; il tuo mese inizia da quel giorno.
 x125|Attiva il mio accesso
 x126|Altro
+x127|Controllo gratuito
+x128|Il controllo gratuito funziona per tutti, senza IA. Il controllo con l’IA (grammatica, livello B2, versione corretta) fa parte del piano «Trainer + IA», 10 € al mese.
+x129|Il browser non ha consentito il riconoscimento vocale. Su iPhone e Mac attiva la dettatura (Impostazioni → Tastiera → Dettatura) oppure scrivi la risposta.
+x130|Il browser non riconosce il tedesco. Apri Chrome, Edge o Safari.
+x131|Nella frase secondaria (weil, dass, obwohl, wenn …) il verbo coniugato va alla fine.
+x132|Possibili errori (controlla)
+x133|Tempo di parola
+x134|I verbi di movimento e di cambiamento di stato formano il Perfekt con sein.
+x135|Parla in modo più fluido: le pause lunghe costano punti all’esame.
+x136|Parla
+x137|Lunghezza della risposta
+x138|Per un periodo nel passato si usa seit o vor: seit zwei Jahren, vor zwei Jahren.
+x139|Aggiungi frasi secondarie: weil, dass, obwohl, wenn. Sono un segno del livello B2.
+x140|L’accesso al microfono è bloccato. Consenti il microfono per questo sito (icona del lucchetto o del microfono nella barra degli indirizzi) e premi di nuovo il pulsante.
+x141|Qui serve l’articolo: in + dem = im (oppure ins).
+x142|Qui serve un verbo riflessivo: ich freue mich, ich interessiere mich.
+x143|L’IA controlla la risposta secondo i criteri d’esame… di solito 30–90 secondi
+x144|Nessun microfono trovato. Collega un microfono o chiudi il programma che lo sta usando.
+x145|Si può migliorare
+x146|Premi «Parla» e rispondi in tedesco, oppure scrivi qui la risposta…
+x147|Premi «Parla» e rispondi in tedesco. Il testo compare nel campo e puoi correggerlo. Il browser non mette quasi la punteggiatura. Nessun audio viene inviato al nostro server: è il browser a riconoscere la voce.
+x148|Non si sente niente. Parla più forte o più vicino al microfono.
+x149|Da migliorare
+x150|Per un unico periodo nel passato si usa als, non wenn.
+x151|Ripetizioni
+x152|Prova per esempio:
+x153|Dopo i verbi modali l’infinito va senza zu.
+x154|Controlla gratis
+x155|Controlla con l’IA
+x156|Il controllo con l’IA non è disponibile in questa visualizzazione. Usa il controllo gratuito e confronta la risposta con il modello.
+x157|Controllo basato su regole: punti del compito, Redemittel, connettivi, lunghezza, ripetizioni ed errori tipici. Non controlla tutta la grammatica: lo fa l’IA.
+x158|Punti del compito (per parole chiave)
+x159|Il riconoscimento si è interrotto con un errore. Premi di nuovo il microfono o scrivi la risposta.
+x160|Il riconoscimento vocale ora non funziona: nessuna connessione al servizio del browser. In Brave, Opera e alcuni altri browser è disattivato. Apri Chrome, Edge o Safari oppure scrivi la risposta.
+x161|Parla del tema per circa 2 minuti (150–260 parole) seguendo questi punti. Premi «Parla» e parla liberamente come all’esame: la voce diventa testo. Poi controlla la risposta gratis o con l’IA, e l’esaminatore IA ti farà delle domande.
+x162|Connettivi e frasi secondarie
+x163|Ancora nessun connettivo.
+x164|Sinonimi:
+x165|Di’ la tua parte della conversazione: rispondi a ogni punto, racconta la tua esperienza e fai 1–2 domande all’interlocutore. Qui sotto puoi parlare con l’interlocutore IA.
+x166|Di’ la tua parte della conversazione: una proposta per ogni punto, il motivo, una risposta a una possibile obiezione e alla fine una proposta per mettervi d’accordo. Qui sotto puoi esercitarti nel dialogo con il partner IA.
+x167|Di’ almeno 15 parole, così il controllo sarà utile.
+x168|Di’ almeno 25 parole, così il controllo con l’IA sarà utile.
+x169|Parole utili dal modello
+x170|Parole riempitive:
+x171|Parola due volte di seguito:
+x172|Il comparativo significa già «più»: qui mehr non serve.
+x173|Stop
+x174|Buona risposta
+x175|Obiettivo per B2:
+x176|Questo punto manca nella risposta. Di’ almeno 1–2 frasi su di esso.
+x177|Questo browser non sa trasformare la voce in testo (per esempio Firefox). Apri la pagina in Chrome, Edge o Safari oppure, per ora, scrivi la risposta.
+x178|senza IA · indicativo
+x179|parole
+x180|parole al minuto
+x181|obiettivo

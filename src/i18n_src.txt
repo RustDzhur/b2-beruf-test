@@ -557,3 +557,58 @@ x123|I have already paid|Ich habe schon bezahlt
 x124|Send a screenshot of the payment. The administrator checks it and opens access; your month starts that day.|Schicken Sie einen Screenshot der Zahlung. Der Administrator prüft ihn und schaltet den Zugang frei, ab diesem Tag läuft Ihr Monat.
 x125|Activate my access|Zugang freischalten
 x126|More|Mehr
+x127|Free check|Kostenlose Prüfung
+x128|The free check works for everyone, without AI. The AI check (grammar, B2 level, corrected version) is part of the “Trainer + AI” plan, 10 € a month.|Die kostenlose Prüfung funktioniert für alle und ohne KI. Die KI-Prüfung (Grammatik, B2-Niveau, korrigierte Fassung) gehört zum Tarif „Trainer + KI“, 10 € im Monat.
+x129|The browser did not allow speech recognition. On iPhone and Mac, turn on Dictation (Settings → Keyboard → Dictation) or type your answer.|Der Browser hat die Spracherkennung nicht erlaubt. Schalten Sie auf iPhone und Mac die Diktierfunktion ein (Einstellungen → Tastatur → Diktierfunktion) oder tippen Sie die Antwort ein.
+x130|The browser cannot recognise German. Open Chrome, Edge or Safari.|Der Browser erkennt kein Deutsch. Öffnen Sie Chrome, Edge oder Safari.
+x131|In a subordinate clause (weil, dass, obwohl, wenn …) the conjugated verb goes to the end.|Im Nebensatz (weil, dass, obwohl, wenn …) steht das konjugierte Verb am Ende.
+x132|Possible mistakes (check them)|Mögliche Fehler (bitte prüfen)
+x133|Speaking time|Sprechzeit
+x134|Verbs of movement and change of state form the Perfekt with sein.|Verben der Bewegung und der Zustandsänderung bilden das Perfekt mit sein.
+x135|Speak more fluently: long pauses cost points in the exam.|Sprechen Sie flüssiger: Lange Pausen kosten in der Prüfung Punkte.
+x136|Speak|Sprechen
+x137|Answer length|Länge der Antwort
+x138|For a period in the past, use seit or vor: seit zwei Jahren, vor zwei Jahren.|Für einen Zeitraum in der Vergangenheit sagt man seit oder vor: seit zwei Jahren, vor zwei Jahren.
+x139|Add subordinate clauses: weil, dass, obwohl, wenn. They are a sign of B2 level.|Bauen Sie Nebensätze ein: weil, dass, obwohl, wenn. Das ist ein Zeichen für B2-Niveau.
+x140|Microphone access is blocked. Allow the microphone for this site (lock or microphone icon in the address bar) and press the button again.|Der Zugriff auf das Mikrofon ist gesperrt. Erlauben Sie das Mikrofon für diese Seite (Schloss- oder Mikrofonsymbol in der Adressleiste) und klicken Sie noch einmal.
+x141|An article is needed here: in + dem = im (or ins).|Hier fehlt der Artikel: in + dem = im (oder ins).
+x142|A reflexive verb is needed here: ich freue mich, ich interessiere mich.|Hier braucht man ein reflexives Verb: ich freue mich, ich interessiere mich.
+x143|AI is checking your answer against the exam criteria… usually 30–90 seconds|KI prüft die Antwort nach den Prüfungskriterien… meist 30–90 Sekunden
+x144|No microphone found. Connect a microphone or close the program that is using it.|Kein Mikrofon gefunden. Schließen Sie ein Mikrofon an oder beenden Sie das Programm, das es gerade benutzt.
+x145|Could be better|Geht noch besser
+x146|Press “Speak” and answer in German, or type your answer here…|Klicken Sie auf „Sprechen“ und antworten Sie auf Deutsch oder tippen Sie die Antwort hier ein…
+x147|Press “Speak” and answer in German. The text appears in the field, and you can correct it. The browser adds almost no punctuation. No audio is sent to our server: the browser itself recognises your speech.|Klicken Sie auf „Sprechen“ und antworten Sie auf Deutsch. Der Text erscheint im Feld und lässt sich korrigieren. Satzzeichen setzt der Browser kaum. Es wird kein Audio an unseren Server geschickt: Die Sprache erkennt der Browser selbst.
+x148|Nothing can be heard. Speak louder or closer to the microphone.|Es ist nichts zu hören. Sprechen Sie lauter oder näher am Mikrofon.
+x149|Needs more work|Noch ausbaufähig
+x150|For a single period in the past, use als, not wenn.|Für einen einmaligen Zeitraum in der Vergangenheit sagt man als, nicht wenn.
+x151|Repetitions|Wiederholungen
+x152|Try, for example:|Versuchen Sie zum Beispiel:
+x153|After modal verbs the infinitive comes without zu.|Nach Modalverben steht der Infinitiv ohne zu.
+x154|Check for free|Kostenlos prüfen
+x155|Check with AI|Mit KI prüfen
+x156|Checking the answer with AI is not available in this view. Use the free check and compare your answer with the model.|Die KI-Prüfung der Antwort ist in dieser Ansicht nicht verfügbar. Nutzen Sie die kostenlose Prüfung und vergleichen Sie Ihre Antwort mit dem Muster.
+x157|A rule-based check: task points, Redemittel, connectors, length, repetitions and typical mistakes. It does not check all the grammar: the AI does that.|Prüfung nach Regeln: Aufgabenpunkte, Redemittel, Konnektoren, Länge, Wiederholungen und typische Fehler. Die ganze Grammatik prüft sie nicht, das macht die KI.
+x158|Task points (by key words)|Aufgabenpunkte (nach Schlüsselwörtern)
+x159|Recognition stopped with an error. Press the microphone again or type your answer.|Die Spracherkennung wurde mit einem Fehler beendet. Klicken Sie noch einmal auf das Mikrofon oder tippen Sie die Antwort ein.
+x160|Speech recognition is not working right now: no connection to the browser’s service. It is turned off in Brave, Opera and some other browsers. Open Chrome, Edge or Safari, or type your answer.|Die Spracherkennung funktioniert gerade nicht: keine Verbindung zum Dienst des Browsers. In Brave, Opera und einigen anderen Browsern ist sie abgeschaltet. Öffnen Sie Chrome, Edge oder Safari oder tippen Sie die Antwort ein.
+x161|Talk about the topic for about 2 minutes (150–260 words) using these points. Press “Speak” and talk freely, as in the exam: your speech turns into text. Then check the answer for free or with AI, and the AI examiner will ask questions.|Sprechen Sie etwa 2 Minuten (150–260 Wörter) zum Thema und zu diesen Punkten. Klicken Sie auf „Sprechen“ und sprechen Sie frei wie in der Prüfung: Ihre Sprache wird zu Text. Prüfen Sie die Antwort danach kostenlos oder mit KI, und die KI-Prüferin stellt Fragen.
+x162|Connectors and subordinate clauses|Konnektoren und Nebensätze
+x163|No connectors yet.|Noch keine Konnektoren.
+x164|Synonyms:|Synonyme:
+x165|Say your part of the conversation: answer each point, talk about your own experience and ask your partner 1–2 questions back. Below you can talk with the AI partner.|Sprechen Sie Ihren Teil des Gesprächs: Gehen Sie auf jeden Punkt ein, erzählen Sie von eigenen Erfahrungen und stellen Sie 1–2 Gegenfragen. Unten können Sie mit dem KI-Gesprächspartner sprechen.
+x166|Say your part of the conversation: a suggestion for each point, a reason, a reply to a possible objection and, at the end, a proposal to agree. Below you can practise the dialogue with the AI partner.|Sprechen Sie Ihren Teil des Gesprächs: zu jedem Punkt einen Vorschlag mit Begründung, eine Antwort auf einen möglichen Einwand und am Ende einen Vorschlag zur Einigung. Unten können Sie den Dialog mit der KI-Partnerin üben.
+x167|Say at least 15 words so that the check is useful.|Sagen Sie mindestens 15 Wörter, dann ist die Prüfung hilfreich.
+x168|Say at least 25 words so that the AI check is useful.|Sagen Sie mindestens 25 Wörter, dann ist die KI-Prüfung hilfreich.
+x169|Useful words from the model answer|Nützliche Wörter aus dem Muster
+x170|Filler words:|Füllwörter:
+x171|Word twice in a row:|Wort zweimal hintereinander:
+x172|The comparative already means “more”: mehr is not needed here.|Der Komparativ bedeutet schon „mehr“: mehr ist hier überflüssig.
+x173|Stop|Stopp
+x174|Good answer|Gute Antwort
+x175|Goal for B2:|Ziel für B2:
+x176|This point is missing from the answer. Say at least 1–2 sentences about it.|Dieser Punkt fehlt in der Antwort. Sagen Sie mindestens 1–2 Sätze dazu.
+x177|This browser cannot turn speech into text (Firefox, for example). Open the page in Chrome, Edge or Safari, or type your answer for now.|Dieser Browser kann Sprache nicht in Text umwandeln (zum Beispiel Firefox). Öffnen Sie die Seite in Chrome, Edge oder Safari oder tippen Sie die Antwort vorerst ein.
+x178|without AI · approximate|ohne KI · Richtwert
+x179|words|Wörter
+x180|words per minute|Wörter pro Minute
+x181|goal|Ziel
