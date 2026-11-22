@@ -15,21 +15,33 @@ open(os.path.join(OUT, 'assets', 'app.js'), 'w', encoding='utf-8').write(js)
 shutil.copy(os.path.join(H, 'admin.css'), os.path.join(OUT, 'assets', 'admin.css'))
 shutil.copy(os.path.join(H, 'admin.js'), os.path.join(OUT, 'assets', 'admin.js'))
 shutil.copy(os.path.join(H, 'admin_i18n.js'), os.path.join(OUT, 'assets', 'admin_i18n.js'))
+# Link preview (Telegram, WhatsApp, Facebook): always German, same for every visitor, no login needed.
+# Image source: project marketing/og/source (og.html + render_og.js).
+OG = '''<meta name="description" content="Online-Trainer für die Prüfung telc Deutsch B2 Beruf (DTB): Lesen, Hören, Schreiben und Sprechen mit Fortschritt in Grafiken und Kabinett für Lehrkräfte. 3 Tage gratis.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="prufungen.de">
+<meta property="og:locale" content="de_DE">
+<meta property="og:title" content="telc DTB B2 Beruf Trainer · 3 Tage gratis · prufungen.de">
+<meta property="og:description" content="Lesen, Hören, Schreiben und Sprechen wie in der echten Prüfung. Fortschritt in Grafiken, Fehlertraining, Probeprüfung und Kabinett für Lehrkräfte.">
+<meta property="og:url" content="https://www.prufungen.de/">
+<meta property="og:image" content="https://www.prufungen.de/assets/og-de.jpg">
+<meta property="og:image:secure_url" content="https://www.prufungen.de/assets/og-de.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="telc DTB B2 Beruf Trainer: Lehrerkabinett mit Grafiken auf dem Laptop, Mein Fortschritt auf dem Handy">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="telc DTB B2 Beruf Trainer · 3 Tage gratis · prufungen.de">
+<meta name="twitter:description" content="Lesen, Hören, Schreiben und Sprechen wie in der echten Prüfung. Fortschritt in Grafiken und Kabinett für Lehrkräfte.">
+<meta name="twitter:image" content="https://www.prufungen.de/assets/og-de.jpg">
+'''
 html = '''<!doctype html>
 <html lang="ru">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>DTB B2 Prüfungstrainer</title>
-<meta property="og:type" content="website">
-<meta property="og:title" content="DTB B2 Beruf Prüfungstrainer">
-<meta property="og:description" content="Тренажёр telc DTB B2 Beruf: Lesen, Hören, Schreiben и Sprechen с озвучкой и проверкой.">
-<meta property="og:image" content="https://b2-beruf-test.vercel.app/assets/og.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:url" content="https://b2-beruf-test.vercel.app/">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://b2-beruf-test.vercel.app/assets/og.png">
+<!--OG-->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=Onest:wght@400;600;700&family=Unbounded:wght@500;600&subset=cyrillic,latin-ext&display=swap" rel="stylesheet">
@@ -48,6 +60,7 @@ html = '''<!doctype html>
 </body>
 </html>
 '''
+html = html.replace('<!--OG-->\n', OG)
 open(os.path.join(OUT, 'index.html'), 'w', encoding='utf-8').write(html)
 admin = '''<!doctype html>
 <html lang="ru">
@@ -56,6 +69,7 @@ admin = '''<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <title>Кабинет преподавателя · DTB B2 Beruf</title>
+<!--OG-->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Onest:wght@400;600;700&family=Unbounded:wght@500;600&subset=cyrillic,latin-ext&display=swap" rel="stylesheet">
@@ -71,5 +85,6 @@ admin = '''<!doctype html>
 </body>
 </html>
 '''
+admin = admin.replace('<!--OG-->\n', OG.split('\n', 1)[1])
 open(os.path.join(OUT, 'admin.html'), 'w', encoding='utf-8').write(admin)
 print('web built')
