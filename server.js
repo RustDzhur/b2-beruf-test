@@ -1,7 +1,7 @@
 // Tiny static server without dependencies: `node server.js` (or `npm start`) → http://localhost:5173
 const http = require("http"), fs = require("fs"), path = require("path"), { exec, execFile } = require("child_process"), os = require("os"), crypto = require("crypto");
 const ROOT = __dirname, PORT = +process.env.PORT || 5173;
-const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png", ".ico": "image/x-icon", ".mp3": "audio/mpeg" };
+const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".ico": "image/x-icon", ".mp3": "audio/mpeg" };
 const ai = require("./api/_ai.js");
 const admin = require("./api/_admin.js");
 const verify = require("./api/_verify.js");
