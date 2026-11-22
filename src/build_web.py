@@ -52,7 +52,7 @@ html = '''<!doctype html>
 <body>
 <header class="top"><div class="top-in">
 <a class="brand" href="#home"><b>DTB B2 Beruf</b><span>Prüfungstrainer</span></a>
-<nav class="nav"><a href="#home">Главная</a><a href="#progress">Прогресс</a><a href="#leaderboard">Рейтинг</a><a href="#review">Ошибки</a><a href="#learn">Учить наизусть</a><a href="#exam">Пробный экзамен</a><a href="#voice">Голос</a></nav>
+<nav class="nav"><a href="#home">Главная</a><a href="#progress">Прогресс</a><a href="#leaderboard">Рейтинг</a><a href="#review">Ошибки</a><a href="#learn" class="nav-wide">Учить наизусть</a><a href="#exam">Пробный экзамен</a><details class="more"><summary>Ещё</summary><div class="more-menu"><a href="#learn" class="nav-narrow">Учить наизусть</a><a href="#voice">Голос</a></div></details></nav>
 </div></header>
 <main id="app"></main>
 <script src="assets/data.js"></script>

@@ -197,12 +197,12 @@ const notVerifiedText = (contact) => "Тренажёр создан волонт
 const errText = (e) => e && e.code === "not_verified" ? notVerifiedText(e.contact) : (ERR[e && e.code] || "Не удалось связаться с ИИ. Попробуйте ещё раз.");
 function thinking(msg) { return h("div", { class: "thinking" }, h("span", { class: "dots" }, h("i"), h("i"), h("i")), msg || "ИИ думает…"); }
 async function getSample() { const s = SAMPLE || await sampleReady; if (!s) throw { code: "not_granted" }; return s; }
-const LANG_NAME = { ru: "Russian", en: "English", de: "German", fr: "French", tr: "Turkish", ar: "Arabic", it: "Italian" };
+const LANG_NAME = { ru: "Russian", en: "English", de: "German", fr: "French", tr: "Turkish", ar: "Arabic", it: "Italian", uk: "Ukrainian" };
 // German names for prompts written in German ("Übersetzung ins …")
-const LANG_DE = { ru: "Russische", en: "Englische", fr: "Französische", tr: "Türkische", ar: "Arabische", it: "Italienische" };
+const LANG_DE = { ru: "Russische", en: "Englische", fr: "Französische", tr: "Türkische", ar: "Arabische", it: "Italienische", uk: "Ukrainische" };
 // the interface language (German by default) decides in which language the AI explains, and into which language it translates
 // "auf …" for German prompts: the language explanations are written in
-const LANG_AUF = { ru: "Russisch", en: "Englisch", de: "Deutsch", fr: "Französisch", tr: "Türkisch", ar: "Arabisch", it: "Italienisch" };
+const LANG_AUF = { ru: "Russisch", en: "Englisch", de: "Deutsch", fr: "Französisch", tr: "Türkisch", ar: "Arabisch", it: "Italienisch", uk: "Ukrainisch" };
 const aufLang = () => "auf " + (LANG_AUF[aiLang()] || "Deutsch");
 const aiLang = () => (typeof curLang === "function" ? curLang() : store.get("lang", "de"));
 // rule for word lists after an AI answer: none for a German interface, otherwise translations into the interface language

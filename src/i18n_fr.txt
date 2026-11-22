@@ -556,3 +556,4 @@ x122|Demander un essai
 x123|J'ai déjà payé
 x124|Envoyez une capture du paiement. L'administrateur la vérifie et ouvre l'accès ; votre mois commence ce jour-là.
 x125|Activer mon accès
+x126|Plus

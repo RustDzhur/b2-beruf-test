@@ -556,3 +556,4 @@ x122|Deneme iste
 x123|Zaten ödedim
 x124|Ödemenin ekran görüntüsünü gönderin. Yönetici kontrol edip erişimi açar; aboneliğiniz o gün başlar.
 x125|Erişimimi aç
+x126|Daha fazla

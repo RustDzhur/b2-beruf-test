@@ -444,7 +444,8 @@ table.score th { font-size: 12px; color: var(--muted); font-weight: 600; }
 .cv-err { margin: 0; color: #b00020; font-weight: 700; }
 .s30-foot { display: flex; justify-content: space-between; align-items: baseline; border-top: 2px solid #111; padding-top: 8px; } .s30-foot b { font-size: 22px; } .s30-foot span { color: #888; font-weight: 700; }
 .who { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border: 1px solid var(--line); border-radius: 999px; font-size: 13.5px; color: var(--ink); text-decoration: none; max-width: 220px; }
-.who span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.who .who-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.who .who-ico { flex: none; }
 .who:hover { background: var(--soft); }
 
 /* ================= theme toggle ================= */
@@ -692,3 +693,46 @@ body.pre .top-in { flex-wrap: nowrap; }
 body.pre .top-in .theme-toggle { margin-left: auto; }
 body.pre .top-in .who { max-width: 140px; }
 @media (max-width: 400px) { body.pre .brand span { display: none; } .langsel { max-width: 120px; } }
+
+/* ---------- compact header (signed in): brand, tabs, "More", theme, account and language on ONE line from ~1000 px ---------- */
+.top-in { max-width: 1080px; gap: 10px; padding-block: 8px; }
+body:not(.pre) .top-in { flex-wrap: nowrap; }
+body:not(.pre) .brand { margin-right: 6px; flex: none; }
+body:not(.pre) .nav { flex: 1 1 auto; flex-wrap: nowrap; gap: 2px; min-width: 0; }
+.nav a, .nav summary { white-space: nowrap; padding: 6px 9px; font-size: 13.5px; }
+.nav .more { position: relative; }
+.nav summary { list-style: none; cursor: pointer; color: var(--muted); border-radius: 8px; display: inline-flex; align-items: center; gap: 4px; user-select: none; }
+.nav summary::-webkit-details-marker { display: none; }
+.nav summary::after { content: ""; width: 6px; height: 6px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: translateY(-2px) rotate(45deg); }
+.nav .more[open] summary::after { transform: translateY(1px) rotate(-135deg); }
+.nav summary:hover, .nav .more[open] summary, .nav .more.on summary { background: var(--soft); color: var(--ink); }
+.more-menu { position: absolute; top: calc(100% + 6px); right: 0; z-index: 20; min-width: 200px; display: grid; gap: 2px; padding: 6px;
+  background: var(--paper); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 12px 30px rgba(0, 0, 0, .28); }
+.more-menu a { display: block; color: var(--ink); }
+[dir="rtl"] .more-menu { right: auto; left: 0; }
+body:not(.pre) .theme-toggle { margin-left: auto; }
+[dir="rtl"] body:not(.pre) .theme-toggle { margin-left: 0; margin-right: auto; }
+body:not(.pre) .top-in .who { flex: 0 1 auto; max-width: 150px; min-width: 0; padding: 5px 9px; font-size: 13px; }
+/* language: signed in, the closed control shows only the code; before sign-in it keeps the full language name */
+.langsw { position: relative; flex: none; }
+.langsw-code { display: none; font: 600 12.5px var(--f-mono); color: var(--ink); padding: 8px 2px 8px 0; }
+body:not(.pre) .langsw { margin-left: 0; padding: 0 8px; gap: 5px; }
+body:not(.pre) .langsw-code { display: inline; }
+body:not(.pre) .langsel { position: absolute; inset: 0; width: 100%; max-width: none; opacity: 0; padding: 0; }
+body:not(.pre) .langsw:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+body:not(.pre) .langsw:hover { background: var(--soft); }
+/* "Learn by heart" sits in the tab row on wide screens and moves into "More" when space runs out */
+.more-menu .nav-narrow { display: none; }
+@media (max-width: 1240px) { body:not(.pre) .brand span { display: none; } }
+@media (max-width: 1090px) { .nav .nav-wide { display: none; } .more-menu .nav-narrow { display: block; } }
+@media (max-width: 1000px) { .nav a, .nav summary { padding: 6px 7px; font-size: 13px; } body:not(.pre) .top-in .who { max-width: 120px; } }
+/* tablet and phone: tabs move to their own scrollable row under the brand, account shrinks to the icon */
+@media (max-width: 900px) {
+  body:not(.pre) .top-in { flex-wrap: wrap; row-gap: 6px; }
+  body:not(.pre) .nav { order: 10; flex: 1 0 100%; overflow-x: auto; scrollbar-width: none; margin: 0 -4px; padding: 0 4px; }
+  body:not(.pre) .nav::-webkit-scrollbar { display: none; }
+  .nav .more { position: static; }
+  .more-menu { right: 16px; top: auto; margin-top: 6px; }
+  body:not(.pre) .top-in .who .who-name { display: none; }
+  body:not(.pre) .top-in .who { padding: 5px 8px; }
+}

@@ -233,12 +233,12 @@ const notVerifiedText = (contact) => "Тренажёр создан волонт
 const errText = (e) => e && e.code === "not_verified" ? notVerifiedText(e.contact) : (ERR[e && e.code] || "Не удалось связаться с ИИ. Попробуйте ещё раз.");
 function thinking(msg) { return h("div", { class: "thinking" }, h("span", { class: "dots" }, h("i"), h("i"), h("i")), msg || "ИИ думает…"); }
 async function getSample() { const s = SAMPLE || await sampleReady; if (!s) throw { code: "not_granted" }; return s; }
-const LANG_NAME = { ru: "Russian", en: "English", de: "German", fr: "French", tr: "Turkish", ar: "Arabic", it: "Italian" };
+const LANG_NAME = { ru: "Russian", en: "English", de: "German", fr: "French", tr: "Turkish", ar: "Arabic", it: "Italian", uk: "Ukrainian" };
 // German names for prompts written in German ("Übersetzung ins …")
-const LANG_DE = { ru: "Russische", en: "Englische", fr: "Französische", tr: "Türkische", ar: "Arabische", it: "Italienische" };
+const LANG_DE = { ru: "Russische", en: "Englische", fr: "Französische", tr: "Türkische", ar: "Arabische", it: "Italienische", uk: "Ukrainische" };
 // the interface language (German by default) decides in which language the AI explains, and into which language it translates
 // "auf …" for German prompts: the language explanations are written in
-const LANG_AUF = { ru: "Russisch", en: "Englisch", de: "Deutsch", fr: "Französisch", tr: "Türkisch", ar: "Arabisch", it: "Italienisch" };
+const LANG_AUF = { ru: "Russisch", en: "Englisch", de: "Deutsch", fr: "Französisch", tr: "Türkisch", ar: "Arabisch", it: "Italienisch", uk: "Ukrainisch" };
 const aufLang = () => "auf " + (LANG_AUF[aiLang()] || "Deutsch");
 const aiLang = () => (typeof curLang === "function" ? curLang() : store.get("lang", "de"));
 // rule for word lists after an AI answer: none for a German interface, otherwise translations into the interface language
@@ -1192,12 +1192,12 @@ function viewLearn() {
     letters, forum, notes, rede, sp1, sp2, sp3);
 }
 
-/* ---------- interface language: RU (default) / EN / DE / FR / TR / AR / IT ----------
+/* ---------- interface language: RU (default) / EN / DE / FR / TR / AR / IT / UK ----------
    The Russian strings stay in the source. A DOM pass swaps text and attributes for the chosen language,
    so every page, dynamic message and tooltip follows the switch without touching each renderer. */
-const LANGS = { ru: "RU", en: "EN", de: "DE", fr: "FR", tr: "TR", ar: "AR", it: "IT" };
-const LANG_IDX = { en: 0, de: 1, fr: 2, tr: 3, ar: 4, it: 5 };
-const LANG_TITLE = { ru: "Русский", en: "English", de: "Deutsch", fr: "Français", tr: "Türkçe", ar: "العربية", it: "Italiano" };
+const LANGS = { ru: "RU", en: "EN", de: "DE", fr: "FR", tr: "TR", ar: "AR", it: "IT", uk: "UK" };
+const LANG_IDX = { en: 0, de: 1, fr: 2, tr: 3, ar: 4, it: 5, uk: 6 };
+const LANG_TITLE = { ru: "Русский", en: "English", de: "Deutsch", fr: "Français", tr: "Türkçe", ar: "العربية", it: "Italiano", uk: "Українська" };
 const CYR = /[А-Яа-яЁё]/;
 const PREFIX_KEYS = ["Ошибка озвучки:", "Неверно · правильно:", "Нет ответа · правильно:", "Правильно:", "Ответ:", "Уровень текста:", "Уровень:", "Правильная записка ·", "Чаще всего ошибки в заданиях №", "Ошибки в №"];
 const RULES = I18N_RULES.map(([rx, t]) => [new RegExp(rx), t]);
@@ -1271,12 +1271,13 @@ function initLang() {
   });
   const top = document.querySelector(".top-in");
   if (top && !top.querySelector(".langsw")) {
-    // compact drop-down with all languages, so the header fits one line on any screen
-    const sel = h("select", { class: "langsel", "aria-label": "Language / Sprache / Язык",
-      onchange: (e) => { store.set("lang", e.target.value); render(); applyLang(document.body); } },
+    // compact language control: the closed state shows only the code (DE, UK, …), the native list shows full names
+    const code = h("span", { class: "langsw-code", "aria-hidden": "true" }, LANGS[curLang()] || "DE");
+    const sel = h("select", { class: "langsel", "aria-label": "Language / Sprache / Мова / Язык", title: "Language / Sprache / Мова / Язык",
+      onchange: (e) => { store.set("lang", e.target.value); code.textContent = LANGS[e.target.value]; render(); applyLang(document.body); } },
       Object.entries(LANGS).map(([k, v]) => h("option", { value: k, "data-l": k }, LANG_TITLE[k])));
     sel.value = curLang();
-    top.append(h("label", { class: "langsw", translate: "no" }, h("span", { class: "langsw-ico", "aria-hidden": "true" }, "🌐"), sel));
+    top.append(h("label", { class: "langsw", translate: "no" }, h("span", { class: "langsw-ico", "aria-hidden": "true" }, "🌐"), code, sel));
   }
   applyLang(document.body);
 }
@@ -2385,7 +2386,10 @@ const LANG_CODES = [["001", "Deutsch"], ["002", "English"], ["003", "Français"]
 // official German label plus its translation into the chosen interface language (none for German); Arabic is not on the printed form, so it is added here
 const L7_AR = { "E-Mail *": "البريد الإلكتروني *", "Kennwort * (mindestens 6 Zeichen)": "كلمة المرور * (6 أحرف على الأقل)", "Kennwort (nur zum Wechseln des Kontos)": "كلمة المرور (لتغيير الحساب فقط)", "männlich": "ذكر", "weiblich": "أنثى", "Testversion": "نسخة الاختبار", "Familienname": "اللقب", "Vorname": "الاسم الأول", "Geburtsdatum": "تاريخ الميلاد", "Geburtsort": "مكان الميلاد",
   "Erstsprache": "اللغة الأولى", "Geschlecht": "الجنس", "Straße und Hausnummer": "الشارع ورقم المنزل", "Postleitzahl und Ort": "الرمز البريدي والمدينة", "Prüfungszentrum": "مركز الامتحان", "Prüfungsdatum": "تاريخ الامتحان" };
-const L7 = (de, en, fr, it, tr, ru) => { const t = { en, fr, it, tr, ru, ar: L7_AR[de] }[curLang()]; return t ? de + " · " + t : de; };
+// Ukrainian is not on the printed form either
+const L7_UK = { "Familienname": "Прізвище", "Vorname": "Ім'я", "männlich": "чоловіча", "weiblich": "жіноча", "Geburtsdatum": "Дата народження", "Geburtsort": "Місце народження",
+  "Erstsprache": "Рідна мова", "Geschlecht": "Стать", "Straße und Hausnummer": "Вулиця й будинок", "Postleitzahl und Ort": "Індекс і місто", "Prüfungszentrum": "Екзаменаційний центр", "Prüfungsdatum": "Дата іспиту" };
+const L7 = (de, en, fr, it, tr, ru) => { const t = { en, fr, it, tr, ru, ar: L7_AR[de], uk: L7_UK[de] }[curLang()]; return t ? de + " · " + t : de; };
 // sign-up / sign-in card (and the profile of a signed-in account). Required at sign-up: surname, first name, e-mail, phone, password, group.
 // The Antwortbogen fields (birth date, address, …) are optional and only used for the printed answer sheet.
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -2604,19 +2608,25 @@ function contactBlock(contact, c, mail) {
     h("div", { class: "contact-warn" }, "📵 ", h("span", null, "Только сообщения, пожалуйста, не звоните.")),
     digits ? h("a", { class: "reg-btn wa", href: "https://wa.me/" + digits + "?text=" + encodeURIComponent(text), target: "_blank", rel: "noopener" }, "Написать в WhatsApp") : null);
 }
-// header badge: who is signed in on this device
+// header badge: who is signed in on this device. Only the first name is shown so the header stays on one line; the full name is in the tooltip.
 function updateWho() {
   const top = document.querySelector(".top-in"); if (!top) return;
   let a = top.querySelector(".who");
   const c = cand();
-  if (!c.done) { if (a) a.remove(); return; }
-  if (!a) { a = h("a", { class: "who", href: "#profile", title: "Данные участника" }); top.insertBefore(a, top.querySelector(".langsw")); }
-  const kids = [h("span", { class: "who-ico", "aria-hidden": "true" }, "👤"), h("span", null, (c.vor || c.fam) ? `${c.vor || ""} ${c.fam || ""}`.trim() : (c.email || ""))];
-  if (cloudOn()) kids.push(h("span", { class: "who-ico", title: "Cloud", "aria-hidden": "true" }, "☁"));
+  const menu = document.querySelector(".nav .more-menu");
+  const dropCab = () => { const x = document.querySelector(".more-cab"); if (x) x.remove(); };
+  if (!c.done) { if (a) a.remove(); dropCab(); return; }
+  if (!a) { a = h("a", { class: "who", href: "#profile" }); top.insertBefore(a, top.querySelector(".langsw")); }
+  const full = `${c.vor || ""} ${c.fam || ""}`.trim();
+  const short = c.vor || c.fam || String(c.email || "").split("@")[0];
+  a.title = [full, c.email].filter(Boolean).join(" · ") || "Данные участника";
+  a.setAttribute("aria-label", "Данные участника");
+  const kids = [h("span", { class: "who-ico", "aria-hidden": "true" }, "👤"), h("span", { class: "who-name" }, short)];
+  if (cloudOn()) kids.push(h("span", { class: "who-ico who-cloud", title: "Cloud", "aria-hidden": "true" }, "☁"));
   a.replaceChildren(...kids);
-  let cab = top.querySelector(".who-cab");
-  if (c.role === "org" && cloud.ok) { if (!cab) { cab = h("a", { class: "who who-cab", href: "/admin" }, "👥 ", h("span", null, "Кабинет группы")); a.after(cab); } }
-  else if (cab) cab.remove();
+  // the group cabinet link lives in the "More" menu
+  if (c.role === "org" && cloud.ok && menu) { if (!menu.querySelector(".more-cab")) menu.append(h("a", { class: "more-cab", href: "/admin" }, "👥 ", h("span", null, "Кабинет группы"))); }
+  else dropCab();
 }
 function render() {
   stopAll();
@@ -2637,6 +2647,8 @@ function render() {
   app().replaceChildren(v);
   const top = ["home", "review", "exam", "voice", "learn", "progress", "leaderboard"].includes(sec) ? sec : "home";
   document.querySelectorAll(".nav a").forEach(a => a.classList.toggle("on", a.getAttribute("href") === "#" + (SEC[sec] ? "" : top)));
+  const more = document.querySelector(".nav .more");
+  if (more) { more.open = false; more.classList.toggle("on", !!more.querySelector(".more-menu a.on")); }
   // before sign-in (and while waiting for access) the sections cannot be opened: the header shows only theme and language
   document.body.classList.toggle("pre", !(cand().done && cloudOn() && cloud.ok));
   refreshAI(); updateNav(); updateWho();
@@ -2646,6 +2658,9 @@ window.addEventListener("hashchange", () => { render(); if (location.hash !== la
 try { localStorage.removeItem("dtb.mode"); } catch {}
 initTheme();
 initLang();
+// "More" menu in the header: closes on a click outside or on Escape
+document.addEventListener("click", (e) => { const m = document.querySelector(".nav .more[open]"); if (m && !m.contains(e.target)) m.open = false; });
+document.addEventListener("keydown", (e) => { if (e.key !== "Escape") return; const m = document.querySelector(".nav .more[open]"); if (m) { m.open = false; m.querySelector("summary").focus(); } });
 cloudBoot(() => render());
 audioReady.then(render);
 })();
