@@ -556,3 +556,4 @@ x122|Richiedi la prova
 x123|Ho già pagato
 x124|Invia uno screenshot del pagamento. L'amministratore lo controlla e apre l'accesso; il tuo mese inizia da quel giorno.
 x125|Attiva il mio accesso
+x126|Altro

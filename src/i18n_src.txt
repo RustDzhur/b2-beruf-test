@@ -556,3 +556,4 @@ x122|Ask for a trial|Testphase anfragen
 x123|I have already paid|Ich habe schon bezahlt
 x124|Send a screenshot of the payment. The administrator checks it and opens access; your month starts that day.|Schicken Sie einen Screenshot der Zahlung. Der Administrator prüft ihn und schaltet den Zugang frei, ab diesem Tag läuft Ihr Monat.
 x125|Activate my access|Zugang freischalten
+x126|More|Mehr

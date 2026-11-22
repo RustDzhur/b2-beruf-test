@@ -1,10 +1,10 @@
 
-/* ---------- interface language: RU (default) / EN / DE / FR / TR / AR / IT ----------
+/* ---------- interface language: RU (default) / EN / DE / FR / TR / AR / IT / UK ----------
    The Russian strings stay in the source. A DOM pass swaps text and attributes for the chosen language,
    so every page, dynamic message and tooltip follows the switch without touching each renderer. */
-const LANGS = { ru: "RU", en: "EN", de: "DE", fr: "FR", tr: "TR", ar: "AR", it: "IT" };
-const LANG_IDX = { en: 0, de: 1, fr: 2, tr: 3, ar: 4, it: 5 };
-const LANG_TITLE = { ru: "Русский", en: "English", de: "Deutsch", fr: "Français", tr: "Türkçe", ar: "العربية", it: "Italiano" };
+const LANGS = { ru: "RU", en: "EN", de: "DE", fr: "FR", tr: "TR", ar: "AR", it: "IT", uk: "UK" };
+const LANG_IDX = { en: 0, de: 1, fr: 2, tr: 3, ar: 4, it: 5, uk: 6 };
+const LANG_TITLE = { ru: "Русский", en: "English", de: "Deutsch", fr: "Français", tr: "Türkçe", ar: "العربية", it: "Italiano", uk: "Українська" };
 const CYR = /[А-Яа-яЁё]/;
 const PREFIX_KEYS = ["Ошибка озвучки:", "Неверно · правильно:", "Нет ответа · правильно:", "Правильно:", "Ответ:", "Уровень текста:", "Уровень:", "Правильная записка ·", "Чаще всего ошибки в заданиях №", "Ошибки в №"];
 const RULES = I18N_RULES.map(([rx, t]) => [new RegExp(rx), t]);
@@ -78,12 +78,13 @@ function initLang() {
   });
   const top = document.querySelector(".top-in");
   if (top && !top.querySelector(".langsw")) {
-    // compact drop-down with all languages, so the header fits one line on any screen
-    const sel = h("select", { class: "langsel", "aria-label": "Language / Sprache / Язык",
-      onchange: (e) => { store.set("lang", e.target.value); render(); applyLang(document.body); } },
+    // compact language control: the closed state shows only the code (DE, UK, …), the native list shows full names
+    const code = h("span", { class: "langsw-code", "aria-hidden": "true" }, LANGS[curLang()] || "DE");
+    const sel = h("select", { class: "langsel", "aria-label": "Language / Sprache / Мова / Язык", title: "Language / Sprache / Мова / Язык",
+      onchange: (e) => { store.set("lang", e.target.value); code.textContent = LANGS[e.target.value]; render(); applyLang(document.body); } },
       Object.entries(LANGS).map(([k, v]) => h("option", { value: k, "data-l": k }, LANG_TITLE[k])));
     sel.value = curLang();
-    top.append(h("label", { class: "langsw", translate: "no" }, h("span", { class: "langsw-ico", "aria-hidden": "true" }, "🌐"), sel));
+    top.append(h("label", { class: "langsw", translate: "no" }, h("span", { class: "langsw-ico", "aria-hidden": "true" }, "🌐"), code, sel));
   }
   applyLang(document.body);
 }
