@@ -428,15 +428,22 @@ function subBlock(s) {
       has ? el("button", { class: "adm-btn", onclick: () => { if (confirm("Сделать доступ " + s.name + " бессрочным?")) subAction(s, { action: "unlimited" }, true); } }, "Бессрочно") : null),
     el("div", { class: "adm-email" }, "Оплата месяца включает доступ сразу. Когда срок кончится, доступ закроется сам, а ученику придёт письмо."));
 }
+// what the student can use right now. When the trial or the paid month is over the server closes the whole trainer
+// (not only the AI), so the list says so plainly until the administrator confirms a payment.
+function accessChip(s) {
+  if (!s.admitted) return el("span", { class: "adm-chip warn" }, "Нет доступа");
+  if (s.sub && s.sub.expired) return el("span", { class: "adm-chip bad" }, "⛔ ", el("span", null, "Тренажёр закрыт до оплаты"));
+  return el("span", { class: "adm-chip " + (s.verified ? "ok" : "") }, s.verified ? "ИИ открыт" : "ИИ закрыт");
+}
 function verifyControl(s, reopen) {
   // a group teacher only sees the state; every change is made by the main administrator
   if (!isSuper()) return el("span", { class: "adm-verify" },
-    el("span", { class: "adm-chip " + (s.admitted ? (s.verified ? "ok" : "") : "warn") }, !s.admitted ? "Нет доступа" : s.verified ? "ИИ открыт" : "ИИ закрыт"), subChip(s));
+    accessChip(s), subChip(s));
   if (!s.admitted) return el("span", { class: "adm-verify" },
     el("span", { class: "adm-chip warn" }, "Ждёт допуска"),
     el("button", { class: "adm-btn primary", onclick: e => { e.stopPropagation(); toggleAdmit(s, reopen); } }, "Допустить"));
   return el("span", { class: "adm-verify" },
-    el("span", { class: "adm-chip " + (s.verified ? "ok" : "") }, s.verified ? "ИИ открыт" : "ИИ закрыт"), subChip(s),
+    accessChip(s), subChip(s),
     el("button", { class: "adm-btn", onclick: e => { e.stopPropagation(); toggleVerify(s, reopen); } }, s.verified ? "Закрыть ИИ" : "Открыть ИИ"),
     reopen ? el("button", { class: "adm-btn danger", onclick: e => { e.stopPropagation(); if (confirm("Заблокировать " + s.name + "? Тренажёр и ИИ закроются, прогресс сохранится.")) toggleAdmit(s, reopen); } }, "Заблокировать") : null);
 }
