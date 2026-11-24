@@ -7,6 +7,7 @@ if (!ADM_LANGS[ADM_LANG]) ADM_LANG = "de";
 
 const ADM_I18N = {
   "Пробный закончился": ["Trial ended", "Testphase vorbei", "Essai terminé", "Deneme bitti", "انتهت التجربة", "Prova terminata", "Пробний закінчився"],
+  "Тренажёр закрыт до оплаты": ["Trainer closed until payment", "Trainer bis zur Zahlung gesperrt", "Entraîneur fermé jusqu'au paiement", "Ödemeye kadar kapalı", "المدرب مغلق حتى الدفع", "Trainer chiuso fino al pagamento", "Тренажер закритий до оплати"],
   "Срок истёк": ["Expired", "Abgelaufen", "Expiré", "Süresi doldu", "انتهت المدة", "Scaduto", "Термін минув"],
   "Пробный": ["Trial", "Test", "Essai", "Deneme", "تجربة", "Prova", "Пробний"],
   "до": ["until", "bis", "jusqu'au", "bitiş", "حتى", "fino al", "до"],

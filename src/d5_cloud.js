@@ -127,6 +127,7 @@ async function cloudConnect(c, password, opt) {
   await cloudPush();
   cloud.state = "ok";
   await cloudAccess();
+  cloudWatch(() => { if (typeof render === "function") render(); });
 }
 // organizer: ask for a new group (the main teacher approves it in /admin) -> {code, name, status}
 async function cloudGroupRequest(name, email) {
@@ -139,6 +140,15 @@ async function cloudResetPw(email) { await fbReq("sendOobCode", { requestType: "
 
 // access to the trainer: only after the teacher approved the account in /admin (server checks Firestore `verified`)
 cloud.ok = store.get("approved", false) === true; cloud.contact = store.get("contact", ""); cloud.pay = store.get("pay", "");
+cloud.sub = store.get("sub", null); cloud.expired = false;
+// a paid month or a trial that ran out closes the trainer at once, even offline or in a tab that stayed open
+function cloudTermOver() {
+  const t = cloud.sub;
+  if (!cloud.ok || !t || !(t.until > 0) || Date.now() < t.until) return false;
+  cloud.ok = false; cloud.expired = true; store.set("approved", false);
+  return true;
+}
+cloudTermOver();
 async function cloudAccess() {
   if (!cloud.s) { cloud.ok = false; return false; }
   try {
@@ -146,21 +156,54 @@ async function cloudAccess() {
     const j = await r.json().catch(() => ({}));
     if (j.contact) { cloud.contact = j.contact; store.set("contact", j.contact); }
     if (typeof j.pay === "string") { cloud.pay = j.pay; store.set("pay", j.pay); }
-    if (j.verified === true || j.verified === false) { cloud.ok = j.verified; store.set("approved", j.verified); cloud.expired = j.expired === true; cloud.sub = j.sub || null; }
-  } catch {} // offline: keep the last known answer
+    if (j.verified === true || j.verified === false) {
+      cloud.ok = j.verified; store.set("approved", j.verified); cloud.expired = j.expired === true;
+      cloud.sub = j.sub || null; store.set("sub", cloud.sub);
+    }
+  } catch {} // offline: keep the last known answer (but a known end date still closes the trainer)
+  cloudTermOver();
   cloud.checked = true;
+  cloud.lastCheck = Date.now();
   return cloud.ok;
+}
+// keep asking the server while the page is open: the trainer closes when the trial or the month ends (and opens as
+// soon as the administrator confirms a payment) without reloading. onChange re-renders the page.
+const ACCESS_EVERY = 5 * 60 * 1000;
+function cloudWatch(onChange) {
+  if (cloud.watching) return;
+  cloud.watching = true;
+  let endTimer = null;
+  const recheck = async () => {
+    if (!cloud.s) return;
+    const was = cloud.ok;
+    await cloudAccess();
+    plan();
+    if (cloud.ok !== was) onChange();
+  };
+  // a timer exactly at the end of the term (setTimeout is limited to ~24 days; the periodic check covers the rest)
+  const plan = () => {
+    clearTimeout(endTimer);
+    const t = cloud.sub, left = t && t.until > 0 ? t.until - Date.now() : -1;
+    if (cloud.ok && left >= 0 && left < 2e9) endTimer = setTimeout(() => { if (cloudTermOver()) onChange(); recheck(); }, left + 1000);
+  };
+  plan();
+  setInterval(() => { if (document.visibilityState !== "hidden") recheck(); }, ACCESS_EVERY);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState !== "visible" || !cloud.s) return;
+    if (cloudTermOver()) onChange();
+    if (Date.now() - (cloud.lastCheck || 0) > 60 * 1000) recheck();
+  });
 }
 function cloudOff(wipe) {
   clearTimeout(cloud.timer);
   if (wipe) SYNC_KEYS.forEach(k => { try { localStorage.removeItem("dtb." + k); } catch {} });
   try { localStorage.removeItem("dtb.cloud"); localStorage.removeItem("dtb.syncts"); } catch {}
-  try { localStorage.removeItem("dtb.approved"); } catch {}
-  cloud.s = null; cloud.id = null; cloud.ok = false;
+  try { localStorage.removeItem("dtb.approved"); localStorage.removeItem("dtb.sub"); } catch {}
+  cloud.s = null; cloud.id = null; cloud.ok = false; cloud.sub = null; cloud.expired = false;
 }
 function cloudBoot(then) {
   if (!cloud.s) return;
-  cloudAccess().then(() => then && then());
+  cloudAccess().then(() => { cloudWatch(() => then && then()); then && then(); });
   cloudPull().then(() => { cloud.state = "ok"; then && then(); return cloudPush(); }).catch(() => { cloud.state = "err"; });
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden" && cloud.s) cloudPush().catch(() => {}); });
 }
