@@ -760,10 +760,10 @@ const REDEMITTEL = {
     { h: "Заключение", items: ["Wir hoffen, dass Sie mit dieser Lösung einverstanden sind.", "Wir freuen uns auf eine weitere gute Zusammenarbeit.", "Für Rückfragen stehe ich Ihnen gern zur Verfügung.", "Mit freundlichen Grüßen"] },
   ],
   forum: [
-    { h: "Обращение и вступление", items: ["Liebe Kolleginnen und Kollegen,", "Hallo zusammen,", "habt ihr schon gehört, dass …", "viele von euch wissen wahrscheinlich schon, dass die Firma vorhat, … zu …", "ich möchte meine Meinung zu … mitteilen."] },
-    { h: "Плюсы", items: ["Einerseits finde ich es gut, dass …", "Ein klarer Vorteil wäre, dass …", "Dafür spricht aus meiner Sicht, dass …", "Positiv ist außerdem, dass …"] },
-    { h: "Минусы", items: ["Andererseits muss man auch bedenken, dass …", "Dagegen spricht allerdings, dass …", "Ein Nachteil ist, dass …", "Ich frage mich außerdem, ob …"] },
-    { h: "Мнение и вывод", items: ["Meiner Meinung nach …", "Persönlich halte ich … für eine gute / keine gute Idee.", "Ich würde vorschlagen, dass …", "Abschließend möchte ich sagen, dass …", "Wie seht ihr das?", "Viele Grüße"] },
+    { h: "Обращение и вступление", items: ["Liebe Kolleginnen und Kollegen,", "Hallo zusammen,", "habt ihr schon gehört, dass …", "viele von euch wissen wahrscheinlich schon, dass die Firma vorhat, … zu …", "ich möchte meine Meinung zu … mitteilen.", "Sehr geehrte Damen und Herren,", "Hallo Leute,", "Ich habe gehört / gelesen, dass … Dazu möchte ich meine Meinung äußern.", "Mir ist zu Ohren gekommen, dass … Auch ich möchte dazu etwas schreiben.", "Ich habe vor Kurzem erfahren, dass … Ich finde diesen Vorschlag (nicht) gut.", "Mich hat die Information erreicht, dass unsere Firma plant, …", "Ich habe mitbekommen, dass unsere Firma plant, … Dazu möchte ich Stellung nehmen.", "Wie wir alle wissen, möchte unsere Geschäftsleitung … Ich bin ehrlich gesagt überrascht."] },
+    { h: "Плюсы", items: ["Einerseits finde ich es gut, dass …", "Ein klarer Vorteil wäre, dass …", "Dafür spricht aus meiner Sicht, dass …", "Positiv ist außerdem, dass …", "Einerseits hat diese Idee einige Vorteile.", "Zum Beispiel …", "Ein weiterer Vorteil ist, dass …", "Außerdem könnte es für viele Menschen praktisch oder hilfreich sein.", "Ich persönlich habe erlebt, dass …", "In meinem früheren Unternehmen war es so, dass …"] },
+    { h: "Минусы", items: ["Andererseits muss man auch bedenken, dass …", "Dagegen spricht allerdings, dass …", "Ein Nachteil ist, dass …", "Ich frage mich außerdem, ob …", "Andererseits gibt es auch Nachteile.", "Viele Leute finden, dass …", "Besonders problematisch ist, dass …", "Das könnte dazu führen, dass …", "Aus eigener Erfahrung weiß ich, dass …"] },
+    { h: "Мнение и вывод", items: ["Meiner Meinung nach …", "Persönlich halte ich … für eine gute / keine gute Idee.", "Ich würde vorschlagen, dass …", "Abschließend möchte ich sagen, dass …", "Wie seht ihr das?", "Viele Grüße", "Ich bin [dafür / dagegen], weil …", "Grundsätzlich befürworte ich den Vorschlag, weil …", "Ich bin geteilter Meinung: Einerseits … Andererseits …", "Deshalb schlage ich vor, dass …", "Ich schlage vor, dass wir gemeinsam eine Lösung finden, die für alle fair ist.", "Man könnte eine Testphase einführen und danach gemeinsam entscheiden.", "Am besten wäre es, wenn die Teilnahme freiwillig bliebe.", "Was [denkt ihr / denken Sie] darüber?", "Ich bin gespannt darauf, was ihr davon haltet.", "Ich würde mich über [eure / Ihre] Rückmeldungen freuen!"] },
   ],
 };
 const WMAX = { beschwerde: { inhalt: 7, sprache: 12 }, forum: { inhalt: 14, sprache: 15 } };
@@ -1142,6 +1142,10 @@ function learnDialog(title, segs) {
 const acc = (summary, chips, ...body) => h("details", { class: "card learnacc" }, h("summary", null, h("span", { class: "grow" }, summary), chips || null), h("div", { class: "stack", style: "margin-top:12px" }, body));
 const rmList = (arr, open) => arr.map((g, i) => h("details", { class: "rm", open: i < open }, h("summary", null, g.h), h("ul", null, g.items.map(s => h("li", null, s)))));
 
+// full Redemittel lists of the collection: German phrase + Russian translation (DB.RM, built in extra_build.py)
+const rmPairs = (arr, open) => (arr || []).map((g, i) => h("details", { class: "rm", open: i < open }, h("summary", null, g.h + " · " + g.hr),
+  h("ul", null, g.items.map(x => h("li", { style: "white-space:pre-line" }, x.tag ? h("div", { class: "small", style: "opacity:.7" }, x.tag) : null, h("div", null, x.de), h("div", { class: "small", style: "opacity:.75" }, x.ru))))));
+
 function viewLearn() {
   const secs = [];
   const sec = (id, title, lead, ...kids) => { secs.push([id, title]); return h("section", { class: "stack", id: "learn-" + id }, h("h2", null, title), lead ? h("p", { class: "lead", style: "margin:0" }, lead) : null, kids); };
@@ -1156,6 +1160,7 @@ function viewLearn() {
     "Порядок: приветствие, вступление, аргументы за, аргументы против, ваше мнение, имя. Одним абзацем, один стиль (Sie или du), не смешивать.",
     acc("Образец с шаблоном (тема «фитнес-зал»)", SRC_FILE(), learnText("Образец форума", DB.F_MODEL)),
     rmList(REDEMITTEL.forum, 1),
+    h("div", { class: "eyebrow" }, "Redemittel · немецкий + перевод"), rmPairs(DB.RM && DB.RM.forum, 0),
     acc(`Все темы форума (${DB.F.length})`, SRC_FILE(), h("ol", { class: "small", style: "margin:0;padding-left:22px" }, DB.F.map(f => h("li", null, h("b", null, f.title), " — " + f.desc)))));
 
   const notes = sec("n", "Telefonnotiz (№42–45)",
@@ -1167,7 +1172,7 @@ function viewLearn() {
   const rede = sec("r", "Redemittel (готовые фразы)",
     "Свои собственные фразы запоминаются лучше всего, но эти покрывают структуру каждой части.",
     h("div", { class: "grid2" },
-      h("div", { class: "card stack" }, h("div", { class: "eyebrow" }, "Beschwerde · ответ клиенту"), rmList(REDEMITTEL.beschwerde, 1)),
+      h("div", { class: "card stack" }, h("div", { class: "eyebrow" }, "Beschwerde · ответ клиенту"), rmList(REDEMITTEL.beschwerde, 1), h("div", { class: "eyebrow" }, "Redemittel · немецкий + перевод"), rmPairs(DB.RM && DB.RM.beschwerde, 0)),
       [["sp1", "Sprechen Teil 1 · презентация"], ["sp2", "Sprechen Teil 2 · Smalltalk"], ["sp3", "Sprechen Teil 3 · решение"]].map(([k, t]) =>
         h("div", { class: "card stack" }, h("div", { class: "eyebrow" }, t), rmList(SP_REDE[k], 1)))));
 

@@ -9,6 +9,7 @@ D['SP2'] = [dict(n=i + 1, id='SP2-%d' % (i + 1), title=x['title'], situation=x['
 D['SP1'] = [dict(n=i + 1, id='SP1-%d' % (i + 1), title=x['title'], points=x['points'], model=[{'who': '', 't': p, 'g': 'm'} for p in x['model'].split('\n\n')]) for i, x in enumerate(SD.T1)]
 from core import L, paras
 D['F_MODEL'] = '\n'.join(paras([l.strip() for l in L[108:118]])) .replace(' Einerseits', '\nEinerseits').replace(' Andererseits', '\nAndererseits') + '\n(Ihr Name)'
+import extra_build; extra_build.add(D)  # variants of the updated collection (02.11.26): new ids only, old ones stay untouched
 js = json.dumps(D, ensure_ascii=False, separators=(',', ':'))
 bad = re.findall(r'.{30}[А-Яа-яЁё]{2,}.{10}', js)
 print('cyrillic leftovers:', bad[:10])

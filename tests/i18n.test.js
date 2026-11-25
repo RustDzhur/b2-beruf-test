@@ -97,3 +97,16 @@ test("teacher cabinet: verification labels are translated into every language", 
     ADM_I18N[k].forEach((t, i) => assert.ok(t && !/[А-Яа-яЁё]/.test(t), LANGS[i] + ": " + k));
   }
 });
+
+test('Redemittel (DB.RM) are translated into every interface language', () => {
+  const fs = require('fs'), vm = require('vm');
+  const sb = {}; vm.createContext(sb);
+  vm.runInContext(fs.readFileSync(__dirname + '/../assets/data.js', 'utf8') + '\n;this.DB = DB; this.I18N = I18N;', sb);
+  const keys = ['Redemittel · немецкий + перевод'];
+  for (const k of ['forum', 'beschwerde']) for (const g of sb.DB.RM[k]) { keys.push(g.h + ' · ' + g.hr); for (const x of g.items) keys.push(x.ru); }
+  for (const key of keys) {
+    const row = sb.I18N[key];
+    assert.ok(row && row.length === 6, 'no translation: ' + key);
+    assert.ok(row.every(t => t && !/[а-яё]/i.test(t.replace(/Redemittel/g, '')) || key === row[0]), 'Russian left in: ' + key);
+  }
+});

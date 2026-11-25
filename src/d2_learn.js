@@ -25,6 +25,10 @@ function learnDialog(title, segs) {
 const acc = (summary, chips, ...body) => h("details", { class: "card learnacc" }, h("summary", null, h("span", { class: "grow" }, summary), chips || null), h("div", { class: "stack", style: "margin-top:12px" }, body));
 const rmList = (arr, open) => arr.map((g, i) => h("details", { class: "rm", open: i < open }, h("summary", null, g.h), h("ul", null, g.items.map(s => h("li", null, s)))));
 
+// full Redemittel lists of the collection: German phrase + Russian translation (DB.RM, built in extra_build.py)
+const rmPairs = (arr, open) => (arr || []).map((g, i) => h("details", { class: "rm", open: i < open }, h("summary", null, g.h + " · " + g.hr),
+  h("ul", null, g.items.map(x => h("li", { style: "white-space:pre-line" }, x.tag ? h("div", { class: "small", style: "opacity:.7" }, x.tag) : null, h("div", null, x.de), h("div", { class: "small", style: "opacity:.75" }, x.ru))))));
+
 function viewLearn() {
   const secs = [];
   const sec = (id, title, lead, ...kids) => { secs.push([id, title]); return h("section", { class: "stack", id: "learn-" + id }, h("h2", null, title), lead ? h("p", { class: "lead", style: "margin:0" }, lead) : null, kids); };
@@ -39,6 +43,7 @@ function viewLearn() {
     "Порядок: приветствие, вступление, аргументы за, аргументы против, ваше мнение, имя. Одним абзацем, один стиль (Sie или du), не смешивать.",
     acc("Образец с шаблоном (тема «фитнес-зал»)", SRC_FILE(), learnText("Образец форума", DB.F_MODEL)),
     rmList(REDEMITTEL.forum, 1),
+    h("div", { class: "eyebrow" }, "Redemittel · немецкий + перевод"), rmPairs(DB.RM && DB.RM.forum, 0),
     acc(`Все темы форума (${DB.F.length})`, SRC_FILE(), h("ol", { class: "small", style: "margin:0;padding-left:22px" }, DB.F.map(f => h("li", null, h("b", null, f.title), " — " + f.desc)))));
 
   const notes = sec("n", "Telefonnotiz (№42–45)",
@@ -50,7 +55,7 @@ function viewLearn() {
   const rede = sec("r", "Redemittel (готовые фразы)",
     "Свои собственные фразы запоминаются лучше всего, но эти покрывают структуру каждой части.",
     h("div", { class: "grid2" },
-      h("div", { class: "card stack" }, h("div", { class: "eyebrow" }, "Beschwerde · ответ клиенту"), rmList(REDEMITTEL.beschwerde, 1)),
+      h("div", { class: "card stack" }, h("div", { class: "eyebrow" }, "Beschwerde · ответ клиенту"), rmList(REDEMITTEL.beschwerde, 1), h("div", { class: "eyebrow" }, "Redemittel · немецкий + перевод"), rmPairs(DB.RM && DB.RM.beschwerde, 0)),
       [["sp1", "Sprechen Teil 1 · презентация"], ["sp2", "Sprechen Teil 2 · Smalltalk"], ["sp3", "Sprechen Teil 3 · решение"]].map(([k, t]) =>
         h("div", { class: "card stack" }, h("div", { class: "eyebrow" }, t), rmList(SP_REDE[k], 1)))));
 

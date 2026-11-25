@@ -24,7 +24,8 @@ for code, fn in (('fr', 'i18n_fr.txt'), ('tr', 'i18n_trk.txt'), ('ar', 'i18n_ar.
     extra_lang[code] = d
 def row(i):
     en, de = src[i]
-    return [en, de] + [extra_lang[c].get(i) or en for c in ('fr', 'tr', 'ar', 'it')]
+    nl = lambda t: t.replace('\\n', '\n')  # a newline is stored as the two characters \n
+    return [nl(en), nl(de)] + [nl(extra_lang[c].get(i) or en) for c in ('fr', 'tr', 'ar', 'it')]
 dic = {}
 for i in src:
     if i.isdigit():

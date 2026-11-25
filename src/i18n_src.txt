@@ -463,3 +463,108 @@ x31|The e-mail is needed for verification: send the same address to the teacher 
 x32|Enter an e-mail: it is needed to save progress in the cloud and for verification.|Geben Sie eine E-Mail an: Sie wird zum Speichern in der Cloud und für die Verifizierung benötigt.
 r29|From {~1}|Ab {~1}
 r30|The trainer is a volunteer project and stays free. Only the AI costs money: every answer it gives is paid for through the API. That is why full access to the AI is open to those who make a symbolic contribution towards it. To get access, register in the cloud (profile: e-mail and password) and write on WhatsApp: {1}. They will tell you how to make the contribution. Once you are confirmed, all tools will open up and you can prepare for the exam fully.|Der Trainer ist ein ehrenamtliches Projekt und bleibt kostenlos. Nur die KI kostet Geld: Für jede ihrer Antworten muss die API bezahlt werden. Deshalb steht der volle KI-Zugang denjenigen offen, die einen symbolischen Beitrag dazu leisten. Um Zugang zu erhalten, registrieren Sie sich in der Cloud (Anmeldebogen: E-Mail und Kennwort) und schreiben Sie per WhatsApp: {1}. Dort erfahren Sie, wie Sie den Beitrag leisten können. Nach der Bestätigung stehen Ihnen alle Werkzeuge zur Verfügung, und Sie können sich vollständig auf die Prüfung vorbereiten.
+x33|Redemittel · German + translation|Redemittel · Deutsch + Übersetzung
+x34|ANREDE · Greeting|ANREDE
+x35|Hi everyone,|Hallo zusammen,
+x36|Hi folks,|Hallo Leute,
+x37|Dear colleagues,|Liebe Kolleginnen und Kollegen,
+x38|Ladies and gentlemen,|Sehr geehrte Damen und Herren,
+x39|EINLEITUNG · Introduction|EINLEITUNG
+x40|I have heard / read that […]. I would like to share my opinion on this.|Ich habe gehört / gelesen, dass […]. Dazu möchte ich meine Meinung äußern.
+x41|It has come to my attention that […]. I would also like to write something about it.|Mir ist zu Ohren gekommen, dass […]. Auch ich möchte dazu etwas schreiben.
+x42|I recently learned that […]. I find this proposal (not) good.|Ich habe vor Kurzem erfahren, dass […]. Ich finde diesen Vorschlag (nicht) gut.
+x43|I would also like to write something in our forum today on the topic […].|Auch ich möchte heute in unserem Forum etwas zum Thema […] schreiben.
+x44|The information has reached me that our company is planning […].|Mich hat die Information erreicht, dass unsere Firma plant, […].
+x45|Have you heard? Our company is planning […].|[Habt ihr / Haben Sie] schon gehört? Unsere Firma plant, […].
+x46|I have learned that our company is planning […]. I would like to comment on this.|Ich habe mitbekommen, dass unsere Firma plant, […]. Dazu möchte ich Stellung nehmen.
+x47|As we all know, our management wants […]. Frankly, I am surprised.|Wie wir alle wissen, möchte unsere Geschäftsleitung […]. Ich bin ehrlich gesagt überrascht.
+x48|EIGENE MEINUNG · Own opinion|EIGENE MEINUNG
+x49|I am [for / against] it because…|Ich bin [dafür / dagegen], weil …
+x50|Personally, I think that […].|Ich persönlich finde, dass […].
+x51|In my opinion, […].|Meiner Meinung nach ist […].
+x52|I think the proposal is good, [because / since]…|Ich finde den Vorschlag gut, [weil / denn] …
+x53|As for me, I am for / against it because…|Was mich betrifft / angeht, bin ich [dafür / dagegen], weil …
+x54|Generally, I support the proposal because…|Grundsätzlich befürworte ich den Vorschlag, weil …
+x55|I (do not) agree with the proposal because…|Ich bin (nicht) mit dem Vorschlag einverstanden, weil …
+x56|I have mixed feelings: on the one hand… on the other hand…|Ich bin geteilter Meinung: Einerseits … Andererseits …
+x57|Regarding this proposal, I am of the opinion that…|In Bezug auf diesen Vorschlag bin ich der Meinung, dass …
+x58|As for me, it is hard to take a clear position because I have mixed feelings.|Was mich betrifft, fällt es mir schwer, eine klare Meinung zu vertreten, weil ich geteilter Meinung bin.
+x59|ARGUMENT 1 (Vorteil) · Argument 1 (advantage)|ARGUMENT 1 (Vorteil)
+x60|On the one hand, this idea has some advantages.|Einerseits hat diese Idee einige Vorteile.
+x61|For example, […].|Zum Beispiel […].
+x62|Another advantage is that […].|Ein weiterer Vorteil ist, dass […].
+x63|In addition, it could be convenient or useful for many people.|Außerdem könnte es für viele Menschen praktisch oder hilfreich sein.
+x64|I have personally experienced that…|Ich persönlich habe erlebt, dass …
+x65|In my previous job it was the case that…|In meinem früheren Unternehmen war es so, dass …
+x66|ARGUMENT 2 (Nachteil) · Argument 2 (disadvantage)|ARGUMENT 2 (Nachteil)
+x67|On the other hand, there are also disadvantages.|Andererseits gibt es auch Nachteile.
+x68|Many people think that […].|Viele Leute finden, dass […].
+x69|It is particularly problematic that […].|Besonders problematisch ist, dass […].
+x70|This could lead to […].|Das könnte dazu führen, dass [negative Folge].
+x71|On the other hand, I know from experience that…|Andererseits weiß ich, dass …
+x72|From my own experience I know that…|Aus eigener Erfahrung weiß ich, dass …
+x73|VORSCHLAG / KOMPROMISS · Proposal / compromise|VORSCHLAG / KOMPROMISS
+x74|That is why I suggest that…|Deshalb schlage ich vor, dass …
+x75|I suggest that we find a solution together that is fair to everyone.|Ich schlage vor, dass wir gemeinsam eine Lösung finden, die für alle fair ist.
+x76|It would be sensible to ask all employees for their opinion first.|Es wäre sinnvoll, die Meinungen aller Mitarbeitenden zuerst zu erfragen.
+x77|A trial period could be introduced and then we could decide together.|Man könnte eine Testphase einführen und danach gemeinsam entscheiden.
+x78|It is important that all employees can decide for themselves.|Es ist wichtig, dass alle Mitarbeitenden selbst entscheiden können.
+x79|It is important that everyone involved is included in the decision.|Wichtig ist, dass alle Beteiligten in die Entscheidung einbezogen werden.
+x80|A good solution would be to offer […].|Eine gute Lösung wäre, wenn man […] anbieten würde.
+x81|It is important to take the interests of all participants into account.|Wichtig ist, dass man die Interessen aller Beteiligten berücksichtigt.
+x82|It would be best if participation remained voluntary.|Am besten wäre es, wenn die Teilnahme freiwillig bliebe.
+x83|SCHLUSSSATZ · Conclusion|SCHLUSSSATZ
+x84|What do you think about it?|Was [denkt ihr / denken Sie] darüber?
+x85|How do you feel about it?|Was [haltet ihr / halten Sie] davon?
+x86|How do you rate this idea?|Wie [findet ihr / finden Sie] diese Idee?
+x87|All in all, that is how I see this topic.|Das ist im Großen und Ganzen, wie ich zu diesem Thema stehe.
+x88|Do you agree with me?|[Seid ihr / Sind Sie] mit mir einverstanden?
+x89|I am curious what you think about it.|Ich bin gespannt darauf, was ihr davon haltet.
+x90|I look forward to reading your contributions to this forum discussion.|Ich freue mich darauf, eure Beiträge zu dieser Forumsdiskussion zu lesen.
+x91|What do you say to that? I look forward to your opinion.|Was [sagt ihr / sagen Sie] dazu? Ich freue mich auf [eure / Ihre] Meinung.
+x92|I am eager to read your opinions on this topic!|Ich bin gespannt, [eure / Ihre] Meinungen zum Thema zu lesen!
+x93|I would be glad to read your opinions on this.|Ich freue mich sehr, [eure / Ihre] Meinungen dazu zu lesen.
+x94|I would appreciate your feedback!|Ich würde mich über [eure / Ihre] Rückmeldungen freuen!
+x95|GRUSSFORMEL · Polite closing of the letter|GRUSSFORMEL
+x96|Best wishes,|Liebe Grüße,
+x97|All the best,|Viele Grüße,
+x98|Kind regards,|Mit freundlichen Grüßen,
+x99|Anrede · Salutation|Anrede
+x100|Dear Ms [surname], / Dear Mr [surname],|Sehr geehrte Frau [Name], / Sehr geehrter Herr [Name],
+x101|Dank & Bezugnahme · Thanks and reference to the topic|Dank & Bezugnahme
+x102|Thank you for your message informing us of problems with our service.|vielen Dank für Ihre Nachricht, in der Sie uns über Probleme mit unserem Service informiert haben.
+x103|Thank you for your message informing us of problems with the device.|vielen Dank für Ihre Nachricht, in der Sie uns über Probleme mit dem Gerät informiert haben.
+x104|Thank you for your message informing us of problems with the invoice.|vielen Dank für Ihre Nachricht, in der Sie uns über Probleme mit der Rechnung informiert haben.
+x105|Thank you for your message informing us of problems with the delivery.|vielen Dank für Ihre Nachricht, in der Sie uns über Probleme mit der Lieferung informiert haben.
+x106|Thank you for your message informing us of problems with the order.|vielen Dank für Ihre Nachricht, in der Sie uns über Probleme mit der Bestellung informiert haben.
+x107|Entschuldigung · Apology|Entschuldigung
+x108|We sincerely regret the inconvenience caused and apologise.|Wir bedauern die entstandenen Unannehmlichkeiten sehr und bitten Sie um Entschuldigung.
+x109|We regret that this situation has arisen.|Wir bedauern, dass es zu dieser Situation gekommen ist.
+x110|Erklärung · Explanation of the cause|Erklärung
+x111|An internal review found that this situation arose because of internal organisational problems.|Nach interner Prüfung wurde festgestellt, dass es aufgrund von internen organisatorischen Problemen zu diesem Vorfall gekommen ist.
+x112|An internal review found that this situation arose because of staff shortages.|Nach interner Prüfung wurde festgestellt, dass es aufgrund von personellen Engpässen zu diesem Vorfall gekommen ist.
+x113|An internal review found that this situation arose because of a technical defect in the device.|Nach interner Prüfung wurde festgestellt, dass es aufgrund eines technischen Defekts am Gerät zu diesem Vorfall gekommen ist.
+x114|An internal review found that this situation arose because of a computer system problem.|Nach interner Prüfung wurde festgestellt, dass es aufgrund eines Computerproblems zu diesem Vorfall gekommen ist.
+x115|An internal review found that this situation arose because of unforeseen delivery difficulties.|Nach interner Prüfung wurde festgestellt, dass es aufgrund unvorhergesehener Lieferschwierigkeiten zu diesem Vorfall gekommen ist.
+x116|An internal review found that this situation arose because of a mix-up in processing the order.|Nach interner Prüfung wurde festgestellt, dass es aufgrund einer Verwechslung bei der Bearbeitung zu diesem Vorfall gekommen ist.
+x117|An internal review found that this situation arose because the device was operated incorrectly.|Nach interner Prüfung wurde festgestellt, dass es aufgrund einer fehlerhaften Bedienung des Geräts zu diesem Vorfall gekommen ist.
+x118|Verständnis zeigen · Showing understanding|Verständnis zeigen
+x119|We understand how important a quick solution is for your company.|Darüber hinaus verstehen wir, wie wichtig eine schnelle Lösung für Ihr Unternehmen ist.
+x120|Lösung · Solution|Lösung
+x121|Today we spoke with our employees and clarified the situation. We assure you that this will not happen again.|Wir haben heute mit unseren Mitarbeitern gesprochen und die Situation geklärt. Wir möchten Ihnen versichern, dass sich dies nicht wiederholen wird.
+x122|We ask you to wait until next Monday. If your order has not arrived by then, we will gladly offer you a comparable model from our stock.|Wir bitten Sie, noch bis nächste Woche Montag zu warten. Falls Ihre Bestellung bis dahin nicht eingetroffen ist, bieten wir Ihnen gerne ein vergleichbares Modell aus unserem Lagerbestand an.
+x123|We will correct the error in the names free of charge by the end of this week. Please note that the colour scheme was implemented as agreed in the contract. Any further corrections are only possible for an extra charge of [X €].|Den Fehler bei den Namen werden wir bis Ende dieser Woche kostenfrei korrigieren. Bitte beachten Sie, dass das vereinbarte Farbschema laut Vertrag korrekt umgesetzt wurde. Weitere Korrekturen sind leider nur gegen einen Aufpreis von [X €] möglich.
+x124|Our technician can come to you on [date] at [time]. Please let us know whether this appointment suits you. Please note that an immediate repair will not be possible if we have to order spare parts. In that case we will inform you at once.|Unser Techniker kann am [Datum] um [Uhrzeit] Uhr zu Ihnen kommen und das Gerät überprüfen. Bitte teilen Sie uns mit, ob der Termin passt. Bitte beachten Sie, dass eine sofortige Reparatur nicht möglich ist, falls wir Ersatzteile bestellen müssen. In diesem Fall informieren wir Sie umgehend.
+x125|On Wednesday morning, two of our employees will arrive punctually at the agreed time and finish assembling the furniture. We will of course cover the costs for the damaged items.|Am Mittwochmorgen werden pünktlich zwei unserer Mitarbeiter bei Ihnen sein und den Möbelaufbau abschließen. Für die beschädigten Gegenstände übernehmen wir selbstverständlich die Kosten.
+x126|After consulting our technician we found that the faults were caused by incorrect operation of the device. We would like to politely point out that solving this problem is not within our area of responsibility. Our technician will gladly visit you again and train your employees in how to use the device free of charge. Please note that the costs for [the previous technician visits] / [checking the device] remain with you.|Nach Rücksprache mit unserem Techniker wurde festgestellt, dass die Fehler auf eine fehlerhafte Bedienung zurückzuführen sind. Wir möchten Sie daher höflich darauf hinweisen, dass die Lösung dieses Problems nicht in unserem Verantwortungsbereich liegt. Gerne kommt unser Techniker erneut zu Ihnen und weist Ihre Mitarbeiterinnen und Mitarbeiter kostenfrei in die Bedienung ein. Bitte beachten Sie, dass die Kosten für [die bisherigen Technikerbesuche] / [die Überprüfung des Geräts] bei Ihnen verbleiben.
+x127|We have checked your order and made the necessary corrections. Your usual discount of [X %] has of course been taken into account. You will receive the corrected invoice again shortly.|Wir haben Ihren Auftrag überprüft und die erforderlichen Korrekturen vorgenommen. Ihr üblicher Rabatt von [X %] wurde dabei selbstverständlich berücksichtigt. Die korrigierte Rechnung erhalten Sie in Kürze erneut zugesandt.
+x128|For the damaged goods we offer you a price reduction of [X %]. Alternatively, you can send the items back and we will deliver a replacement of flawless quality. Unfortunately, because of our current staffing situation we can only send the missing T-shirts by [date]. We will of course cover the shipping costs.|Für die beschädigten Waren bieten wir Ihnen einen Preisnachlass von [X %] an. Alternativ können Sie uns die Artikel zurücksenden und wir liefern Ersatz in einwandfreier Qualität. Die fehlenden T-Shirts liefern wir aufgrund unserer aktuellen Personalsituation leider erst bis zum [Datum] nach. Die Versandkosten übernehmen selbstverständlich wir.
+x129|We will of course reimburse in full the additional costs that arose through our mistake. Please send us the corresponding receipts. We would be glad to continue counting you among our customers.|Die durch unseren Fehler entstandenen Zusatzkosten übernehmen wir selbstverständlich. Bitte senden Sie uns die entsprechenden Belege zu. Wir würden uns freuen, Sie weiterhin zu unseren Kunden zählen zu dürfen.
+x130|Entgegenkommen · Goodwill gesture (only if a discount is mentioned in the manager's letter)|Entgegenkommen
+x131|As a gesture of goodwill we offer you a discount of [X %] on your next order.|Als Zeichen unseres Entgegenkommens bieten wir Ihnen einen Rabatt von [X %] auf Ihren nächsten Auftrag an.
+x132|Dank & Zusammenarbeit · Thanks and continued cooperation|Dank & Zusammenarbeit
+x133|In closing, we thank you for your understanding and hope for continued good cooperation.|Abschließend danken wir Ihnen für Ihr Verständnis und hoffen auf eine weiterhin gute Zusammenarbeit.
+x134|Service-Satz · Willingness to answer questions|Service-Satz
+x135|You can contact us at any time with any questions.|Für Rückfragen stehen wir Ihnen jederzeit gerne zur Verfügung.
+x136|Grußformel · Polite closing of the letter|Grußformel
+x137|Kind regards,\n[Your first and last name]|Mit freundlichen Grüßen\n[Ihr Vorname und Nachname]

@@ -1,6 +1,6 @@
 # DTB B2 Prüfungstrainer
 
-Тренажёр по билетам экзамена **telc Deutsch-Test für den Beruf B2**: Lesen 1–4, Beschwerde, Hören 1–4 с озвучкой голосом браузера, Telefonnotiz, Sprachbausteine 1–2, 68 тем форума, Sprechen Teil 3 и пробный экзамен с подсчётом баллов. Прогресс сохраняется в браузере (localStorage).
+Тренажёр по билетам экзамена **telc Deutsch-Test für den Beruf B2**: Lesen 1–4, Beschwerde, Hören 1–4 с озвучкой голосом браузера, Telefonnotiz, Sprachbausteine 1–2, 110 тем форума, Sprechen Teil 3 и пробный экзамен с подсчётом баллов. Прогресс сохраняется в браузере (localStorage).
 
 ## Запуск на localhost
 

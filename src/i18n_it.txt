@@ -463,3 +463,108 @@ x31|L'e-mail serve per la verifica: invia lo stesso indirizzo all'insegnante su 
 x32|Inserisci un'e-mail: serve per salvare i progressi nel cloud e per la verifica.
 r29|Da {~1}
 r30|Il trainer è un progetto di volontariato e resta gratuito. Solo l'IA costa: ogni sua risposta si paga tramite l'API. Per questo l'accesso completo all'IA è aperto a chi dà un contributo simbolico. Per ottenerlo, registrati nel cloud (scheda: e-mail e password) e scrivi su WhatsApp: {1}. Lì ti spiegheranno come versare il contributo. Dopo la conferma si apriranno tutti gli strumenti e potrai prepararti pienamente all'esame.
+x33|Redemittel · tedesco + traduzione
+x34|ANREDE · Saluto
+x35|Ciao a tutti,
+x36|Ciao ragazzi,
+x37|Cari colleghi,
+x38|Gentili signore e signori,
+x39|EINLEITUNG · Introduzione
+x40|Ho sentito / letto che […]. Vorrei esprimere la mia opinione al riguardo.
+x41|Mi è giunta voce che […]. Anch'io vorrei scrivere qualcosa in merito.
+x42|Ho saputo di recente che […]. Trovo questa proposta (non) buona.
+x43|Anch’io oggi vorrei scrivere qualcosa nel nostro forum sul tema […].
+x44|Mi è arrivata la notizia che la nostra azienda sta pianificando […].
+x45|Avete sentito? La nostra azienda sta pianificando […].
+x46|Ho saputo che la nostra azienda sta pianificando […]. Vorrei commentare la cosa.
+x47|Come tutti sappiamo, la direzione vuole […]. Francamente, sono sorpreso/a.
+x48|EIGENE MEINUNG · Opinione personale
+x49|Sono [a favore / contrario/a] perché…
+x50|Personalmente penso che […].
+x51|Secondo me, […].
+x52|Trovo buona la proposta, [perché / poiché]…
+x53|Per quanto mi riguarda, sono a favore / contrario/a perché…
+x54|In linea di massima appoggio la proposta perché…
+x55|(Non) sono d’accordo con la proposta perché…
+x56|Sono di due opinioni: da un lato… dall’altro…
+x57|Riguardo a questa proposta, sono dell’opinione che…
+x58|Per quanto mi riguarda, mi è difficile prendere una posizione chiara perché ho opinioni contrastanti.
+x59|ARGUMENT 1 (Vorteil) · Argomento 1 (vantaggio)
+x60|Da un lato, questa idea ha alcuni vantaggi.
+x61|Ad esempio, […].
+x62|Un altro vantaggio è che […].
+x63|Inoltre potrebbe essere comodo o utile per molte persone.
+x64|Personalmente ho vissuto che…
+x65|Nella mia precedente azienda succedeva che…
+x66|ARGUMENT 2 (Nachteil) · Argomento 2 (svantaggio)
+x67|D’altra parte ci sono anche degli svantaggi.
+x68|Molte persone pensano che […].
+x69|È particolarmente problematico che […].
+x70|Questo potrebbe portare a […].
+x71|D’altra parte, so per esperienza che…
+x72|Per esperienza personale so che…
+x73|VORSCHLAG / KOMPROMISS · Proposta / compromesso
+x74|Perciò propongo che…
+x75|Propongo di trovare insieme una soluzione equa per tutti.
+x76|Sarebbe sensato chiedere prima il parere di tutti i dipendenti.
+x77|Si potrebbe introdurre un periodo di prova e poi decidere insieme.
+x78|È importante che tutti i dipendenti possano decidere da soli.
+x79|È importante che tutte le parti coinvolte partecipino alla decisione.
+x80|Una buona soluzione sarebbe offrire […].
+x81|È importante tenere conto degli interessi di tutti i partecipanti.
+x82|Sarebbe meglio se la partecipazione restasse volontaria.
+x83|SCHLUSSSATZ · Conclusione
+x84|Che ne pensate?
+x85|Come la vedete?
+x86|Come valutate questa idea?
+x87|Nel complesso, questa è la mia posizione su questo tema.
+x88|Siete d’accordo con me?
+x89|Sono curioso/a di sapere che cosa ne pensate.
+x90|Non vedo l’ora di leggere i vostri contributi a questa discussione del forum.
+x91|Che ne dite? Attendo con piacere la vostra opinione.
+x92|Sono curioso/a di leggere le vostre opinioni su questo tema!
+x93|Leggerò volentieri le vostre opinioni in merito.
+x94|Mi farebbero piacere i vostri riscontri!
+x95|GRUSSFORMEL · Chiusura cortese della lettera
+x96|I migliori auguri,
+x97|Tutto il meglio,
+x98|Distinti saluti,
+x99|Anrede · Formula di apertura
+x100|Gentile signora [cognome], / Gentile signor [cognome],
+x101|Dank & Bezugnahme · Ringraziamento e riferimento all'argomento
+x102|La ringraziamo per il suo messaggio con cui ci segnala dei problemi con il nostro servizio.
+x103|La ringraziamo per il suo messaggio con cui ci segnala dei problemi con l’apparecchio.
+x104|La ringraziamo per il suo messaggio con cui ci segnala dei problemi con la fattura.
+x105|La ringraziamo per il suo messaggio con cui ci segnala dei problemi con la consegna.
+x106|La ringraziamo per il suo messaggio con cui ci segnala dei problemi con l’ordine.
+x107|Entschuldigung · Scuse
+x108|Ci rammarichiamo molto per i disagi causati e ci scusiamo.
+x109|Ci dispiace che si sia creata questa situazione.
+x110|Erklärung · Spiegazione della causa
+x111|Da una verifica interna è emerso che la situazione è dovuta a problemi organizzativi interni.
+x112|Da una verifica interna è emerso che la situazione è dovuta a carenza di personale.
+x113|Da una verifica interna è emerso che la situazione è dovuta a un difetto tecnico dell’apparecchio.
+x114|Da una verifica interna è emerso che la situazione è dovuta a un problema del sistema informatico.
+x115|Da una verifica interna è emerso che la situazione è dovuta a imprevisti difficoltà di consegna.
+x116|Da una verifica interna è emerso che la situazione è dovuta a uno scambio nell’elaborazione dell’ordine.
+x117|Da una verifica interna è emerso che la situazione è dovuta a un uso errato dell’apparecchio.
+x118|Verständnis zeigen · Mostrare comprensione
+x119|Comprendiamo quanto sia importante per la vostra azienda una soluzione rapida.
+x120|Lösung · Soluzione
+x121|Oggi abbiamo parlato con i nostri collaboratori e chiarito la situazione. Le assicuriamo che non si ripeterà.
+x122|Le chiediamo di attendere fino a lunedì prossimo. Se entro allora l’ordine non fosse arrivato, le offriremo volentieri un modello analogo dal nostro magazzino.
+x123|Correggeremo gratuitamente l’errore nei nomi entro la fine della settimana. Si noti che la combinazione di colori è stata realizzata come previsto dal contratto. Ulteriori correzioni sono possibili solo con un supplemento di [X €].
+x124|Il nostro tecnico può venire da lei il [data] alle [ora]. Ci faccia sapere se l’appuntamento le va bene. Si noti che una riparazione immediata non sarà possibile se dovremo ordinare dei pezzi di ricambio. In tal caso la informeremo subito.
+x125|Mercoledì mattina due nostri collaboratori saranno puntuali da lei e completeranno il montaggio dei mobili. Naturalmente ci assumiamo i costi degli oggetti danneggiati.
+x126|Dopo aver sentito il nostro tecnico è emerso che i guasti sono dovuti a un uso errato dell’apparecchio. Desideriamo farle presente con cortesia che la soluzione di questo problema non rientra nella nostra responsabilità. Il nostro tecnico verrà volentieri da lei e istruirà gratuitamente i suoi collaboratori sull’uso. Si noti che i costi per [le precedenti visite del tecnico] / [il controllo dell’apparecchio] restano a suo carico.
+x127|Abbiamo controllato il suo ordine e apportato le correzioni necessarie. Il suo sconto abituale del [X %] è stato naturalmente considerato. Riceverà a breve la fattura corretta.
+x128|Per la merce danneggiata le offriamo uno sconto del [X %]. In alternativa può rimandarci gli articoli e le consegneremo un sostituto di qualità ineccepibile. Le magliette mancanti, purtroppo, a causa dell’attuale situazione del personale potremo inviarle solo entro il [data]. Le spese di spedizione sono naturalmente a nostro carico.
+x129|Rimborseremo naturalmente per intero i costi aggiuntivi dovuti al nostro errore. Ci invii cortesemente le relative ricevute. Saremmo lieti di continuare a contarla tra i nostri clienti.
+x130|Entgegenkommen · Gesto di cortesia (solo se nella lettera del superiore è citato uno sconto)
+x131|Come segno di cortesia le offriamo uno sconto del [X %] sul prossimo ordine.
+x132|Dank & Zusammenarbeit · Ringraziamento e proseguimento della collaborazione
+x133|In conclusione la ringraziamo per la comprensione e speriamo in una proficua collaborazione futura.
+x134|Service-Satz · Disponibilità per eventuali domande
+x135|Per qualsiasi domanda può contattarci in qualsiasi momento.
+x136|Grußformel · Chiusura cortese della lettera
+x137|Distinti saluti,\n[Nome e cognome]

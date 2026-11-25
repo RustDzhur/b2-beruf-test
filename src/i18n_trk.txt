@@ -463,3 +463,108 @@ x31|E-posta doğrulama için gereklidir: aynı adresi WhatsApp'tan öğretmene g
 x32|E-posta girin: ilerlemeyi bulutta saklamak ve doğrulama için gereklidir.
 r29|{~1} itibaren
 r30|Eğitmen gönüllü bir projedir ve ücretsiz kalır. Yalnızca yapay zekâ para gerektirir: verdiği her yanıt için API ücreti ödenir. Bu yüzden yapay zekâya tam erişim, buna sembolik bir katkı sağlayanlara açılır. Erişim için bulutta kayıt olun (form: e-posta ve şifre) ve WhatsApp'tan yazın: {1}. Katkıyı nasıl yapacağınızı orada size anlatacaklar. Onaylandıktan sonra tüm araçlar açılır ve sınava tam olarak hazırlanabilirsiniz.
+x33|Redemittel · Almanca + çeviri
+x34|ANREDE · Hitap
+x35|Herkese merhaba,
+x36|Selam millet,
+x37|Sevgili meslektaşlarım,
+x38|Sayın hanımlar ve beyler,
+x39|EINLEITUNG · Giriş
+x40|[…] olduğunu duydum / okudum. Bu konuda görüşümü belirtmek istiyorum.
+x41|[…] haberi kulağıma geldi. Ben de bu konuda bir şeyler yazmak istiyorum.
+x42|Kısa süre önce […] olduğunu öğrendim. Bu öneriyi iyi buluyorum / bulmuyorum.
+x43|Ben de bugün forumumuzda […] konusunda bir şeyler yazmak istiyorum.
+x44|Şirketimizin […] planladığı bilgisi bana ulaştı.
+x45|Duydunuz mu? Şirketimiz […] planlıyor.
+x46|Şirketimizin […] planladığını öğrendim. Bu konuda görüş bildirmek istiyorum.
+x47|Hepimizin bildiği gibi yönetimimiz […] istiyor. Açıkçası şaşırdım.
+x48|EIGENE MEINUNG · Kendi görüşünüz
+x49|Ben [lehinde / aleyhinde]yim, çünkü…
+x50|Kişisel olarak […] diye düşünüyorum.
+x51|Bence […].
+x52|Öneriyi iyi buluyorum, [çünkü]…
+x53|Bana gelince, lehinde / aleyhindeyim, çünkü…
+x54|Genel olarak öneriyi destekliyorum, çünkü…
+x55|Öneriye katılıyorum / katılmıyorum, çünkü…
+x56|Kararsızım: bir yandan… diğer yandan…
+x57|Bu öneri konusunda şu görüşteyim:…
+x58|Bana gelince, net bir tavır almak zor, çünkü kararsızım.
+x59|ARGUMENT 1 (Vorteil) · Argüman 1 (avantaj)
+x60|Bir yandan, bu fikrin bazı avantajları var.
+x61|Örneğin, […].
+x62|Bir diğer avantajı, […].
+x63|Ayrıca birçok kişi için pratik veya faydalı olabilir.
+x64|Şahsen şunu yaşadım:…
+x65|Önceki işimde şöyleydi:…
+x66|ARGUMENT 2 (Nachteil) · Argüman 2 (dezavantaj)
+x67|Öte yandan dezavantajları da var.
+x68|Birçok kişi […] düşünüyor.
+x69|Özellikle sorunlu olan, […].
+x70|Bu, […] sonucuna yol açabilir.
+x71|Öte yandan, deneyimlerimden biliyorum ki…
+x72|Kendi deneyimimden biliyorum ki…
+x73|VORSCHLAG / KOMPROMISS · Öneri / uzlaşma
+x74|Bu yüzden şunu öneriyorum:…
+x75|Birlikte herkes için adil bir çözüm bulmayı öneriyorum.
+x76|Önce tüm çalışanların görüşünü almak mantıklı olur.
+x77|Bir deneme süreci başlatılıp ardından birlikte karar verilebilir.
+x78|Tüm çalışanların kendi kararlarını verebilmesi önemlidir.
+x79|İlgili tüm tarafların karara dahil edilmesi önemlidir.
+x80|İyi bir çözüm, […] sunmak olurdu.
+x81|Tüm katılımcıların çıkarlarını göz önünde bulundurmak önemlidir.
+x82|Katılımın gönüllü kalması en iyisi olurdu.
+x83|SCHLUSSSATZ · Sonuç
+x84|Bu konuda ne düşünüyorsunuz?
+x85|Buna nasıl bakıyorsunuz?
+x86|Bu fikri nasıl buluyorsunuz?
+x87|Genel olarak bu konudaki görüşüm bu.
+x88|Bana katılıyor musunuz?
+x89|Bu konuda ne düşündüğünüzü merak ediyorum.
+x90|Bu forum tartışmasına yapacağınız katkıları okumak için sabırsızlanıyorum.
+x91|Buna ne dersiniz? Görüşünüzü bekliyorum.
+x92|Bu konudaki görüşlerinizi okumak için sabırsızlanıyorum!
+x93|Bu konudaki görüşlerinizi okumaktan memnun olurum.
+x94|Geri bildiriminizi bekliyorum!
+x95|GRUSSFORMEL · Mektubun nazik kapanışı
+x96|En iyi dileklerimle,
+x97|Her şey gönlünüzce olsun,
+x98|Saygılarımla,
+x99|Anrede · Hitap
+x100|Sayın [Soyadı] Hanım, / Sayın [Soyadı] Bey,
+x101|Dank & Bezugnahme · Teşekkür ve konuya atıf
+x102|Hizmetimizle ilgili sorunları bildirdiğiniz mesajınız için teşekkür ederiz.
+x103|Cihazla ilgili sorunları bildirdiğiniz mesajınız için teşekkür ederiz.
+x104|Faturayla ilgili sorunları bildirdiğiniz mesajınız için teşekkür ederiz.
+x105|Teslimatla ilgili sorunları bildirdiğiniz mesajınız için teşekkür ederiz.
+x106|Siparişle ilgili sorunları bildirdiğiniz mesajınız için teşekkür ederiz.
+x107|Entschuldigung · Özür
+x108|Yaşanan sıkıntılar için çok üzgünüz ve özür dileriz.
+x109|Bu durumun ortaya çıkmasından dolayı üzgünüz.
+x110|Erklärung · Nedenin açıklanması
+x111|Yapılan iç incelemede, bu durumun iç organizasyon sorunlarından kaynaklandığı tespit edildi.
+x112|Yapılan iç incelemede, bu durumun personel yetersizliğinden kaynaklandığı tespit edildi.
+x113|Yapılan iç incelemede, bu durumun cihazdaki teknik bir arızadan kaynaklandığı tespit edildi.
+x114|Yapılan iç incelemede, bu durumun bilgisayar sistemindeki bir sorundan kaynaklandığı tespit edildi.
+x115|Yapılan iç incelemede, bu durumun öngörülemeyen tedarik sorunlarından kaynaklandığı tespit edildi.
+x116|Yapılan iç incelemede, bu durumun siparişin işlenmesi sırasındaki bir karışıklıktan kaynaklandığı tespit edildi.
+x117|Yapılan iç incelemede, bu durumun cihazın yanlış kullanılmasından kaynaklandığı tespit edildi.
+x118|Verständnis zeigen · Anlayış gösterme
+x119|Şirketiniz için hızlı bir çözümün ne kadar önemli olduğunu anlıyoruz.
+x120|Lösung · Çözüm
+x121|Bugün çalışanlarımızla görüştük ve durumu netleştirdik. Bunun tekrarlanmayacağını temin ederiz.
+x122|Gelecek pazartesiye kadar beklemenizi rica ederiz. Siparişiniz o zamana kadar ulaşmazsa, stoğumuzdan benzer bir modeli memnuniyetle sunarız.
+x123|İsimlerdeki hatayı bu haftanın sonuna kadar ücretsiz düzelteceğiz. Renk şemasının sözleşmeye uygun olarak uygulandığını belirtmek isteriz. Başka düzeltmeler yalnızca [X €] ek ücretle mümkündür.
+x124|Teknisyenimiz [tarih] günü saat [saat] gibi size gelip cihazı kontrol edebilir. Bu randevunun size uygun olup olmadığını bildirmenizi rica ederiz. Yedek parça sipariş etmemiz gerekirse hemen onarım yapılamayacağını hatırlatırız. Bu durumda sizi derhal bilgilendireceğiz.
+x125|Çarşamba sabahı iki çalışanımız tam zamanında size gelip mobilya montajını tamamlayacak. Hasar gören eşyaların masraflarını elbette biz karşılıyoruz.
+x126|Teknisyenimizle görüştükten sonra arızaların cihazın yanlış kullanımından kaynaklandığı tespit edildi. Bu sorunun çözümünün sorumluluk alanımızda olmadığını nazikçe belirtmek isteriz. Teknisyenimiz memnuniyetle tekrar gelip çalışanlarınıza cihazın kullanımını ücretsiz anlatabilir. [Önceki teknisyen ziyaretlerinin] / [cihaz kontrolünün] masraflarının size ait olduğunu lütfen unutmayın.
+x127|Siparişinizi kontrol ettik ve gerekli düzeltmeleri yaptık. Olağan [X %] indiriminiz elbette dikkate alındı. Düzeltilmiş fatura kısa süre içinde size yeniden gönderilecektir.
+x128|Hasarlı mallar için [X %] indirim öneriyoruz. Alternatif olarak ürünleri bize geri gönderebilirsiniz, kusursuz kalitede yenisini teslim ederiz. Eksik tişörtleri mevcut personel durumumuz nedeniyle maalesef ancak [tarih] tarihine kadar gönderebiliriz. Kargo masraflarını elbette biz karşılıyoruz.
+x129|Hatamız yüzünden ortaya çıkan ek masrafları elbette tamamen karşılayacağız. Lütfen ilgili belgeleri bize gönderin. Sizi müşterilerimiz arasında saymaya devam etmekten memnuniyet duyarız.
+x130|Entgegenkommen · İyi niyet jesti (yalnızca yönetici mektubunda indirim geçiyorsa)
+x131|İyi niyet göstergesi olarak bir sonraki siparişinizde [X %] indirim sunuyoruz.
+x132|Dank & Zusammenarbeit · Teşekkür ve işbirliğinin sürmesi
+x133|Son olarak anlayışınız için teşekkür eder, iyi işbirliğimizin sürmesini umarız.
+x134|Service-Satz · Sorulara hazır olma
+x135|Sorularınız için bize her zaman başvurabilirsiniz.
+x136|Grußformel · Mektubun nazik kapanışı
+x137|Saygılarımla,\n[Adınız ve soyadınız]

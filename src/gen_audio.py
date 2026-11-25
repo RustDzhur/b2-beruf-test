@@ -17,7 +17,7 @@ M_VOICES = ['de-DE-ConradNeural', 'de-DE-KillianNeural', 'de-DE-FlorianMultiling
 RATE = '-4%'
 
 F_NAMES = re.compile(r'^(frau|kundin|chefin|leiterin|verkäuferin|kollegin|mitarbeiterin|sekretärin|ärztin|lehrerin|teamleiterin|erzieherin|alimi|amira|anita|barthum|ella|emilia|lena|melanie|mia|michaella|sabine|sandra|jana|anna|katia|kathrin|andrea|daniela|barbara|rita|lara|clara|anja|irina|erisia|trixi|julia|gina|miriam|petra|adriane)', re.I)
-M_NAMES = re.compile(r'^(herr|chef\b|kunde|leiter\b|verkäufer\b|kollege|mitarbeiter\b|teamleiter\b|sprecher|ignacio|karl|markus|max|michael|murat|mustafa|simmering|timbur|tom|thomas|zarif|juri|mario|taro|felix|daniel|robert|stefan|guido|waldemar|julius|konstantinos|roman|paul|eno|hans|ahmed|achmed)', re.I)
+M_NAMES = re.compile(r'^(herr|lieferant|chef\b|kunde|leiter\b|verkäufer\b|kollege|mitarbeiter\b|teamleiter\b|sprecher|ignacio|karl|markus|max|michael|murat|mustafa|simmering|timbur|tom|thomas|zarif|juri|mario|taro|felix|daniel|robert|stefan|guido|waldemar|julius|konstantinos|roman|paul|eno|hans|ahmed|achmed)', re.I)
 
 def gender(who, i):
     w = (who or '').strip()

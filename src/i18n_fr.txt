@@ -463,3 +463,108 @@ x31|L'e-mail sert à la vérification : envoyez la même adresse à l'enseignant
 x32|Indiquez un e-mail : il est nécessaire pour sauvegarder la progression dans le cloud et pour la vérification.
 r29|À partir de {~1}
 r30|L'entraîneur est un projet bénévole et reste gratuit. Seule l'IA coûte de l'argent : chacune de ses réponses est payée via l'API. C'est pourquoi l'accès complet à l'IA est ouvert à ceux qui versent une contribution symbolique. Pour y accéder, inscrivez-vous dans le cloud (fiche : e-mail et mot de passe) et écrivez sur WhatsApp: {1}. On vous y expliquera comment verser la contribution. Une fois votre accès confirmé, tous les outils seront disponibles et vous pourrez vous préparer pleinement à l'examen.
+x33|Redemittel · allemand + traduction
+x34|ANREDE · Salutation
+x35|Salut à tous,
+x36|Salut, les amis,
+x37|Chers collègues,
+x38|Mesdames et Messieurs,
+x39|EINLEITUNG · Introduction
+x40|J'ai entendu dire / lu que […]. Je voudrais donner mon avis à ce sujet.
+x41|Il m'est revenu que […]. Je voudrais moi aussi écrire quelque chose à ce sujet.
+x42|J'ai appris récemment que […]. Je trouve cette proposition (pas) bonne.
+x43|Je voudrais moi aussi écrire aujourd’hui quelques mots sur notre forum au sujet de […].
+x44|L’information m’est parvenue que notre entreprise prévoit […].
+x45|Vous avez entendu ? Notre entreprise prévoit […].
+x46|J’ai appris que notre entreprise prévoit […]. Je voudrais commenter cela.
+x47|Comme nous le savons tous, notre direction souhaite […]. Franchement, cela me surprend.
+x48|EIGENE MEINUNG · Opinion personnelle
+x49|Je suis [pour / contre] parce que…
+x50|Personnellement, je pense que […].
+x51|À mon avis, […].
+x52|Je trouve la proposition bonne, [parce que / car]…
+x53|En ce qui me concerne, je suis pour / contre parce que…
+x54|Dans l’ensemble, je soutiens la proposition parce que…
+x55|Je (ne) suis (pas) d’accord avec la proposition parce que…
+x56|Mon avis est partagé : d’une part… d’autre part…
+x57|En ce qui concerne cette proposition, je pense que…
+x58|Pour ma part, il m’est difficile de prendre une position claire, car mon avis est partagé.
+x59|ARGUMENT 1 (Vorteil) · Argument 1 (avantage)
+x60|D’une part, cette idée présente plusieurs avantages.
+x61|Par exemple, […].
+x62|Un autre avantage est que […].
+x63|De plus, cela pourrait être pratique ou utile pour beaucoup de gens.
+x64|J’ai moi-même constaté que…
+x65|Dans mon ancien emploi, c’était ainsi que…
+x66|ARGUMENT 2 (Nachteil) · Argument 2 (inconvénient)
+x67|D’autre part, il y a aussi des inconvénients.
+x68|Beaucoup de gens pensent que […].
+x69|Il est particulièrement problématique que […].
+x70|Cela pourrait conduire à […].
+x71|D’autre part, je sais par expérience que…
+x72|Par ma propre expérience, je sais que…
+x73|VORSCHLAG / KOMPROMISS · Proposition / compromis
+x74|C’est pourquoi je propose que…
+x75|Je propose que nous trouvions ensemble une solution équitable pour tous.
+x76|Il serait judicieux de demander d’abord l’avis de tous les employés.
+x77|On pourrait introduire une période d’essai, puis décider ensemble.
+x78|Il est important que tous les employés puissent décider eux-mêmes.
+x79|Il est important que toutes les parties concernées soient associées à la décision.
+x80|Une bonne solution serait de proposer […].
+x81|Il est important de tenir compte des intérêts de tous les participants.
+x82|Le mieux serait que la participation reste facultative.
+x83|SCHLUSSSATZ · Conclusion
+x84|Qu’en pensez-vous ?
+x85|Que pensez-vous de cela ?
+x86|Comment trouvez-vous cette idée ?
+x87|Dans l’ensemble, voilà ce que je pense de ce sujet.
+x88|Êtes-vous d’accord avec moi ?
+x89|Je suis curieux de savoir ce que vous en pensez.
+x90|J’ai hâte de lire vos contributions à cette discussion du forum.
+x91|Qu’en dites-vous ? J’attends votre avis avec plaisir.
+x92|Je suis impatient de lire vos avis sur ce sujet !
+x93|Je serai ravi de lire vos avis à ce sujet.
+x94|Vos retours me feraient plaisir !
+x95|GRUSSFORMEL · Formule de politesse finale
+x96|Meilleurs vœux,
+x97|Bonne continuation,
+x98|Cordialement,
+x99|Anrede · Formule d'appel
+x100|Madame [nom], / Monsieur [nom],
+x101|Dank & Bezugnahme · Remerciements et rappel du sujet
+x102|Nous vous remercions de votre message dans lequel vous nous informez de problèmes avec notre service.
+x103|Nous vous remercions de votre message dans lequel vous nous informez de problèmes avec l’appareil.
+x104|Nous vous remercions de votre message dans lequel vous nous informez de problèmes avec la facture.
+x105|Nous vous remercions de votre message dans lequel vous nous informez de problèmes avec la livraison.
+x106|Nous vous remercions de votre message dans lequel vous nous informez de problèmes avec la commande.
+x107|Entschuldigung · Excuses
+x108|Nous regrettons vivement les désagréments occasionnés et vous prions de nous en excuser.
+x109|Nous regrettons que cette situation se soit produite.
+x110|Erklärung · Explication de la cause
+x111|Après vérification interne, il a été établi que cette situation est due à des problèmes d’organisation interne.
+x112|Après vérification interne, il a été établi que cette situation est due à un manque de personnel.
+x113|Après vérification interne, il a été établi que cette situation est due à une panne technique de l’appareil.
+x114|Après vérification interne, il a été établi que cette situation est due à un problème informatique.
+x115|Après vérification interne, il a été établi que cette situation est due à des difficultés de livraison imprévues.
+x116|Après vérification interne, il a été établi que cette situation est due à une confusion lors du traitement de la commande.
+x117|Après vérification interne, il a été établi que cette situation est due à une mauvaise utilisation de l’appareil.
+x118|Verständnis zeigen · Montrer sa compréhension
+x119|Nous comprenons à quel point une solution rapide est importante pour votre entreprise.
+x120|Lösung · Solution
+x121|Nous avons parlé aujourd’hui avec nos collaborateurs et clarifié la situation. Nous vous assurons que cela ne se reproduira pas.
+x122|Nous vous prions d’attendre jusqu’à lundi prochain. Si votre commande n’est pas arrivée d’ici là, nous vous proposerons volontiers un modèle comparable de notre stock.
+x123|Nous corrigerons gratuitement l’erreur dans les noms d’ici la fin de la semaine. Veuillez noter que le schéma de couleurs a été réalisé conformément au contrat. Toute autre correction n’est possible que moyennant un supplément de [X €].
+x124|Notre technicien peut passer chez vous le [date] à [heure]. Veuillez nous indiquer si ce rendez-vous vous convient. Veuillez noter qu’une réparation immédiate ne sera pas possible si nous devons commander des pièces détachées. Dans ce cas, nous vous informerons immédiatement.
+x125|Mercredi matin, deux de nos collaborateurs seront chez vous à l’heure convenue et termineront le montage des meubles. Nous prenons bien sûr en charge les frais pour les objets endommagés.
+x126|Après consultation de notre technicien, il a été établi que les défauts proviennent d’une mauvaise utilisation de l’appareil. Nous nous permettons de vous signaler poliment que la résolution de ce problème ne relève pas de notre responsabilité. Notre technicien se fera un plaisir de revenir et de former gratuitement vos collaborateurs à l’utilisation. Veuillez noter que les frais de [les précédentes interventions du technicien] / [la vérification de l’appareil] restent à votre charge.
+x127|Nous avons vérifié votre commande et apporté les corrections nécessaires. Votre remise habituelle de [X %] a bien entendu été prise en compte. Vous recevrez prochainement la facture corrigée.
+x128|Pour les marchandises endommagées, nous vous proposons une remise de [X %]. Vous pouvez aussi nous renvoyer les articles et nous vous livrerons un remplacement de qualité irréprochable. En raison de notre situation actuelle en personnel, nous ne pourrons malheureusement livrer les T-shirts manquants que d’ici le [date]. Nous prenons bien sûr les frais d’expédition à notre charge.
+x129|Nous rembourserons bien entendu intégralement les frais supplémentaires dus à notre erreur. Veuillez nous envoyer les justificatifs correspondants. Nous serions heureux de continuer à vous compter parmi nos clients.
+x130|Entgegenkommen · Geste commercial (uniquement si une remise est mentionnée dans la lettre du supérieur)
+x131|En signe de bonne volonté, nous vous offrons une remise de [X %] sur votre prochaine commande.
+x132|Dank & Zusammenarbeit · Remerciements et poursuite de la collaboration
+x133|Pour conclure, nous vous remercions de votre compréhension et espérons poursuivre une bonne collaboration.
+x134|Service-Satz · Disponibilité pour les questions
+x135|Pour toute question, vous pouvez nous contacter à tout moment.
+x136|Grußformel · Formule de politesse finale
+x137|Cordialement,\n[Votre prénom et nom]
