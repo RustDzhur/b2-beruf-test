@@ -463,108 +463,257 @@ x31|L'e-mail serve per la verifica: invia lo stesso indirizzo all'insegnante su 
 x32|Inserisci un'e-mail: serve per salvare i progressi nel cloud e per la verifica.
 r29|Da {~1}
 r30|Il trainer è un progetto di volontariato e resta gratuito. Solo l'IA costa: ogni sua risposta si paga tramite l'API. Per questo l'accesso completo all'IA è aperto a chi dà un contributo simbolico. Per ottenerlo, registrati nel cloud (scheda: e-mail e password) e scrivi su WhatsApp: {1}. Lì ti spiegheranno come versare il contributo. Dopo la conferma si apriranno tutti gli strumenti e potrai prepararti pienamente all'esame.
-x33|Redemittel · tedesco + traduzione
-x34|ANREDE · Saluto
-x35|Ciao a tutti,
-x36|Ciao ragazzi,
-x37|Cari colleghi,
-x38|Gentili signore e signori,
-x39|EINLEITUNG · Introduzione
-x40|Ho sentito / letto che […]. Vorrei esprimere la mia opinione al riguardo.
-x41|Mi è giunta voce che […]. Anch'io vorrei scrivere qualcosa in merito.
-x42|Ho saputo di recente che […]. Trovo questa proposta (non) buona.
-x43|Anch’io oggi vorrei scrivere qualcosa nel nostro forum sul tema […].
-x44|Mi è arrivata la notizia che la nostra azienda sta pianificando […].
-x45|Avete sentito? La nostra azienda sta pianificando […].
-x46|Ho saputo che la nostra azienda sta pianificando […]. Vorrei commentare la cosa.
-x47|Come tutti sappiamo, la direzione vuole […]. Francamente, sono sorpreso/a.
-x48|EIGENE MEINUNG · Opinione personale
-x49|Sono [a favore / contrario/a] perché…
-x50|Personalmente penso che […].
-x51|Secondo me, […].
-x52|Trovo buona la proposta, [perché / poiché]…
-x53|Per quanto mi riguarda, sono a favore / contrario/a perché…
-x54|In linea di massima appoggio la proposta perché…
-x55|(Non) sono d’accordo con la proposta perché…
-x56|Sono di due opinioni: da un lato… dall’altro…
-x57|Riguardo a questa proposta, sono dell’opinione che…
-x58|Per quanto mi riguarda, mi è difficile prendere una posizione chiara perché ho opinioni contrastanti.
-x59|ARGUMENT 1 (Vorteil) · Argomento 1 (vantaggio)
-x60|Da un lato, questa idea ha alcuni vantaggi.
-x61|Ad esempio, […].
-x62|Un altro vantaggio è che […].
-x63|Inoltre potrebbe essere comodo o utile per molte persone.
-x64|Personalmente ho vissuto che…
-x65|Nella mia precedente azienda succedeva che…
-x66|ARGUMENT 2 (Nachteil) · Argomento 2 (svantaggio)
-x67|D’altra parte ci sono anche degli svantaggi.
-x68|Molte persone pensano che […].
-x69|È particolarmente problematico che […].
-x70|Questo potrebbe portare a […].
-x71|D’altra parte, so per esperienza che…
-x72|Per esperienza personale so che…
-x73|VORSCHLAG / KOMPROMISS · Proposta / compromesso
-x74|Perciò propongo che…
-x75|Propongo di trovare insieme una soluzione equa per tutti.
-x76|Sarebbe sensato chiedere prima il parere di tutti i dipendenti.
-x77|Si potrebbe introdurre un periodo di prova e poi decidere insieme.
-x78|È importante che tutti i dipendenti possano decidere da soli.
-x79|È importante che tutte le parti coinvolte partecipino alla decisione.
-x80|Una buona soluzione sarebbe offrire […].
-x81|È importante tenere conto degli interessi di tutti i partecipanti.
-x82|Sarebbe meglio se la partecipazione restasse volontaria.
-x83|SCHLUSSSATZ · Conclusione
-x84|Che ne pensate?
-x85|Come la vedete?
-x86|Come valutate questa idea?
-x87|Nel complesso, questa è la mia posizione su questo tema.
-x88|Siete d’accordo con me?
-x89|Sono curioso/a di sapere che cosa ne pensate.
-x90|Non vedo l’ora di leggere i vostri contributi a questa discussione del forum.
-x91|Che ne dite? Attendo con piacere la vostra opinione.
-x92|Sono curioso/a di leggere le vostre opinioni su questo tema!
-x93|Leggerò volentieri le vostre opinioni in merito.
-x94|Mi farebbero piacere i vostri riscontri!
-x95|GRUSSFORMEL · Chiusura cortese della lettera
-x96|I migliori auguri,
-x97|Tutto il meglio,
-x98|Distinti saluti,
-x99|Anrede · Formula di apertura
-x100|Gentile signora [cognome], / Gentile signor [cognome],
-x101|Dank & Bezugnahme · Ringraziamento e riferimento all'argomento
-x102|La ringraziamo per il suo messaggio con cui ci segnala dei problemi con il nostro servizio.
-x103|La ringraziamo per il suo messaggio con cui ci segnala dei problemi con l’apparecchio.
-x104|La ringraziamo per il suo messaggio con cui ci segnala dei problemi con la fattura.
-x105|La ringraziamo per il suo messaggio con cui ci segnala dei problemi con la consegna.
-x106|La ringraziamo per il suo messaggio con cui ci segnala dei problemi con l’ordine.
-x107|Entschuldigung · Scuse
-x108|Ci rammarichiamo molto per i disagi causati e ci scusiamo.
-x109|Ci dispiace che si sia creata questa situazione.
-x110|Erklärung · Spiegazione della causa
-x111|Da una verifica interna è emerso che la situazione è dovuta a problemi organizzativi interni.
-x112|Da una verifica interna è emerso che la situazione è dovuta a carenza di personale.
-x113|Da una verifica interna è emerso che la situazione è dovuta a un difetto tecnico dell’apparecchio.
-x114|Da una verifica interna è emerso che la situazione è dovuta a un problema del sistema informatico.
-x115|Da una verifica interna è emerso che la situazione è dovuta a imprevisti difficoltà di consegna.
-x116|Da una verifica interna è emerso che la situazione è dovuta a uno scambio nell’elaborazione dell’ordine.
-x117|Da una verifica interna è emerso che la situazione è dovuta a un uso errato dell’apparecchio.
-x118|Verständnis zeigen · Mostrare comprensione
-x119|Comprendiamo quanto sia importante per la vostra azienda una soluzione rapida.
-x120|Lösung · Soluzione
-x121|Oggi abbiamo parlato con i nostri collaboratori e chiarito la situazione. Le assicuriamo che non si ripeterà.
-x122|Le chiediamo di attendere fino a lunedì prossimo. Se entro allora l’ordine non fosse arrivato, le offriremo volentieri un modello analogo dal nostro magazzino.
-x123|Correggeremo gratuitamente l’errore nei nomi entro la fine della settimana. Si noti che la combinazione di colori è stata realizzata come previsto dal contratto. Ulteriori correzioni sono possibili solo con un supplemento di [X €].
-x124|Il nostro tecnico può venire da lei il [data] alle [ora]. Ci faccia sapere se l’appuntamento le va bene. Si noti che una riparazione immediata non sarà possibile se dovremo ordinare dei pezzi di ricambio. In tal caso la informeremo subito.
-x125|Mercoledì mattina due nostri collaboratori saranno puntuali da lei e completeranno il montaggio dei mobili. Naturalmente ci assumiamo i costi degli oggetti danneggiati.
-x126|Dopo aver sentito il nostro tecnico è emerso che i guasti sono dovuti a un uso errato dell’apparecchio. Desideriamo farle presente con cortesia che la soluzione di questo problema non rientra nella nostra responsabilità. Il nostro tecnico verrà volentieri da lei e istruirà gratuitamente i suoi collaboratori sull’uso. Si noti che i costi per [le precedenti visite del tecnico] / [il controllo dell’apparecchio] restano a suo carico.
-x127|Abbiamo controllato il suo ordine e apportato le correzioni necessarie. Il suo sconto abituale del [X %] è stato naturalmente considerato. Riceverà a breve la fattura corretta.
-x128|Per la merce danneggiata le offriamo uno sconto del [X %]. In alternativa può rimandarci gli articoli e le consegneremo un sostituto di qualità ineccepibile. Le magliette mancanti, purtroppo, a causa dell’attuale situazione del personale potremo inviarle solo entro il [data]. Le spese di spedizione sono naturalmente a nostro carico.
-x129|Rimborseremo naturalmente per intero i costi aggiuntivi dovuti al nostro errore. Ci invii cortesemente le relative ricevute. Saremmo lieti di continuare a contarla tra i nostri clienti.
-x130|Entgegenkommen · Gesto di cortesia (solo se nella lettera del superiore è citato uno sconto)
-x131|Come segno di cortesia le offriamo uno sconto del [X %] sul prossimo ordine.
-x132|Dank & Zusammenarbeit · Ringraziamento e proseguimento della collaborazione
-x133|In conclusione la ringraziamo per la comprensione e speriamo in una proficua collaborazione futura.
-x134|Service-Satz · Disponibilità per eventuali domande
-x135|Per qualsiasi domanda può contattarci in qualsiasi momento.
-x136|Grußformel · Chiusura cortese della lettera
-x137|Distinti saluti,\n[Nome e cognome]
+x33|Registrazione via e-mail: inserisci la tua e-mail e una password. I tuoi progressi vengono salvati nel cloud; su un altro dispositivo bastano la stessa e-mail e la stessa password.
+x34|Registrazione e accesso con e-mail e password. Dopo la registrazione riceverai un'e-mail di conferma. L'accesso al trainer si apre dopo l'autorizzazione dell'insegnante: contattalo via WhatsApp o per telefono. Nome e cognome servono solo per la classifica e sono facoltativi.
+x35|Inserisci un'e-mail valida: serve per la registrazione e l'accesso.
+x36|Inserisci una password (almeno 6 caratteri).
+x37|Inserisci prima la tua e-mail.
+x38|E-mail per reimpostare la password inviata a:
+x39|Impossibile inviare l'e-mail. Controlla l'indirizzo.
+x40|Registrati / accedi
+x41|Esci / cambia account
+x42|In attesa di autorizzazione
+x43|Registrazione completata. Abbiamo inviato un'e-mail di conferma a:
+x44|Accesso effettuato come:
+x45|Il trainer è riservato ai membri del gruppo. Per ottenere l'accesso, contatta l'insegnante via WhatsApp o per telefono e chiedi l'autorizzazione a collegarti. Indica l'e-mail con cui ti sei registrato.
+x46|WhatsApp / telefono:
+x47|Verifica in corso…
+x48|L'accesso non è ancora stato autorizzato.
+x49|Verifica di nuovo
+x50|Cambia account
+x51|Verifica dell'accesso…
+x52|Il numero dell'amministratore non è ancora indicato.
+x53|Scrivi su WhatsApp
+x54|Chiama
+x55|Reimposta password
+x56|Sono uno studente
+x57|Organizzo un gruppo
+x58|— scegli il tuo gruppo —
+x59|Il tuo gruppo *
+x60|Nome del tuo gruppo *
+x61|Chi sei? *
+x62|Indica il nome del gruppo.
+x63|Scegli il tuo gruppo.
+x64|Impossibile creare il gruppo.
+x65|Esiste già un gruppo con questo nome.
+x66|Il tuo gruppo attende l'approvazione dell'amministratore principale:
+x67|Dopo l'approvazione si apre il trainer e lo spazio del gruppo è su /admin (accesso «Organizzatore del gruppo» con la tua e-mail e password).
+x68|Il tuo gruppo:
+x69|Spazio del gruppo
+x70|Gruppo principale
+x71|Dati per il foglio risposte (facoltativo)
+x72|Cognome *
+x73|Nome *
+x74|Telefono (WhatsApp) *
+x75|Password *
+x76|Password * (almeno 6 caratteri)
+x77|Dopo la registrazione riceverai un'e-mail di conferma. L'accesso si apre dopo il permesso dell'amministratore: scrivigli su WhatsApp. Per favore solo un messaggio, non chiamare.
+x78|Accedi
+x79|Registrati
+x80|Inserisci un numero con WhatsApp, ad es. +49 151 2345678.
+x81|Password dimenticata?
+x82|Trainer per l'esame telc
+x83|Accesso
+x84|Registrazione
+x85|Accedi con l'e-mail e la password usate per la registrazione. I progressi verranno caricati dal cloud.
+x86|Crea un account: i progressi sono salvati nel cloud e disponibili su ogni dispositivo.
+x87|Questi dati li vede il tuo insegnante.
+x88|Indietro
+x89|Prezzo dell'abbonamento
+x90|Trainer
+x91|mese
+x92|Tutte le attività d'esame, correzione delle risposte, lavoro sugli errori e classifica del gruppo. Senza IA.
+x93|Preparazione migliore
+x94|Trainer + IA
+x95|Tutto il pacchetto «Trainer» più l'IA che corregge compiti, lettere e risposte orali e ti aiuta a prepararti meglio all'esame.
+x96|Conferma l'e-mail: apri il messaggio e clicca sul link.
+x97|Scrivi all'amministratore su WhatsApp.
+x98|Per favore non chiamare: invia un messaggio per chiedere l'accesso. Indica cognome, nome, e-mail di registrazione e il pacchetto scelto.
+x99|Dopo il pagamento l'amministratore apre l'accesso e il trainer funziona su tutti i tuoi dispositivi.
+x100|WhatsApp dell'amministratore:
+x101|Solo messaggi, per favore non chiamare.
+x102|E-mail o password errati. Puoi reimpostare la password con «Password dimenticata?». Se studiavi qui prima dell'accesso via e-mail, apri «Registrazione» e inserisci gli stessi cognome, nome e password: i vecchi progressi verranno trovati e l'e-mail collegata.
+x103|Gruppo aperto
+x104|Gruppo aperto: studio da solo, senza insegnante
+x105|Il periodo di prova è terminato
+x106|L'abbonamento è scaduto
+x107|L'accesso è chiuso, i tuoi progressi sono salvati.
+x108|Per continuare paga 5 € al mese (senza IA) o 10 € al mese (con IA) e scrivi all'amministratore su WhatsApp.
+x109|Per favore non chiamare, solo un messaggio.
+x110|Paga online: l'accesso si apre subito dopo il pagamento.
+x111|Pagamento ricevuto, l'accesso è aperto.
+x112|Il pagamento non è andato a buon fine. Riprova o scrivi all'amministratore.
+x113|Paga con PayPal
+x114|Dopo aver pagato tramite il link, scrivi all'amministratore su WhatsApp: l'accesso si apre dopo la verifica.
+x115|Paga con PayPal e invia uno screenshot del pagamento all'amministratore su WhatsApp. L'amministratore apre l'accesso e il tuo mese inizia da quel giorno.
+x116|Invia la ricevuta su WhatsApp
+x117|Come ottenere l'accesso
+x118|Paga l'abbonamento
+x119|Pagamento con PayPal. L'importo è già inserito.
+x120|Prova gratis per 3 giorni
+x121|Scrivi all'amministratore e attiverà il periodo di prova.
+x122|Richiedi la prova
+x123|Ho già pagato
+x124|Invia uno screenshot del pagamento. L'amministratore lo controlla e apre l'accesso; il tuo mese inizia da quel giorno.
+x125|Attiva il mio accesso
+x126|Altro
+x127|Controllo gratuito
+x128|Il controllo gratuito funziona per tutti, senza IA. Il controllo con l’IA (grammatica, livello B2, versione corretta) fa parte del piano «Trainer + IA», 10 € al mese.
+x129|Il browser non ha consentito il riconoscimento vocale. Su iPhone e Mac attiva la dettatura (Impostazioni → Tastiera → Dettatura) oppure scrivi la risposta.
+x130|Il browser non riconosce il tedesco. Apri Chrome, Edge o Safari.
+x131|Nella frase secondaria (weil, dass, obwohl, wenn …) il verbo coniugato va alla fine.
+x132|Possibili errori (controlla)
+x133|Tempo di parola
+x134|I verbi di movimento e di cambiamento di stato formano il Perfekt con sein.
+x135|Parla in modo più fluido: le pause lunghe costano punti all’esame.
+x136|Parla
+x137|Lunghezza della risposta
+x138|Per un periodo nel passato si usa seit o vor: seit zwei Jahren, vor zwei Jahren.
+x139|Aggiungi frasi secondarie: weil, dass, obwohl, wenn. Sono un segno del livello B2.
+x140|L’accesso al microfono è bloccato. Consenti il microfono per questo sito (icona del lucchetto o del microfono nella barra degli indirizzi) e premi di nuovo il pulsante.
+x141|Qui serve l’articolo: in + dem = im (oppure ins).
+x142|Qui serve un verbo riflessivo: ich freue mich, ich interessiere mich.
+x143|L’IA controlla la risposta secondo i criteri d’esame… di solito 30–90 secondi
+x144|Nessun microfono trovato. Collega un microfono o chiudi il programma che lo sta usando.
+x145|Si può migliorare
+x146|Premi «Parla» e rispondi in tedesco, oppure scrivi qui la risposta…
+x147|Premi «Parla» e rispondi in tedesco. Il testo compare nel campo e puoi correggerlo. Il browser non mette quasi la punteggiatura. Nessun audio viene inviato al nostro server: è il browser a riconoscere la voce.
+x148|Non si sente niente. Parla più forte o più vicino al microfono.
+x149|Da migliorare
+x150|Per un unico periodo nel passato si usa als, non wenn.
+x151|Ripetizioni
+x152|Prova per esempio:
+x153|Dopo i verbi modali l’infinito va senza zu.
+x154|Controlla gratis
+x155|Controlla con l’IA
+x156|Il controllo con l’IA non è disponibile in questa visualizzazione. Usa il controllo gratuito e confronta la risposta con il modello.
+x157|Controllo basato su regole: punti del compito, Redemittel, connettivi, lunghezza, ripetizioni ed errori tipici. Non controlla tutta la grammatica: lo fa l’IA.
+x158|Punti del compito (per parole chiave)
+x159|Il riconoscimento si è interrotto con un errore. Premi di nuovo il microfono o scrivi la risposta.
+x160|Il riconoscimento vocale ora non funziona: nessuna connessione al servizio del browser. In Brave, Opera e alcuni altri browser è disattivato. Apri Chrome, Edge o Safari oppure scrivi la risposta.
+x161|Parla del tema per circa 2 minuti (150–260 parole) seguendo questi punti. Premi «Parla» e parla liberamente come all’esame: la voce diventa testo. Poi controlla la risposta gratis o con l’IA, e l’esaminatore IA ti farà delle domande.
+x162|Connettivi e frasi secondarie
+x163|Ancora nessun connettivo.
+x164|Sinonimi:
+x165|Di’ la tua parte della conversazione: rispondi a ogni punto, racconta la tua esperienza e fai 1–2 domande all’interlocutore. Qui sotto puoi parlare con l’interlocutore IA.
+x166|Di’ la tua parte della conversazione: una proposta per ogni punto, il motivo, una risposta a una possibile obiezione e alla fine una proposta per mettervi d’accordo. Qui sotto puoi esercitarti nel dialogo con il partner IA.
+x167|Di’ almeno 15 parole, così il controllo sarà utile.
+x168|Di’ almeno 25 parole, così il controllo con l’IA sarà utile.
+x169|Parole utili dal modello
+x170|Parole riempitive:
+x171|Parola due volte di seguito:
+x172|Il comparativo significa già «più»: qui mehr non serve.
+x173|Stop
+x174|Buona risposta
+x175|Obiettivo per B2:
+x176|Questo punto manca nella risposta. Di’ almeno 1–2 frasi su di esso.
+x177|Questo browser non sa trasformare la voce in testo (per esempio Firefox). Apri la pagina in Chrome, Edge o Safari oppure, per ora, scrivi la risposta.
+x178|senza IA · indicativo
+x179|parole
+x180|parole al minuto
+x181|obiettivo
+x182|Redemittel · tedesco + traduzione
+x183|ANREDE · Saluto
+x184|Ciao a tutti,
+x185|Ciao ragazzi,
+x186|Cari colleghi,
+x187|Gentili signore e signori,
+x188|EINLEITUNG · Introduzione
+x189|Ho sentito / letto che […]. Vorrei esprimere la mia opinione al riguardo.
+x190|Mi è giunta voce che […]. Anch'io vorrei scrivere qualcosa in merito.
+x191|Ho saputo di recente che […]. Trovo questa proposta (non) buona.
+x192|Anch’io oggi vorrei scrivere qualcosa nel nostro forum sul tema […].
+x193|Mi è arrivata la notizia che la nostra azienda sta pianificando […].
+x194|Avete sentito? La nostra azienda sta pianificando […].
+x195|Ho saputo che la nostra azienda sta pianificando […]. Vorrei commentare la cosa.
+x196|Come tutti sappiamo, la direzione vuole […]. Francamente, sono sorpreso/a.
+x197|EIGENE MEINUNG · Opinione personale
+x198|Sono [a favore / contrario/a] perché…
+x199|Personalmente penso che […].
+x200|Secondo me, […].
+x201|Trovo buona la proposta, [perché / poiché]…
+x202|Per quanto mi riguarda, sono a favore / contrario/a perché…
+x203|In linea di massima appoggio la proposta perché…
+x204|(Non) sono d’accordo con la proposta perché…
+x205|Sono di due opinioni: da un lato… dall’altro…
+x206|Riguardo a questa proposta, sono dell’opinione che…
+x207|Per quanto mi riguarda, mi è difficile prendere una posizione chiara perché ho opinioni contrastanti.
+x208|ARGUMENT 1 (Vorteil) · Argomento 1 (vantaggio)
+x209|Da un lato, questa idea ha alcuni vantaggi.
+x210|Ad esempio, […].
+x211|Un altro vantaggio è che […].
+x212|Inoltre potrebbe essere comodo o utile per molte persone.
+x213|Personalmente ho vissuto che…
+x214|Nella mia precedente azienda succedeva che…
+x215|ARGUMENT 2 (Nachteil) · Argomento 2 (svantaggio)
+x216|D’altra parte ci sono anche degli svantaggi.
+x217|Molte persone pensano che […].
+x218|È particolarmente problematico che […].
+x219|Questo potrebbe portare a […].
+x220|D’altra parte, so per esperienza che…
+x221|Per esperienza personale so che…
+x222|VORSCHLAG / KOMPROMISS · Proposta / compromesso
+x223|Perciò propongo che…
+x224|Propongo di trovare insieme una soluzione equa per tutti.
+x225|Sarebbe sensato chiedere prima il parere di tutti i dipendenti.
+x226|Si potrebbe introdurre un periodo di prova e poi decidere insieme.
+x227|È importante che tutti i dipendenti possano decidere da soli.
+x228|È importante che tutte le parti coinvolte partecipino alla decisione.
+x229|Una buona soluzione sarebbe offrire […].
+x230|È importante tenere conto degli interessi di tutti i partecipanti.
+x231|Sarebbe meglio se la partecipazione restasse volontaria.
+x232|SCHLUSSSATZ · Conclusione
+x233|Che ne pensate?
+x234|Come la vedete?
+x235|Come valutate questa idea?
+x236|Nel complesso, questa è la mia posizione su questo tema.
+x237|Siete d’accordo con me?
+x238|Sono curioso/a di sapere che cosa ne pensate.
+x239|Non vedo l’ora di leggere i vostri contributi a questa discussione del forum.
+x240|Che ne dite? Attendo con piacere la vostra opinione.
+x241|Sono curioso/a di leggere le vostre opinioni su questo tema!
+x242|Leggerò volentieri le vostre opinioni in merito.
+x243|Mi farebbero piacere i vostri riscontri!
+x244|GRUSSFORMEL · Chiusura cortese della lettera
+x245|I migliori auguri,
+x246|Tutto il meglio,
+x247|Distinti saluti,
+x248|Anrede · Formula di apertura
+x249|Gentile signora [cognome], / Gentile signor [cognome],
+x250|Dank & Bezugnahme · Ringraziamento e riferimento all'argomento
+x251|La ringraziamo per il suo messaggio con cui ci segnala dei problemi con il nostro servizio.
+x252|La ringraziamo per il suo messaggio con cui ci segnala dei problemi con l’apparecchio.
+x253|La ringraziamo per il suo messaggio con cui ci segnala dei problemi con la fattura.
+x254|La ringraziamo per il suo messaggio con cui ci segnala dei problemi con la consegna.
+x255|La ringraziamo per il suo messaggio con cui ci segnala dei problemi con l’ordine.
+x256|Entschuldigung · Scuse
+x257|Ci rammarichiamo molto per i disagi causati e ci scusiamo.
+x258|Ci dispiace che si sia creata questa situazione.
+x259|Erklärung · Spiegazione della causa
+x260|Da una verifica interna è emerso che la situazione è dovuta a problemi organizzativi interni.
+x261|Da una verifica interna è emerso che la situazione è dovuta a carenza di personale.
+x262|Da una verifica interna è emerso che la situazione è dovuta a un difetto tecnico dell’apparecchio.
+x263|Da una verifica interna è emerso che la situazione è dovuta a un problema del sistema informatico.
+x264|Da una verifica interna è emerso che la situazione è dovuta a imprevisti difficoltà di consegna.
+x265|Da una verifica interna è emerso che la situazione è dovuta a uno scambio nell’elaborazione dell’ordine.
+x266|Da una verifica interna è emerso che la situazione è dovuta a un uso errato dell’apparecchio.
+x267|Verständnis zeigen · Mostrare comprensione
+x268|Comprendiamo quanto sia importante per la vostra azienda una soluzione rapida.
+x269|Lösung · Soluzione
+x270|Oggi abbiamo parlato con i nostri collaboratori e chiarito la situazione. Le assicuriamo che non si ripeterà.
+x271|Le chiediamo di attendere fino a lunedì prossimo. Se entro allora l’ordine non fosse arrivato, le offriremo volentieri un modello analogo dal nostro magazzino.
+x272|Correggeremo gratuitamente l’errore nei nomi entro la fine della settimana. Si noti che la combinazione di colori è stata realizzata come previsto dal contratto. Ulteriori correzioni sono possibili solo con un supplemento di [X €].
+x273|Il nostro tecnico può venire da lei il [data] alle [ora]. Ci faccia sapere se l’appuntamento le va bene. Si noti che una riparazione immediata non sarà possibile se dovremo ordinare dei pezzi di ricambio. In tal caso la informeremo subito.
+x274|Mercoledì mattina due nostri collaboratori saranno puntuali da lei e completeranno il montaggio dei mobili. Naturalmente ci assumiamo i costi degli oggetti danneggiati.
+x275|Dopo aver sentito il nostro tecnico è emerso che i guasti sono dovuti a un uso errato dell’apparecchio. Desideriamo farle presente con cortesia che la soluzione di questo problema non rientra nella nostra responsabilità. Il nostro tecnico verrà volentieri da lei e istruirà gratuitamente i suoi collaboratori sull’uso. Si noti che i costi per [le precedenti visite del tecnico] / [il controllo dell’apparecchio] restano a suo carico.
+x276|Abbiamo controllato il suo ordine e apportato le correzioni necessarie. Il suo sconto abituale del [X %] è stato naturalmente considerato. Riceverà a breve la fattura corretta.
+x277|Per la merce danneggiata le offriamo uno sconto del [X %]. In alternativa può rimandarci gli articoli e le consegneremo un sostituto di qualità ineccepibile. Le magliette mancanti, purtroppo, a causa dell’attuale situazione del personale potremo inviarle solo entro il [data]. Le spese di spedizione sono naturalmente a nostro carico.
+x278|Rimborseremo naturalmente per intero i costi aggiuntivi dovuti al nostro errore. Ci invii cortesemente le relative ricevute. Saremmo lieti di continuare a contarla tra i nostri clienti.
+x279|Entgegenkommen · Gesto di cortesia (solo se nella lettera del superiore è citato uno sconto)
+x280|Come segno di cortesia le offriamo uno sconto del [X %] sul prossimo ordine.
+x281|Dank & Zusammenarbeit · Ringraziamento e proseguimento della collaborazione
+x282|In conclusione la ringraziamo per la comprensione e speriamo in una proficua collaborazione futura.
+x283|Service-Satz · Disponibilità per eventuali domande
+x284|Per qualsiasi domanda può contattarci in qualsiasi momento.
+x285|Grußformel · Chiusura cortese della lettera
+x286|Distinti saluti,\n[Nome e cognome]

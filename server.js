@@ -1,10 +1,11 @@
 // Tiny static server without dependencies: `node server.js` (or `npm start`) → http://localhost:5173
 const http = require("http"), fs = require("fs"), path = require("path"), { exec, execFile } = require("child_process"), os = require("os"), crypto = require("crypto");
 const ROOT = __dirname, PORT = +process.env.PORT || 5173;
-const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png", ".ico": "image/x-icon", ".mp3": "audio/mpeg" };
+const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".ico": "image/x-icon", ".mp3": "audio/mpeg" };
 const ai = require("./api/_ai.js");
 const admin = require("./api/_admin.js");
 const verify = require("./api/_verify.js");
+const router = require("./api/_router.js");
 const json = (res, code, o) => { res.writeHead(code, { "Content-Type": "application/json; charset=utf-8" }); res.end(JSON.stringify(o)); };
 // Teacher cabinet: on a local run a random password is generated once, so /admin is never open by accident.
 let generatedAdminPassword = "";
@@ -21,43 +22,11 @@ function readBody(req, limit = 1e6) {
   });
 }
 async function adminRoute(req, res, p) {
-  const headers = req.headers || {};
-  const secure = admin.isSecure(headers);
-  const send = (code, out, extra) => {
-    res.writeHead(code, Object.assign({ "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" }, extra || {}));
-    res.end(JSON.stringify(out));
-  };
-  if (!admin.sameOrigin(headers)) return send(403, { code: "origin", message: "forbidden origin" });
-  const ip = admin.clientIp(headers, req.socket.remoteAddress);
-  try {
-    if (p === "/api/admin/login" && req.method === "POST") {
-      if (admin.loginRateLimited(ip)) return send(429, { code: "rate_limited", message: "Слишком много попыток. Попробуйте через 10 минут." });
-      const body = admin.bodyOf(await readBody(req));
-      admin.login(body.password);
-      admin.clearLoginHits(ip);
-      return send(200, { ok: true }, { "Set-Cookie": admin.sessionCookie(secure) });
-    }
-    if (p === "/api/admin/logout" && req.method === "POST") return send(200, { ok: true }, { "Set-Cookie": admin.clearCookie(secure) });
-    if (p === "/api/admin/me") {
-      let storage = false, fixtures = false;
-      try { storage = !!admin.serviceAccount(); } catch {}
-      try { fixtures = !!admin.fixtureUsers(); } catch {}
-      return send(200, { ok: admin.verifySession(headers.cookie), configured: !!admin.adminPassword(), storage, fixtures });
-    }
-    if (p === "/api/admin/dashboard" && req.method === "GET") {
-      if (!admin.verifySession(headers.cookie)) return send(401, { code: "unauthorized", message: "Войдите в кабинет." });
-      return send(200, await admin.buildDashboard());
-    }
-    if (p === "/api/admin/verify" && req.method === "POST") {
-      if (!admin.verifySession(headers.cookie)) return send(401, { code: "unauthorized", message: "Войдите в кабинет." });
-      const b = admin.bodyOf(await readBody(req));
-      await verify.setVerified(b.uid, !!b.verified);
-      return send(200, { ok: true, uid: String(b.uid), verified: !!b.verified });
-    }
-    return send(404, { code: "not_found", message: "Неизвестный метод API." });
-  } catch (e) {
-    return send(e.status || 500, { code: e.code || "error", message: e.message || "Ошибка сервера." });
-  }
+  const headers = Object.assign({}, req.headers || {}, { "x-url": req.url });
+  const body = req.method === "POST" ? await readBody(req) : "";
+  const r = await router.handle({ method: req.method, path: p, headers, body, ip: admin.clientIp(req.headers || {}, req.socket.remoteAddress) });
+  res.writeHead(r.status, Object.assign({ "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" }, r.headers));
+  res.end(JSON.stringify(r.json));
 }
 async function aiRoute(req, res) {
   let body = ""; for await (const c of req) { body += c; if (body.length > 2e6) return json(res, 413, { code: "error", message: "too large" }); }
@@ -82,6 +51,7 @@ http.createServer((req, res) => {
   if (req.url.startsWith("/api/tts?")) return tts(req, res);
   if (req.url === "/api/status") return json(res, 200, { ready: ai.ready() });
   if (req.url === "/api/ai" && req.method === "POST") return aiRoute(req, res);
+  if (req.url === "/api/access") return verify.access(req.headers.authorization).then(([code, out]) => json(res, code, out));
   let p = decodeURIComponent(req.url.split("?")[0]);
   if (p === "/api/leaderboard" && req.method === "GET") {
     const q = new URL(req.url, "http://x").searchParams;
@@ -91,7 +61,7 @@ http.createServer((req, res) => {
       .then(data => json(res, 200, data))
       .catch(e => json(res, e.status || 500, { code: e.code || "error", message: e.message || "Рейтинг временно недоступен." }));
   }
-  if (p.startsWith("/api/admin/")) return adminRoute(req, res, p);
+  if (p.startsWith("/api/admin/") || p === "/api/groups" || p === "/api/group-request" || p === "/api/link-email" || p.startsWith("/api/cron/")) return adminRoute(req, res, p);
   if (p.startsWith("/api/")) { res.writeHead(404, { "Content-Type": "application/json; charset=utf-8" }); return res.end(JSON.stringify({ code: "not_found" })); }
   if (p === "/") p = "/index.html";
   if (p === "/admin" || p === "/admin/") p = "/admin.html";

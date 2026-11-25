@@ -79,3 +79,27 @@ test("uids are validated before they reach Firestore paths", async () => {
   await assert.rejects(() => verify.setVerified("../users/other", true), { code: "bad_uid" });
   await assert.rejects(() => verify.setVerified("", true), { code: "bad_uid" });
 });
+
+test("/api/access: admission and AI are separate; old accounts are admitted, the AI stays closed", async () => {
+  const admit = verify._hooks.isAdmitted;
+  stub("student-old-1", false); verify._hooks.isAdmitted = async () => true;
+  let [code, out] = await verify.access(BEARER);
+  assert.equal(code, 200); assert.equal(out.verified, true); assert.equal(out.ai, false);
+  stub("student-paid-1", true);
+  [code, out] = await verify.access(BEARER);
+  assert.equal(out.verified, true); assert.equal(out.ai, true);
+  stub("student-new-1", true); verify._hooks.isAdmitted = async () => false;
+  [code, out] = await verify.access(BEARER);
+  assert.equal(code, 200); assert.equal(out.verified, false); assert.equal(out.ai, false); assert.equal(out.contact, "+49 000 0000000");
+  [code, out] = await verify.access(undefined);
+  assert.equal(out.verified, false);
+  verify._hooks.isAdmitted = admit;
+});
+
+test("accounts created before the switch to e-mail sign-up count as admitted", async () => {
+  const A = require("../api/_admit.js");
+  assert.equal(A.isOld(Date.parse("2026-10-01T00:00:00Z")), true);
+  assert.equal(A.isOld(Date.parse("2026-11-22T00:00:00Z")), false);
+  assert.equal(A.isOld(0), false);
+  assert.equal(await A.isAdmitted("student-old-2", Date.parse("2026-10-01T00:00:00Z")), true);
+});

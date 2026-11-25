@@ -1,6 +1,6 @@
-"""Build i18n.js: Russian UI string -> [en, de, fr, tr, ar, it] plus pattern rules.
+"""Build i18n.js: Russian UI string -> [en, de, fr, tr, ar, it, uk] plus pattern rules.
 Sources: i18n_ru.json (index -> Russian), i18n_meta.json (ids of extras and rules), i18n_src.txt (id|EN|DE),
-i18n_fr.txt, i18n_trk.txt, i18n_ar.txt, i18n_it.txt (id|translation). A missing translation falls back to English."""
+i18n_fr.txt, i18n_trk.txt, i18n_ar.txt, i18n_it.txt, i18n_uk.txt (id|translation). A missing translation falls back to English."""
 import json, os
 H = os.path.dirname(os.path.abspath(__file__))
 rd = lambda n: open(os.path.join(H, n), encoding='utf-8')
@@ -13,7 +13,7 @@ for line in rd('i18n_src.txt'):
         i, en, de = line.split('|', 2)
         src[i] = [en, de]
 extra_lang = {}
-for code, fn in (('fr', 'i18n_fr.txt'), ('tr', 'i18n_trk.txt'), ('ar', 'i18n_ar.txt'), ('it', 'i18n_it.txt')):
+for code, fn in (('fr', 'i18n_fr.txt'), ('tr', 'i18n_trk.txt'), ('ar', 'i18n_ar.txt'), ('it', 'i18n_it.txt'), ('uk', 'i18n_uk.txt')):
     d = {}
     if os.path.exists(os.path.join(H, fn)):
         for line in rd(fn):
@@ -25,7 +25,7 @@ for code, fn in (('fr', 'i18n_fr.txt'), ('tr', 'i18n_trk.txt'), ('ar', 'i18n_ar.
 def row(i):
     en, de = src[i]
     nl = lambda t: t.replace('\\n', '\n')  # a newline is stored as the two characters \n
-    return [nl(en), nl(de)] + [nl(extra_lang[c].get(i) or en) for c in ('fr', 'tr', 'ar', 'it')]
+    return [nl(en), nl(de)] + [nl(extra_lang[c].get(i) or en) for c in ('fr', 'tr', 'ar', 'it', 'uk')]
 dic = {}
 for i in src:
     if i.isdigit():

@@ -233,12 +233,12 @@ const notVerifiedText = (contact) => "Тренажёр создан волонт
 const errText = (e) => e && e.code === "not_verified" ? notVerifiedText(e.contact) : (ERR[e && e.code] || "Не удалось связаться с ИИ. Попробуйте ещё раз.");
 function thinking(msg) { return h("div", { class: "thinking" }, h("span", { class: "dots" }, h("i"), h("i"), h("i")), msg || "ИИ думает…"); }
 async function getSample() { const s = SAMPLE || await sampleReady; if (!s) throw { code: "not_granted" }; return s; }
-const LANG_NAME = { ru: "Russian", en: "English", de: "German", fr: "French", tr: "Turkish", ar: "Arabic", it: "Italian" };
+const LANG_NAME = { ru: "Russian", en: "English", de: "German", fr: "French", tr: "Turkish", ar: "Arabic", it: "Italian", uk: "Ukrainian" };
 // German names for prompts written in German ("Übersetzung ins …")
-const LANG_DE = { ru: "Russische", en: "Englische", fr: "Französische", tr: "Türkische", ar: "Arabische", it: "Italienische" };
+const LANG_DE = { ru: "Russische", en: "Englische", fr: "Französische", tr: "Türkische", ar: "Arabische", it: "Italienische", uk: "Ukrainische" };
 // the interface language (German by default) decides in which language the AI explains, and into which language it translates
 // "auf …" for German prompts: the language explanations are written in
-const LANG_AUF = { ru: "Russisch", en: "Englisch", de: "Deutsch", fr: "Französisch", tr: "Türkisch", ar: "Arabisch", it: "Italienisch" };
+const LANG_AUF = { ru: "Russisch", en: "Englisch", de: "Deutsch", fr: "Französisch", tr: "Türkisch", ar: "Arabisch", it: "Italienisch", uk: "Ukrainisch" };
 const aufLang = () => "auf " + (LANG_AUF[aiLang()] || "Deutsch");
 const aiLang = () => (typeof curLang === "function" ? curLang() : store.get("lang", "de"));
 // rule for word lists after an AI answer: none for a German interface, otherwise translations into the interface language
@@ -780,7 +780,7 @@ function writeSheet(t, ta) {
 }
 function writeTask(t) {
   const drafts = store.get("drafts", {});
-  const ta = h("textarea", { class: "letter", id: "ta-" + t.id, spellcheck: "false", placeholder: t.kind === "forum" ? "Liebe Kolleginnen und Kollegen,\n…" : t.kind === "praesentation" ? "Guten Tag, ich möchte Ihnen heute … vorstellen.\n…" : "Sehr geehrte Frau …,\n…" });
+  const ta = h("textarea", { class: "letter" + (t.speak ? " spoken" : ""), id: "ta-" + t.id, spellcheck: "false", lang: "de", placeholder: t.speak ? "Нажмите «Говорить» и отвечайте по-немецки или введите ответ здесь…" : t.kind === "forum" ? "Liebe Kolleginnen und Kollegen,\n…" : t.kind === "praesentation" ? "Guten Tag, ich möchte Ihnen heute … vorstellen.\n…" : "Sehr geehrte Frau …,\n…" });
   ta.value = drafts[t.id] || "";
   const counter = h("span", { class: "small mono" });
   const upd = () => { const n = words(ta.value); counter.textContent = `${n} слов` + (n < t.target[0] ? ` · цель ${t.target[0]}–${t.target[1]}` : n > t.target[1] + 40 ? " · многовато" : " ✓"); const d = store.get("drafts", {}); d[t.id] = ta.value; store.set("drafts", d); };
@@ -793,15 +793,26 @@ function writeTask(t) {
   const insert = (s) => { const c = s.replace(/…/g, "").replace(/\s+/g, " ").trim(); const p = ta.selectionStart ?? ta.value.length; ta.value = ta.value.slice(0, p) + c + " " + ta.value.slice(ta.selectionEnd ?? p); ta.focus(); ta.selectionStart = ta.selectionEnd = p + c.length + 1; upd(); };
   const rm = h("div", { class: "stack" }, h("div", { class: "eyebrow" }, "Redemittel · нажмите, чтобы вставить"), REDEMITTEL[t.kind].map((g, i) => h("details", { class: "rm", open: i < 2 }, h("summary", null, g.h), h("ul", null, g.items.map(s => h("li", { onclick: () => insert(s) }, s))))));
   const fb = h("div", { class: "stack" });
+  // Sprechen: a microphone fills the field, and a free rule-based check works without the AI
+  const dict = t.speak ? dictation(ta) : null;
+  const freeBtn = t.speak ? h("button", { class: "btn", onclick: () => {
+    dict.stop();
+    const text = ta.value.trim();
+    if (words(text) < 15) { fb.replaceChildren(h("div", { class: "note" }, "Скажите хотя бы 15 слов, тогда проверка будет полезной.")); return; }
+    fb.replaceChildren(spReport(spCheck(text, { points: t.points, rede: REDEMITTEL[t.kind], model: t.modelText, target: t.target, seconds: dict.seconds(), conn: t.conn })));
+    fb.scrollIntoView({ behavior: "smooth", block: "start" });
+  } }, "Проверить бесплатно") : null;
   const prev = store.get("feedback", {})[t.id];
   if (prev && prev.data) fb.append(renderFeedback(prev.data, prev.text, t.kind));
   let ctl = null;
   const stopBtn = h("button", { class: "btn", hidden: true, onclick: () => ctl && ctl.abort() }, "Остановить");
-  const checkBtn = aiButton("Проверить письмо", async () => {
+  const checkBtn = aiButton(t.speak ? "Проверить с ИИ" : "Проверить письмо", async () => {
+    if (dict) dict.stop();
     const text = ta.value.trim();
-    if (words(text) < 40) { fb.replaceChildren(h("div", { class: "note" }, "Напишите хотя бы 40 слов, тогда проверка будет полезной.")); return; }
+    if (t.speak && words(text) < 25) { fb.replaceChildren(h("div", { class: "note" }, "Скажите хотя бы 25 слов, тогда проверка ИИ будет полезной.")); return; }
+    if (!t.speak && words(text) < 40) { fb.replaceChildren(h("div", { class: "note" }, "Напишите хотя бы 40 слов, тогда проверка будет полезной.")); return; }
     checkBtn.disabled = true; stopBtn.hidden = false; ctl = new AbortController();
-    fb.replaceChildren(thinking("ИИ проверяет письмо по критериям экзамена… обычно 30–90 секунд"));
+    fb.replaceChildren(thinking(t.speak ? "ИИ проверяет ответ по критериям экзамена… обычно 30–90 секунд" : "ИИ проверяет письмо по критериям экзамена… обычно 30–90 секунд"));
     try {
       const d = await askJSON(feedbackPrompt(t, text), { signal: ctl.signal });
       if (!d || !d.inhalt || !d.sprache) throw { code: "invalid_json" };
@@ -826,19 +837,20 @@ function writeTask(t) {
   return h("div", { class: "stack" },
     h("div", { class: "card stack" }, h("div", { class: "spread" }, h("h2", null, t.title), h("div", { class: "row" }, tb, tl)), t.taskEl),
     h("div", { class: "two" },
-      h("div", { class: "stack" }, writeSheet(t, ta), h("div", { class: "spread" }, counter, h("div", { class: "row" }, checkBtn, stopBtn, modelBtn, genBtn, skip)),
-        noAiNote("Проверка письма через ИИ недоступна в этом просмотре. Сравните текст с образцом и пройдитесь по Redemittel."), models, genBox),
+      h("div", { class: "stack" }, dict ? dict.el : null, writeSheet(t, ta), h("div", { class: "spread" }, counter, h("div", { class: "row" }, freeBtn, checkBtn, stopBtn, modelBtn, genBtn, skip)),
+        t.speak ? h("p", { class: "small muted", style: "margin:0" }, "Бесплатная проверка работает у всех и без ИИ. Проверка ИИ (грамматика, уровень B2, исправленный вариант) входит в тариф «Тренажёр + ИИ», 10 € в месяц.") : null,
+        noAiNote(t.speak ? "Проверка ответа через ИИ недоступна в этом просмотре. Используйте бесплатную проверку и сравните ответ с образцом." : "Проверка письма через ИИ недоступна в этом просмотре. Сравните текст с образцом и пройдитесь по Redemittel."), models, genBox),
       h("div", { class: "card sticky" }, rm)),
     fb);
 }
 function feedbackPrompt(t, text) {
   const mx = WMAX[t.kind];
-  const task = t.kind === "praesentation" ? PRAES_TASK : t.kind === "beschwerde"
+  const task = t.kind === "praesentation" ? (t.speak ? PRAES_TASK_SPOKEN + "\n\n" + t.context : PRAES_TASK) : t.kind === "smalltalk" ? SMALLTALK_TASK + "\n\n" + t.context : t.kind === "loesung" ? LOESUNG_TASK + "\n\n" + t.context : t.kind === "beschwerde"
     ? `Aufgabe 21 (DTB B2 Beruf): Antwort auf eine Kundenbeschwerde im Auftrag der Vorgesetzten. Bewertet wird vor allem, ob ALLE Aufträge aus der Notiz der Vorgesetzten umgesetzt sind, ob nichts Unpassendes versprochen wird (z. B. kein Rabatt, wenn er nicht erwähnt ist), ob das Register formell und höflich ist und ob die Textsorte stimmt (Anrede, Bezug, Entschuldigung, Erklärung, Lösung, Schluss, Gruß).\n\n${t.context}`
     : `Aufgabe 58 (DTB B2 Beruf): Forumsbeitrag im Intranet zu folgender Situation. Erwartet werden: kurze Einleitung zum Thema, Vorteile, Nachteile, eigene begründete Meinung, passender Schluss; einheitliches Register (du/ihr oder Sie, nicht gemischt); ca. 150 Wörter.\n\n${t.context}`;
   return `Du bist ein erfahrener, strenger, aber ermutigender Prüfer für telc Deutsch B2 Beruf (DTB). Bewerte den Text eines Lernenden.
 
-${task}
+${task}${t.speak ? "\n\n" + SPOKEN_NOTE : ""}
 
 Text des Lernenden:
 """
@@ -859,7 +871,7 @@ Antworte NUR mit JSON in genau diesem Format:
 
 Regeln:
 - Alle Kommentare, Erklärungen, das Fazit und die Tipps auf ${aiLang() === "de" ? "Deutsch (einfach und klar, ohne Übersetzungen in andere Sprachen)" : LANG_NAME[aiLang()] + " (Sprache der Benutzeroberfläche)"}.
-- "leitpunkte": ${t.kind === "beschwerde" ? "jeder einzelne Auftrag aus der Notiz der Vorgesetzten als eigener Punkt (auf Deutsch kurz benannt)" : t.kind === "praesentation" ? "Einleitung mit Gliederung, jeder Stichpunkt des Themas, eigene Meinung, Schluss" : "Einleitung, Vorteile, Nachteile, eigene Meinung, Schluss"}; "status" ist "ja", "teilweise" oder "nein".
+- "leitpunkte": ${t.kind === "beschwerde" ? "jeder einzelne Auftrag aus der Notiz der Vorgesetzten als eigener Punkt (auf Deutsch kurz benannt)" : t.kind === "smalltalk" ? "jeder Aspekt des Themas, Gegenfragen an den Partner, eigene Erfahrungen" : t.kind === "loesung" ? "jeder Stichpunkt der Aufgabe als eigener Punkt, dann Einigung / gemeinsame Lösung" : t.kind === "praesentation" ? "Einleitung mit Gliederung, jeder Stichpunkt des Themas, eigene Meinung, Schluss" : "Einleitung, Vorteile, Nachteile, eigene Meinung, Schluss"}; "status" ist "ja", "teilweise" oder "nein".
 - "original" muss wörtlich und exakt im Text des Lernenden vorkommen (1–6 Wörter), "korrektur" ist die korrigierte Form desselben Ausschnitts.
 - "typ" ist eines von: Grammatik, Wortschatz, Rechtschreibung, Zeichensetzung, Stil.
 - Alle echten Fehler auflisten (höchstens 30), keine Geschmacksfragen.
@@ -1000,6 +1012,12 @@ const SP_REDE = {
 REDEMITTEL.praesentation = SP_REDE.sp1;
 WMAX.praesentation = { inhalt: 6, sprache: 6 };
 const PRAES_TASK = `Sprechen Teil 1 (DTB B2 Beruf): Präsentation zu einem Thema, ca. 2 Minuten (etwa 180–250 Wörter), danach 2 Minuten Fragen. Der Text wurde hier schriftlich vorbereitet. Erwartet werden: Einleitung mit Gliederung, Hauptteil mit allen Stichpunkten und konkreten Beispielen, eigene Meinung, Schluss (Zusammenfassung und Dank), einheitlicher, gut sprechbarer Stil (keine zu langen Schachtelsätze). Bewertet werden Inhalt und Sprache.`;
+const PRAES_TASK_SPOKEN = `Sprechen Teil 1A (DTB B2 Beruf): Präsentation zu einem Thema, ca. 2 Minuten frei gesprochen (etwa 180–250 Wörter). Erwartet werden: Einleitung mit Gliederung, Hauptteil mit allen Stichpunkten und konkreten Beispielen, eigene Meinung und Erfahrung, Schluss (Zusammenfassung und Dank). Bewertet werden Inhalt und Sprache.`;
+const SMALLTALK_TASK = `Sprechen Teil 2 (DTB B2 Beruf): Smalltalk mit einer Kollegin oder einem Kollegen, ca. 3 Minuten, lockerer Ton (du). Der Lernende spricht hier seinen eigenen Teil des Gesprächs als zusammenhängenden Beitrag: auf die Aspekte des Themas eingehen, von eigenen Erfahrungen erzählen, Gegenfragen stellen, das Gespräch freundlich am Laufen halten.`;
+const LOESUNG_TASK = `Sprechen Teil 3 (DTB B2 Beruf): gemeinsam mit einer Kollegin eine Lösung für ein Problem am Arbeitsplatz finden, ca. 4 Minuten, du-Form. Der Lernende spricht hier seinen eigenen Teil: zu jedem Stichpunkt einen konkreten Vorschlag mit Begründung, Reaktion auf mögliche Einwände (zustimmen, nachfragen, höflich widersprechen), kurzfristige und langfristige Maßnahmen, am Ende ein Vorschlag zur Einigung.`;
+const SPOKEN_NOTE = `Wichtig: Der Text wurde frei gesprochen und vom Browser automatisch in Text umgewandelt (Spracherkennung). Ignoriere fehlende oder falsche Zeichensetzung, Groß- und Kleinschreibung und offensichtliche Erkennungsfehler (ähnlich klingende Wörter) und liste sie nicht als Fehler auf (keine Fehler vom Typ Rechtschreibung oder Zeichensetzung). Bewerte die gesprochene Sprache: Aufgabenerfüllung, Grammatik, Wortschatz, Satzbau, Redemittel, Kohärenz. "verbesserter_text" ist eine korrigierte, gut sprechbare Fassung auf B2-Niveau mit Satzzeichen.`;
+REDEMITTEL.smalltalk = SP_REDE.sp2; REDEMITTEL.loesung = SP_REDE.sp3;
+WMAX.smalltalk = { inhalt: 4, sprache: 4 }; WMAX.loesung = { inhalt: 5, sprache: 5 };
 
 const PRAXIS = { sp1: "Teil 1", sp2: "Teil 2", sp3: "Teil 3" };
 // model dialogue / monologue with audio (neural recording when available) and a readable transcript
@@ -1014,7 +1032,8 @@ function modelBlock(segs, title, hint) {
 function chatPartner(cfg) {
   const turns = [];
   const chat = h("div", { class: "chat" });
-  const box = h("textarea", { class: "in", id: "sp-in-" + cfg.id, rows: 3, placeholder: "Schreiben Sie Ihre Antwort auf Deutsch…" });
+  const box = h("textarea", { class: "in", id: "sp-in-" + cfg.id, rows: 3, lang: "de", placeholder: "Sagen oder schreiben Sie Ihre Antwort auf Deutsch…" });
+  const mic = dictation(box, { compact: true });
   const fb = h("div", { class: "stack" });
   const autoSpeak = h("input", { type: "checkbox", id: "sp-voice-" + cfg.id, checked: store.get("spVoice", true) });
   autoSpeak.onchange = () => store.set("spVoice", autoSpeak.checked);
@@ -1031,7 +1050,7 @@ function chatPartner(cfg) {
     sendBtn.disabled = false;
   }
   const startBtn = aiButton(cfg.startLabel, () => { first = cfg.rules() + "\n" + cfg.start; startBtn.hidden = true; partner(); });
-  const sendBtn = h("button", { class: "btn primary", onclick: () => { const v = box.value.trim(); if (!v || !first) return; bubble("me", v); turns.push({ role: "user", content: v }); box.value = ""; partner(); } }, "Отправить");
+  const sendBtn = h("button", { class: "btn primary", onclick: () => { mic.stop(); const v = box.value.trim(); if (!v || !first) return; bubble("me", v); turns.push({ role: "user", content: v }); box.value = ""; partner(); } }, "Отправить");
   box.addEventListener("keydown", (e) => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) sendBtn.click(); });
   const rateBtn = aiButton("Оценить мой разговор", async () => {
     const mine = turns.filter(t => t.role === "user").map(t => t.content);
@@ -1051,10 +1070,9 @@ function chatPartner(cfg) {
   }, "");
   const el = h("div", { class: "card stack" }, h("div", { class: "spread" }, h("h3", null, cfg.title), h("label", { class: "row small", for: "sp-voice-" + cfg.id }, autoSpeak, "озвучивать ответы")),
     noAiNote("Разговор с ИИ здесь недоступен. Потренируйтесь вслух по пунктам и Redemittel и сравните с образцом."),
-    startBtn, chat, h("div", { class: "stack", "data-ai": "", hidden: !SAMPLE }, box, h("div", { class: "row" }, sendBtn, rateBtn, h("span", { class: "small muted" }, "Ctrl+Enter — отправить"))), fb);
+    startBtn, chat, h("div", { class: "stack", "data-ai": "", hidden: !SAMPLE }, mic.el, box, h("div", { class: "row" }, sendBtn, rateBtn, h("span", { class: "small muted" }, "Ctrl+Enter — отправить"))), fb);
   return el;
 }
-const rmCard = (key) => h("div", { class: "card sticky stack" }, h("div", { class: "eyebrow" }, "Redemittel"), SP_REDE[key].map((g, i) => h("details", { class: "rm", open: i < 2 }, h("summary", null, g.h), h("ul", null, g.items.map(s => h("li", null, s))))));
 const RULES_COMMON = "Antworte immer nur auf Deutsch, in 2–4 kurzen Sätzen, natürlich gesprochen auf B2-Niveau. Keine Korrekturen, keine Erklärungen, keine Aufzählungen, nur das Gespräch.";
 
 // strip in the style of the "Aufgabenblätter" of the oral exam (pair exam, about 16 minutes, no preparation time)
@@ -1068,41 +1086,51 @@ const spHead = (k) => h("div", { class: "sp-head" }, h("span", { class: "sp-ico"
     SP_HEAD[k].map(([t, d, m]) => h("div", { class: "sp-p" }, h("b", null, t), " " + T(d), m ? h("span", null, ` (${T(m)})`) : null))));
 function rSprechen3(it) {
   const m = modelBlock(it.model, "Образец диалога", "A — это вы, B — ваш партнёр. Это один из возможных вариантов: берите структуру и фразы, но говорите своими словами.");
+  // first the learner speaks their own part (free check or AI check), then can train the dialogue with the AI partner
+  const speak = writeTask({
+    id: "w-" + it.id, kind: "loesung", speak: true, title: "Teil 3 · " + T("Ситуация") + " " + it.n, minutes: 4, target: [100, 220], conn: 4,
+    taskEl: h("div", { class: "stack" }, h("p", { class: "qt", style: "margin:0" }, it.text), h("div", { class: "eyebrow" }, T("Эти пункты помогут вам")), h("ul", { style: "margin:0;padding-left:20px" }, it.points.map(p => h("li", null, p))),
+      h("p", { class: "small muted", style: "margin:0" }, "Скажите свою часть разговора: предложение по каждому пункту, причину, ответ на возможное возражение и в конце предложение договориться. Ниже можно потренировать диалог с ИИ-партнёром."),
+      h("div", { class: "row" }, m.btn)),
+    context: `Situation: ${it.text}\nStichpunkte: ${it.points.join("; ")}`,
+    points: it.points, modelText: spModel(it.model, "A"),
+  });
   const chat = chatPartner({
     id: it.id, title: "Разговор с партнёром (ИИ)", partnerName: "Партнёр (ИИ)", startLabel: "Начать разговор", max: 10,
     rules: () => `Wir üben die mündliche Prüfung telc DTB B2 Beruf, Teil 3 ("Gemeinsam eine Lösung finden"). Du bist meine Gesprächspartnerin, eine freundliche Kollegin. Situation: ${it.text}\nStichpunkte: ${it.points.join("; ")}\nRegeln: ${RULES_COMMON} Mach eigene konkrete Vorschläge, reagiere auf meine Ideen (zustimmen, nachfragen oder höflich widersprechen) und bringe das Gespräch Schritt für Schritt zu einer gemeinsamen Lösung, sodass alle Stichpunkte besprochen werden. Wenn wir uns einigen, bestätige das kurz.`,
     start: "Beginne du das Gespräch: Begrüße mich kurz, beschreibe das Problem in 2 Sätzen und frage mich, was wir tun sollen.",
     rateIntro: `Bewerte meine Beiträge in einem Übungsgespräch für telc DTB B2 Beruf, Sprechen Teil 3 (gemeinsam Lösungen finden, 10 Punkte). Situation: ${it.text}. Stichpunkte: ${it.points.join("; ")}. Kriterien: alle Stichpunkte behandelt, eigene Vorschläge, auf die Partnerin eingehen, Einigung erzielen, Sprache.`,
   });
-  return h("div", { class: "stack" }, spHead("sp3"), h("div", { class: "two" },
-    h("div", { class: "stack" },
-      h("div", { class: "card stack" }, h("div", { class: "eyebrow" }, T("Ситуация") + " " + it.n), h("p", { class: "qt", style: "margin:0" }, it.text), h("div", { class: "eyebrow" }, T("Эти пункты помогут вам")), h("ul", { style: "margin:0;padding-left:20px" }, it.points.map(p => h("li", null, p))),
-        h("div", { class: "row" }, m.btn)), m.box, chat),
-    rmCard("sp3")));
+  return h("div", { class: "stack" }, spHead("sp3"), speak, m.box, chat);
 }
 
 function rSprechen2(it) {
   const m = modelBlock(it.model, "Образец разговора", "A — это вы, B — собеседник. Берите фразы и структуру, а ответы делайте про себя.");
+  const speak = writeTask({
+    id: "w-" + it.id, kind: "smalltalk", speak: true, title: "Teil 2 · " + it.title, minutes: 3, target: [80, 180], conn: 3,
+    taskEl: h("div", { class: "stack" }, h("p", { class: "qt", style: "margin:0" }, it.situation), h("ul", { style: "margin:0;padding-left:20px" }, it.points.map(p => h("li", null, p))),
+      h("p", { class: "small muted", style: "margin:0" }, "Скажите свою часть разговора: ответьте на каждый пункт, расскажите о своём опыте и задайте собеседнику 1–2 встречных вопроса. Ниже можно поговорить с ИИ-собеседником."),
+      h("div", { class: "row" }, m.btn)),
+    context: `Thema: ${it.title}\nSituation: ${it.situation}\nAspekte: ${it.points.join("; ")}`,
+    points: it.points, modelText: spModel(it.model, "A"),
+  });
   const chat = chatPartner({
     id: it.id, title: "Разговор с собеседником (ИИ)", partnerName: "Собеседник (ИИ)", startLabel: "Начать разговор", max: 8,
     rules: () => `Wir üben die mündliche Prüfung telc DTB B2 Beruf, Teil 2 (Smalltalk, ca. 3 Minuten, entspannte Alltagsunterhaltung unter Kollegen). Du bist mein Gesprächspartner / meine Gesprächspartnerin. Thema: ${it.title}. Situation: ${it.situation}\nMögliche Aspekte: ${it.points.join("; ")}\nRegeln: ${RULES_COMMON} Stelle immer wieder eine kurze Frage zu meiner Antwort, erzähle auch selbst etwas Kurzes über dich, bleib freundlich und locker.`,
     start: "Beginne du das Gespräch mit einem natürlichen Einstieg zum Thema.",
     rateIntro: `Bewerte meine Beiträge in einem Smalltalk-Übungsgespräch für telc DTB B2 Beruf, Sprechen Teil 2 (8 Punkte). Thema: ${it.title}. Kriterien: auf den Partner eingehen, Gespräch am Laufen halten, Fragen stellen, eigene Erfahrungen erzählen, Wortschatz und Grammatik.`,
   });
-  return h("div", { class: "stack" }, spHead("sp2"), h("div", { class: "two" },
-    h("div", { class: "stack" },
-      h("div", { class: "card stack" }, h("div", { class: "eyebrow" }, T("Тема") + " " + it.n + " · " + it.title), h("p", { class: "qt", style: "margin:0" }, it.situation), h("ul", { style: "margin:0;padding-left:20px" }, it.points.map(p => h("li", null, p))),
-        h("div", { class: "row" }, m.btn)), m.box, chat),
-    rmCard("sp2")));
+  return h("div", { class: "stack" }, spHead("sp2"), speak, m.box, chat);
 }
 
 function rSprechen1(it, mode, ctx) {
   const m = modelBlock(it.model, "Образец презентации", "Пример структуры: приветствие и план, основная часть с примерами, мнение, заключение. Ваш текст должен быть про вас.");
   const write = writeTask({
-    id: "w-" + it.id, kind: "praesentation", title: "Teil 1 · " + it.title, minutes: 6, target: [150, 260],
-    taskEl: h("div", { class: "stack" }, h("p", { style: "margin:0" }, "Подготовьте выступление на ~2 минуты (150–260 слов) по теме и этим пунктам. Потом прочитайте его вслух, на экзамене вы говорите свободно. ИИ проверит текст, затем задаст вопросы, как экзаменатор."),
+    id: "w-" + it.id, kind: "praesentation", speak: true, title: "Teil 1 · " + it.title, minutes: 2, target: [150, 260], conn: 5,
+    taskEl: h("div", { class: "stack" }, h("p", { style: "margin:0" }, "Расскажите о теме примерно 2 минуты (150–260 слов) по этим пунктам. Нажмите «Говорить» и говорите свободно, как на экзамене: речь превратится в текст. Потом проверьте ответ бесплатно или с ИИ, а ИИ-экзаменатор задаст вопросы."),
       h("ul", { style: "margin:0;padding-left:20px" }, it.points.map(p => h("li", null, p)))),
     context: `Thema: ${it.title}\nStichpunkte: ${it.points.join("; ")}`,
+    points: it.points, modelText: spModel(it.model),
     models: [it.model.map(s => s.t).join("\n\n")], modelNote: "Один из возможных вариантов. Ниже можно ещё послушать его.", onDone: ctx && ctx.onWriteDone,
   });
   const ta = () => (document.getElementById("ta-w-" + it.id) || {}).value || "";
@@ -1115,6 +1143,233 @@ function rSprechen1(it, mode, ctx) {
   const audio = h("div", { class: "stack" }, h("div", { class: "row" }, m.btn), m.box);
   return h("div", { class: "stack" }, spHead("sp1"), write, audio, qa);
 }
+/* ---------- Sprechen: speak the answer, the browser turns it into text (Web Speech API, de-DE) ----------
+   The recognition runs in the browser and its own service (Google in Chrome, Microsoft in Edge, Apple in Safari).
+   No audio is ever sent to our server: the page only receives the recognised text. Firefox has no SpeechRecognition,
+   so there the learner types the answer by hand. */
+const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+const SR_FATAL = { "not-allowed": 1, "service-not-allowed": 1, "audio-capture": 1, "network": 1, "language-not-supported": 1 };
+const SR_ERR = {
+  "not-allowed": "Доступ к микрофону запрещён. Разрешите микрофон для этого сайта (значок замка или микрофона в адресной строке) и нажмите кнопку ещё раз.",
+  "service-not-allowed": "Браузер не разрешил распознавание речи. На iPhone и Mac включите диктовку (Настройки → Клавиатура → Диктовка) или введите ответ вручную.",
+  "audio-capture": "Микрофон не найден. Подключите микрофон или закройте программу, которая его занимает.",
+  "network": "Распознавание речи сейчас не работает: нет связи с сервисом браузера. В Brave, Opera и некоторых других браузерах оно отключено. Откройте Chrome, Edge или Safari или введите ответ вручную.",
+  "no-speech": "Ничего не слышно. Говорите громче или ближе к микрофону.",
+  "language-not-supported": "Браузер не распознаёт немецкий язык. Откройте Chrome, Edge или Safari.",
+  other: "Распознавание остановилось с ошибкой. Нажмите на микрофон ещё раз или введите ответ вручную.",
+};
+const mmss = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+
+// Microphone bar for a textarea: press, speak German, the text is appended to the field and stays editable.
+// opts.onTime(seconds) gets the total time spoken into this field (used for words per minute); opts.compact hides the hint.
+function dictation(ta, opts = {}) {
+  const msg = h("div", { class: "note", hidden: true, role: "status" });
+  const say = (t, cls) => { msg.className = "note" + (cls ? " " + cls : ""); msg.textContent = t; msg.hidden = !t; };
+  if (!SpeechRec) {
+    return { el: h("div", { class: "note mic-off" }, "Этот браузер не умеет превращать речь в текст (например, Firefox). Откройте страницу в Chrome, Edge или Safari, а пока введите ответ вручную."), stop() {}, supported: false, seconds: () => 0 };
+  }
+  const android = /Android/i.test(navigator.userAgent);
+  const live = h("span", { class: "mic-live", "aria-live": "polite", lang: "de" });
+  const clock = h("span", { class: "mic-time mono" }, "0:00");
+  const label = h("span", null, "Говорить");
+  const btn = h("button", { type: "button", class: "btn primary mic", "aria-pressed": "false" }, h("span", { class: "mic-ico", "aria-hidden": "true" }), label);
+  let rec = null, want = false, total = 0, since = 0, tick = null, quick = 0, startedAt = 0;
+  const spoken = () => total + (since ? (Date.now() - since) / 1000 : 0);
+  const show = () => { clock.textContent = mmss(spoken()); };
+  const append = (piece) => {
+    piece = piece.replace(/\s+/g, " ").trim();
+    if (!piece) return;
+    const v = ta.value, sep = !v || /\s$/.test(v) ? "" : " ";
+    if (!v.trim() || /[.!?]\s*$/.test(v)) piece = piece[0].toUpperCase() + piece.slice(1);
+    ta.value = v + sep + piece;
+    ta.dispatchEvent(new Event("input", { bubbles: true }));
+    ta.scrollTop = ta.scrollHeight;
+  };
+  const setUi = (on) => {
+    btn.classList.toggle("on", on); btn.setAttribute("aria-pressed", on ? "true" : "false");
+    label.textContent = on ? "Стоп" : "Говорить";
+    if (!on) live.textContent = "";
+  };
+  const finish = () => {
+    if (since) { total += (Date.now() - since) / 1000; since = 0; }
+    clearInterval(tick); tick = null; show(); setUi(false);
+    opts.onTime && opts.onTime(total);
+  };
+  const begin = () => {
+    rec = new SpeechRec();
+    rec.lang = "de-DE";
+    rec.interimResults = true;
+    rec.maxAlternatives = 1;
+    rec.continuous = !android; // Android Chrome repeats phrases in continuous mode: restart after each phrase instead
+    rec.onresult = (e) => {
+      let interim = "";
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const r = e.results[i];
+        if (r.isFinal) append(r[0].transcript); else interim += r[0].transcript;
+      }
+      live.textContent = interim;
+    };
+    rec.onerror = (e) => {
+      if (e.error === "aborted") return;
+      say(SR_ERR[e.error] || SR_ERR.other, e.error === "no-speech" ? "info" : "");
+      if (SR_FATAL[e.error]) want = false;
+    };
+    rec.onend = () => {
+      live.textContent = "";
+      // Chrome ends a session after a pause; keep listening until the learner presses Stop
+      if (want && document.body.contains(btn)) {
+        quick = Date.now() - startedAt < 1500 ? quick + 1 : 0;
+        if (quick < 4) { try { startedAt = Date.now(); rec.start(); return; } catch {} }
+      }
+      want = false; finish();
+    };
+    startedAt = Date.now();
+    rec.start();
+  };
+  const start = () => {
+    say("");
+    if (window.speechSynthesis) speechSynthesis.cancel(); // do not record the page's own voice
+    want = true; quick = 0;
+    try { begin(); } catch { want = false; say(SR_ERR.other); return; }
+    since = Date.now(); setUi(true);
+    tick = setInterval(() => { if (!document.body.contains(btn)) { stop(); return; } show(); }, 500);
+  };
+  const stop = () => { want = false; if (rec) { try { rec.stop(); } catch { finish(); } } else finish(); };
+  btn.onclick = () => (want ? stop() : start());
+  const el = h("div", { class: "stack mic-box" },
+    h("div", { class: "row mic-row" }, btn, clock, live),
+    opts.compact ? null : h("p", { class: "small muted", style: "margin:0" }, "Нажмите «Говорить» и отвечайте по-немецки. Текст появится в поле, его можно исправить. Знаки препинания браузер почти не ставит. Аудио на наш сервер не отправляется: речь распознаёт сам браузер."),
+    msg);
+  return { el, stop, supported: true, seconds: spoken };
+}
+
+/* ---------- free check without AI: rules on the transcribed answer ---------- */
+const SP_STOP = new Set(("aber alle allem allen aller alles als also am an andere anderen auch auf aus bei beim bin bis bist bitte da dabei dafuer damit dann darauf darueber das dass dein deine dem den denn der des dich die dies diese diesem diesen dieser dieses dir doch dort du durch ein eine einem einen einer eines er es etwas euch euer fuer gab gibt ganz gar gern gerne gewesen hab habe haben hast hat hatte hatten hier ich ihm ihn ihnen ihr ihre ihrem ihren ihrer im immer in ins ist ja jetzt kann kannst koennen koennte kein keine man mehr mein meine meinem meinen meiner mich mir mit muss muessen nach nicht nichts noch nun nur ob oder ohne schon sehr sein seine sich sie sind so soll sollen sollte sondern ueber um und uns unser unsere unter viel viele vom von vor war waren was weil wenn wer werde werden wie wieder will wir wird wo wollen wuerde wuerden zu zum zur zwar sieht macht machen gemacht geht gehen kommt finden finde sagen gut neue neuen neues erste ersten welche welcher welches woher wohin wann warum").split(" "));
+const SP_CONN = ["weil", "da", "denn", "dass", "obwohl", "trotzdem", "deshalb", "deswegen", "darum", "daher", "ausserdem", "zudem", "sodass", "so dass", "damit", "wenn", "falls", "als", "waehrend", "bevor", "nachdem", "sobald", "seitdem", "einerseits", "andererseits", "zum beispiel", "zuerst", "zunaechst", "danach", "anschliessend", "schliesslich", "zum schluss", "allerdings", "jedoch", "sondern", "ob", "statt", "ansonsten", "sonst", "dennoch", "erstens", "zweitens"];
+const SP_SUB = new Set(["weil", "da", "dass", "obwohl", "sodass", "so dass", "damit", "wenn", "falls", "als", "waehrend", "bevor", "nachdem", "sobald", "seitdem", "ob"]);
+const SP_SYN = { gut: "toll, sinnvoll, hilfreich, gelungen", machen: "erledigen, organisieren, durchführen", sagen: "erklären, betonen, erwähnen", sehr: "besonders, wirklich, ziemlich", wichtig: "entscheidend, wesentlich", viel: "zahlreiche, eine Menge", problem: "Schwierigkeit, Herausforderung", schoen: "angenehm, toll, gelungen", finde: "meine, halte … für, bin der Meinung", denke: "meine, glaube, bin überzeugt" };
+// Each rule: pattern on the original text (case kept), a short Russian hint (translated by the language pass) and a German example
+const SP_RULES = [
+  { rx: /\b(?:habe|hast|hat|haben|habt)\b(?:\s+(?!bin\b|ist\b|sind\b)\S+){0,5}?\s+(?:gegangen|gekommen|geflogen|geblieben|gewesen|geworden|passiert|aufgestanden|umgezogen|gelaufen|angekommen|eingeschlafen|aufgewacht|eingestiegen|ausgestiegen|gestorben)\b/gi,
+    hint: "Глаголы движения и изменения состояния образуют Perfekt с sein.", ex: "Ich bin gegangen. Es ist passiert." },
+  { rx: /\b(?:weil|dass|obwohl|wenn|damit|nachdem|bevor|ob)\s+(?:ich|du|er|sie|es|wir|ihr|man)\s+(?:bin|bist|ist|sind|seid|habe|hast|hat|haben|habt|kann|kannst|können|muss|musst|müssen|will|willst|wollen|möchte|möchten|werde|wird|werden|gehe|geht|arbeite|arbeitet|mache|macht|finde|findet|denke|glaube|weiß)(?=[\s,.!?]+\S)/gi,
+    hint: "В придаточном предложении (weil, dass, obwohl, wenn …) спрягаемый глагол стоит в конце.", ex: "…, weil ich müde bin. …, dass wir mehr Zeit haben." },
+  { rx: /\b(?:möchte|möchten|kann|können|muss|müssen|will|wollen|soll|sollen|darf|dürfen)\s+(?:\S+\s+){0,3}?zu\s+(?!(?:ihnen|einen|meinen|deinen|seinen|unseren|ihren|den|denen|diesen|allen|vielen|anderen|guten|beiden|jeden|welchen|keinen)\b)[a-zäöüß]+en\b/g,
+    hint: "После модальных глаголов инфинитив идёт без zu.", ex: "Ich möchte das erklären. Wir müssen anrufen." },
+  { rx: /\bich\s+(?:freue|interessiere|ärgere|erinnere|kümmere|bewerbe|beschwere|entschuldige|melde|beeile|konzentriere)\s+(?:auf|für|über|an|um|bei|nicht|sehr|schon|gern|gerne)\b/gi,
+    hint: "Здесь нужен возвратный глагол: ich freue mich, ich interessiere mich.", ex: "Ich freue mich auf …, ich interessiere mich für …" },
+  { rx: /\bmehr\s+(?:besser|schneller|größer|einfacher|schöner|billiger|teurer|wichtiger|interessanter|leichter|schwieriger|länger|kürzer)\b/gi,
+    hint: "Сравнительная степень уже значит «больше»: mehr здесь не нужно.", ex: "besser, schneller" },
+  { rx: /\bin\s+(?:Internet|Moment|Büro|Lager|Team|Betrieb|Krankenhaus)\b/gi,
+    hint: "Здесь нужен артикль: in + dem = im (или ins).", ex: "im Internet, im Moment, im Büro" },
+  { rx: /\bfür\s+(?:\S+\s+)?Jahren\b/gi,
+    hint: "Для срока в прошлом говорят seit или vor: seit zwei Jahren, vor zwei Jahren.", ex: "Ich arbeite seit drei Jahren hier." },
+  { rx: /\bwenn\s+ich\s+(?:noch\s+)?(?:ein\s+)?(?:Kind|jung|klein|Schüler|Schülerin|Student|Studentin)\s+war\b/gi,
+    hint: "Об одном периоде в прошлом говорят als, а не wenn.", ex: "Als ich ein Kind war, …" },
+];
+const spWords = (s) => (norm(s).replace(/[^a-z0-9\s-]/g, " ").match(/[a-z0-9]+(?:-[a-z0-9]+)*/g) || []);
+const spStem = (w) => w.length <= 5 ? w : w.slice(0, Math.max(5, w.length - 3));
+// key words of a task point: content words of four letters or more, without question words
+const spKeys = (p) => [...new Set(spWords(p.replace(/\*innen\b/g, "").replace(/\*in\b/g, "")).filter(w => w.length >= 4 && !SP_STOP.has(w)))];
+function spHas(ans, w) { const st = spStem(w); return ans.some(a => a.startsWith(st) || (st.length >= 5 && a.includes(st))); }
+// the most telling part of a Redemittel phrase: its longest segment between "…" or commas, at most four words
+function rmCore(s) {
+  const segs = s.split(/…|\.\.\.|\/|,/).map(x => spWords(x)).filter(x => x.length);
+  if (!segs.length) return null;
+  const best = segs.sort((a, b) => b.length - a.length)[0].slice(0, 4);
+  return best.length >= 2 || (best[0] && best[0].length >= 7) ? best.join(" ") : null;
+}
+
+// the data of the free report; spReport() draws it. cfg: {points, rede, model, target:[lo,hi], seconds, conn}
+function spCheck(text, cfg) {
+  const ans = spWords(text), flat = " " + ans.join(" ") + " ";
+  const n = ans.length;
+  const points = (cfg.points || []).map(p => {
+    const keys = spKeys(p), hit = keys.filter(k => spHas(ans, k));
+    const st = !keys.length ? "warn" : hit.length / keys.length >= 0.5 ? "ok" : hit.length ? "warn" : "bad";
+    return { p, st };
+  });
+  const rede = (cfg.rede || []).map(g => {
+    const used = g.items.filter(s => { const c = rmCore(s); return c && flat.includes(" " + c + " "); });
+    return { h: g.h, used, sample: g.items[0] };
+  });
+  const conn = SP_CONN.filter(c => flat.includes(" " + c + " "));
+  const sub = conn.filter(c => SP_SUB.has(c));
+  const freq = {};
+  ans.forEach(w => { if ((w.length >= 4 && !SP_STOP.has(w)) || SP_SYN[w]) freq[w] = (freq[w] || 0) + 1; });
+  const reps = Object.entries(freq).filter(([w, c]) => c >= (SP_SYN[w] ? 3 : 4)).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  // no lookbehind here: older Safari cannot parse it, and a parse error would blank the whole page
+  const doubles = [...new Set([...text.matchAll(/(^|[^\p{L}])(\p{L}{2,})\s+\2(?![\p{L}])/giu)].map(m => (m[2] + " " + m[2]).toLowerCase()))].filter(s => !/^(die die|das das|sie sie)$/.test(s)).slice(0, 5);
+  const fillers = ans.filter(w => /^(aeh+m*|aehm|hm+|ehm|halt|irgendwie|sozusagen|quasi)$/.test(w)).length;
+  const errs = [];
+  for (const r of SP_RULES) {
+    r.rx.lastIndex = 0;
+    const found = [...text.matchAll(r.rx)].map(m => m[0].replace(/\s+/g, " ")).slice(0, 3);
+    if (found.length) errs.push({ found, hint: r.hint, ex: r.ex });
+  }
+  // words of the model answer that would help: long content words the learner did not use
+  const modelWords = [];
+  if (cfg.model) {
+    const seen = new Set();
+    for (const raw of cfg.model.match(/[\p{L}-]{6,}/gu) || []) {
+      const w = spWords(raw)[0];
+      if (!w || SP_STOP.has(w) || seen.has(spStem(w)) || spHas(ans, w)) continue;
+      seen.add(spStem(w)); modelWords.push(raw);
+      if (modelWords.length >= 10) break;
+    }
+  }
+  const [lo, hi] = cfg.target;
+  const connGoal = cfg.conn || 4;
+  const sPts = points.length ? points.reduce((s, x) => s + (x.st === "ok" ? 1 : x.st === "warn" ? 0.5 : 0), 0) / points.length : 1;
+  const sLen = Math.min(1, n / lo);
+  const sRede = rede.length ? rede.filter(g => g.used.length).length / rede.length : 1;
+  const sConn = Math.min(1, conn.length / connGoal);
+  const sErr = Math.max(0, 1 - errs.length * 0.25);
+  const score = Math.round(100 * (0.35 * sPts + 0.2 * sLen + 0.15 * sRede + 0.15 * sConn + 0.15 * sErr));
+  const wpm = cfg.seconds >= 15 ? Math.round(n / (cfg.seconds / 60)) : 0;
+  return { n, lo, hi, points, rede, conn, sub, connGoal, reps, doubles, fillers, errs, modelWords, score, wpm, seconds: cfg.seconds || 0 };
+}
+
+function spReport(d) {
+  const chip = (st, t) => h("span", { class: "chip " + st }, t);
+  const row = (st, mark, ...kids) => h("div", { class: "err sp-row" }, h("div", { class: "sp-line" }, chip(st, mark), h("div", { class: "grow" }, kids)));
+  const lenSt = d.n < d.lo * 0.6 ? "bad" : d.n < d.lo || d.n > d.hi + 60 ? "warn" : "ok";
+  const sec = (title, ...kids) => h("div", { class: "stack" }, h("div", { class: "eyebrow" }, title), kids);
+  const verdict = d.score >= 75 ? ["ok", "Хороший ответ"] : d.score >= 50 ? ["warn", "Можно лучше"] : ["bad", "Нужно доработать"];
+  return h("div", { class: "card stack sp-report" },
+    h("div", { class: "spread" }, h("h2", null, "Бесплатная проверка"), h("span", { class: "chip" }, "без ИИ · ориентировочно")),
+    h("div", { class: "result" }, h("span", { class: "big" }, d.score + "%"), chip(verdict[0], verdict[1]),
+      h("span", { class: "small muted", style: "flex:1;min-width:200px" }, "Проверка по правилам: пункты задания, Redemittel, связки, длина, повторы и типичные ошибки. Всю грамматику она не проверяет: это делает ИИ.")),
+    sec("Длина ответа",
+      h("div", { class: "errlist" },
+        row(lenSt, lenSt === "ok" ? "✓" : "!", h("b", null, String(d.n)), " ", h("span", null, "слов"), " · ", h("span", null, "цель"), " " + d.lo + "–" + d.hi),
+        d.wpm ? row(d.wpm >= 70 && d.wpm <= 170 ? "ok" : "warn", "⏱", h("span", null, "Время речи"), " " + mmss(d.seconds) + " · " + d.wpm + " ", h("span", null, "слов в минуту"),
+          d.wpm < 70 ? h("div", { class: "small muted" }, "Говорите свободнее: длинные паузы на экзамене стоят баллов.") : null) : null)),
+    d.points.length ? sec("Пункты задания (по ключевым словам)",
+      h("div", { class: "errlist" }, d.points.map(x => row(x.st, x.st === "ok" ? "✓" : x.st === "warn" ? "~" : "✗", h("span", { lang: "de" }, x.p),
+        x.st === "bad" ? h("div", { class: "small muted" }, "Этого пункта нет в ответе. Скажите о нём хотя бы 1–2 предложения.") : null)))) : null,
+    d.rede.length ? sec("Redemittel",
+      h("div", { class: "errlist" }, d.rede.map(g => g.used.length
+        ? row("ok", "✓", h("b", null, g.h), h("div", { class: "small", lang: "de" }, g.used.join(" · ")))
+        : row("warn", "–", h("b", null, g.h), h("div", { class: "small muted" }, h("span", null, "Попробуйте, например:"), " ", h("span", { lang: "de" }, g.sample)))))) : null,
+    sec("Связки и придаточные",
+      h("div", { class: "errlist" }, row(d.conn.length >= d.connGoal ? "ok" : "warn", String(d.conn.length),
+        d.conn.length ? h("span", { lang: "de" }, d.conn.join(", ")) : h("span", null, "Связок пока нет."),
+        d.sub.length ? null : h("div", { class: "small muted" }, "Добавьте придаточные: weil, dass, obwohl, wenn. Это признак уровня B2."),
+        d.conn.length < d.connGoal ? h("div", { class: "small muted" }, h("span", null, "Цель для B2:"), " " + d.connGoal + "+") : null))),
+    d.errs.length ? sec("Возможные ошибки (проверьте)",
+      h("div", { class: "errlist" }, d.errs.map(e => h("div", { class: "err" }, h("span", { lang: "de" }, h("s", null, e.found.join(" · "))), h("span", { class: "small" }, e.hint), h("span", { class: "small muted", lang: "de" }, "→ " + e.ex))))) : null,
+    d.reps.length || d.doubles.length || d.fillers ? sec("Повторы",
+      h("div", { class: "errlist" },
+        d.reps.map(([w, c]) => row("warn", "×" + c, h("b", { lang: "de" }, w), SP_SYN[w] ? h("div", { class: "small muted" }, h("span", null, "Синонимы:"), " ", h("span", { lang: "de" }, SP_SYN[w])) : null)),
+        d.doubles.length ? row("warn", "2×", h("span", null, "Слово дважды подряд:"), " ", h("span", { lang: "de" }, d.doubles.join(", "))) : null,
+        d.fillers ? row("warn", "äh", h("span", null, "Слова-паразиты:"), " " + d.fillers) : null)) : null,
+    d.modelWords.length ? sec("Слова из образца, которые пригодятся",
+      h("div", { class: "row sp-words", lang: "de" }, d.modelWords.map(w => h("span", { class: "chip" }, w)))) : null);
+}
+
+// the model answer as plain text: the whole monologue (Teil 1) or the lines of speaker A (Teil 2 and 3)
+const spModel = (model, who) => (model || []).filter(s => !who || s.who === who).map(s => s.t).join(" ");
 
 /* ---------- «Учить наизусть»: all texts to learn in one place ---------- */
 const SRC_FILE = () => null;
@@ -1197,12 +1452,12 @@ function viewLearn() {
     letters, forum, notes, rede, sp1, sp2, sp3);
 }
 
-/* ---------- interface language: RU (default) / EN / DE / FR / TR / AR / IT ----------
+/* ---------- interface language: RU (default) / EN / DE / FR / TR / AR / IT / UK ----------
    The Russian strings stay in the source. A DOM pass swaps text and attributes for the chosen language,
    so every page, dynamic message and tooltip follows the switch without touching each renderer. */
-const LANGS = { ru: "RU", en: "EN", de: "DE", fr: "FR", tr: "TR", ar: "AR", it: "IT" };
-const LANG_IDX = { en: 0, de: 1, fr: 2, tr: 3, ar: 4, it: 5 };
-const LANG_TITLE = { ru: "Русский", en: "English", de: "Deutsch", fr: "Français", tr: "Türkçe", ar: "العربية", it: "Italiano" };
+const LANGS = { ru: "RU", en: "EN", de: "DE", fr: "FR", tr: "TR", ar: "AR", it: "IT", uk: "UK" };
+const LANG_IDX = { en: 0, de: 1, fr: 2, tr: 3, ar: 4, it: 5, uk: 6 };
+const LANG_TITLE = { ru: "Русский", en: "English", de: "Deutsch", fr: "Français", tr: "Türkçe", ar: "العربية", it: "Italiano", uk: "Українська" };
 const CYR = /[А-Яа-яЁё]/;
 const PREFIX_KEYS = ["Ошибка озвучки:", "Неверно · правильно:", "Нет ответа · правильно:", "Правильно:", "Ответ:", "Уровень текста:", "Уровень:", "Правильная записка ·", "Чаще всего ошибки в заданиях №", "Ошибки в №"];
 const RULES = I18N_RULES.map(([rx, t]) => [new RegExp(rx), t]);
@@ -1276,10 +1531,13 @@ function initLang() {
   });
   const top = document.querySelector(".top-in");
   if (top && !top.querySelector(".langsw")) {
-    const sw = h("div", { class: "seg langsw", role: "group", "aria-label": "Language" });
-    const paint = () => sw.querySelectorAll("button").forEach((b) => b.classList.toggle("on", b.dataset.l === curLang()));
-    Object.entries(LANGS).forEach(([k, v]) => sw.append(h("button", { "data-l": k, title: LANG_TITLE[k], onclick: () => { store.set("lang", k); paint(); render(); applyLang(document.body); } }, v)));
-    paint(); top.append(sw);
+    // compact language control: the closed state shows only the code (DE, UK, …), the native list shows full names
+    const code = h("span", { class: "langsw-code", "aria-hidden": "true" }, LANGS[curLang()] || "DE");
+    const sel = h("select", { class: "langsel", "aria-label": "Language / Sprache / Мова / Язык", title: "Language / Sprache / Мова / Язык",
+      onchange: (e) => { store.set("lang", e.target.value); code.textContent = LANGS[e.target.value]; render(); applyLang(document.body); } },
+      Object.entries(LANGS).map(([k, v]) => h("option", { value: k, "data-l": k }, LANG_TITLE[k])));
+    sel.value = curLang();
+    top.append(h("label", { class: "langsw", translate: "no" }, h("span", { class: "langsw-ico", "aria-hidden": "true" }, "🌐"), code, sel));
   }
   applyLang(document.body);
 }
@@ -1287,7 +1545,7 @@ function initLang() {
 /* ---------- optional cloud sync of progress (Firebase Auth + Firestore over REST, no SDK, no own server) ----------
    Called from: e_main.js (viewProfile submit -> cloudConnect, boot -> cloudBoot, updateWho -> cloudOn) and build_web.py (concat before e_main.js).
    Reads/writes: localStorage keys dtb.{res,wrong,nstat,days,drafts,feedback,cand,log} + dtb.cloud (session), dtb.syncts; Firestore doc users/{uid} = {data: JSON string, updated: ms}.
-   The web apiKey is public by design; access is protected by Firestore rules (uid == doc id). Without a password everything stays local. */
+   The web apiKey is public by design; access is protected by Firestore rules (uid == doc id). Sign-up is by e-mail + password; the trainer opens after the teacher approves the account (cloudAccess). */
 const FB = { key: "AIzaSyA5_PmCPlHg-9P1OD9LQFHXXF4Svj6Vajo", project: "prufung-6e9b1" };
 const SYNC_KEYS = ["res", "wrong", "nstat", "days", "drafts", "feedback", "cand", "log"];
 const cloud = { s: store.get("cloud", null), timer: null, state: "" };
@@ -1368,36 +1626,135 @@ function cloudSoon() {
 }
 store.onSet = (k) => { if (cloud.s && SYNC_KEYS.includes(k)) { store.set("syncts", Date.now() - 1); cloudSoon(); } };
 
-// sign in (or create the account on first use), then merge cloud progress with this device and upload the result
-async function cloudConnect(c, password) {
-  const email = await fbMail(c);
-  let a;
+const fbReq = (op, body) => fbApi(`https://identitytoolkit.googleapis.com/v1/accounts:${op}?key=${FB.key}`,
+  { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+const NOT_FOUND = /EMAIL_NOT_FOUND|INVALID_LOGIN_CREDENTIALS|INVALID_PASSWORD|USER_NOT_FOUND/;
+
+// sign in with the student's own e-mail (or create the account on first use and send the confirmation letter),
+// then merge cloud progress with this device and upload the result.
+// Accounts made before the e-mail sign-up used a synthetic address from name + birth date: they still open,
+// and get the real e-mail attached so the next sign-in works by e-mail.
+async function cloudConnect(c, password, opt) {
+  const login = !!(opt && opt.login); // "Вход": never create a new account
+  const email = String(c.email || "").trim().toLowerCase();
+  let a, created = false, legacy = false;
   try { a = await fbAuth("signInWithPassword", email, password); }
   catch (e) {
-    if (!/EMAIL_NOT_FOUND|INVALID_LOGIN_CREDENTIALS|USER_NOT_FOUND/.test(e.msg)) throw e;
-    try { a = await fbAuth("signUp", email, password); }
-    catch (e2) { if (/EMAIL_EXISTS/.test(e2.msg)) throw Object.assign(new Error("PW"), { msg: "PW" }); throw e2; }
+    if (!NOT_FOUND.test(e.msg)) throw e;
+    if (c.fam && c.vor) {
+      try {
+        a = await fbAuth("signInWithPassword", await fbMail(c), password);
+        legacy = true;
+      } catch (e1) { if (!NOT_FOUND.test(e1.msg)) throw e1; a = null; }
+    }
+    if (!a && login) throw Object.assign(new Error("NOACC"), { msg: "NOACC" });
+    if (!a) {
+      try { a = await fbAuth("signUp", email, password); created = true; }
+      catch (e2) { if (/EMAIL_EXISTS/.test(e2.msg)) throw Object.assign(new Error("PW"), { msg: "PW" }); throw e2; }
+    }
   }
   cloud.s = { uid: a.localId, refresh: a.refreshToken, email };
   cloud.id = a.idToken; cloud.exp = Date.now() + (+a.expiresIn || 3600) * 1000;
   store.set("cloud", cloud.s);
+  // an old account (opened by name + password): the server attaches the real e-mail, so the next sign-in works by e-mail
+  if (legacy) {
+    try { await fetch("/api/link-email", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + a.idToken }, body: JSON.stringify({ email }) }); } catch {}
+  }
+  // confirmation letter; its link leads back to the waiting screen with the WhatsApp request and the prices
+  if (created) {
+    const send = extra => fbReq("sendOobCode", { requestType: "VERIFY_EMAIL", idToken: a.idToken, ...extra });
+    try { await send({ continueUrl: location.origin + "/#home" }); store.set("mailsent", email); }
+    catch { try { await send({}); store.set("mailsent", email); } catch {} } // the domain may be missing in Firebase "Authorized domains"
+  }
   await cloudPull();
   await cloudPush();
   cloud.state = "ok";
+  await cloudAccess();
+  cloudWatch(() => { if (typeof render === "function") render(); });
+}
+// organizer: ask for a new group (the main teacher approves it in /admin) -> {code, name, status}
+async function cloudGroupRequest(name, email) {
+  const r = await fetch("/api/group-request", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + await fbToken() }, body: JSON.stringify({ name, email }) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || !j.group) throw new Error(j.message || "Не удалось создать группу.");
+  return j.group;
+}
+async function cloudResetPw(email) { await fbReq("sendOobCode", { requestType: "PASSWORD_RESET", email }); }
+
+// access to the trainer: only after the teacher approved the account in /admin (server checks Firestore `verified`)
+cloud.ok = store.get("approved", false) === true; cloud.contact = store.get("contact", ""); cloud.pay = store.get("pay", "");
+cloud.sub = store.get("sub", null); cloud.expired = false;
+// a paid month or a trial that ran out closes the trainer at once, even offline or in a tab that stayed open
+function cloudTermOver() {
+  const t = cloud.sub;
+  if (!cloud.ok || !t || !(t.until > 0) || Date.now() < t.until) return false;
+  cloud.ok = false; cloud.expired = true; store.set("approved", false);
+  return true;
+}
+cloudTermOver();
+async function cloudAccess() {
+  if (!cloud.s) { cloud.ok = false; return false; }
+  try {
+    const r = await fetch("/api/access", { headers: { Authorization: "Bearer " + await fbToken() } });
+    const j = await r.json().catch(() => ({}));
+    if (j.contact) { cloud.contact = j.contact; store.set("contact", j.contact); }
+    if (typeof j.pay === "string") { cloud.pay = j.pay; store.set("pay", j.pay); }
+    if (j.verified === true || j.verified === false) {
+      cloud.ok = j.verified; store.set("approved", j.verified); cloud.expired = j.expired === true;
+      cloud.sub = j.sub || null; store.set("sub", cloud.sub);
+    }
+  } catch {} // offline: keep the last known answer (but a known end date still closes the trainer)
+  cloudTermOver();
+  cloud.checked = true;
+  cloud.lastCheck = Date.now();
+  return cloud.ok;
+}
+// keep asking the server while the page is open: the trainer closes when the trial or the month ends (and opens as
+// soon as the administrator confirms a payment) without reloading. onChange re-renders the page.
+const ACCESS_EVERY = 5 * 60 * 1000;
+function cloudWatch(onChange) {
+  if (cloud.watching) return;
+  cloud.watching = true;
+  let endTimer = null;
+  const recheck = async () => {
+    if (!cloud.s) return;
+    const was = cloud.ok;
+    await cloudAccess();
+    plan();
+    if (cloud.ok !== was) onChange();
+  };
+  // a timer exactly at the end of the term (setTimeout is limited to ~24 days; the periodic check covers the rest)
+  const plan = () => {
+    clearTimeout(endTimer);
+    const t = cloud.sub, left = t && t.until > 0 ? t.until - Date.now() : -1;
+    if (cloud.ok && left >= 0 && left < 2e9) endTimer = setTimeout(() => { if (cloudTermOver()) onChange(); recheck(); }, left + 1000);
+  };
+  plan();
+  setInterval(() => { if (document.visibilityState !== "hidden") recheck(); }, ACCESS_EVERY);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState !== "visible" || !cloud.s) return;
+    if (cloudTermOver()) onChange();
+    if (Date.now() - (cloud.lastCheck || 0) > 60 * 1000) recheck();
+  });
 }
 function cloudOff(wipe) {
   clearTimeout(cloud.timer);
   if (wipe) SYNC_KEYS.forEach(k => { try { localStorage.removeItem("dtb." + k); } catch {} });
   try { localStorage.removeItem("dtb.cloud"); localStorage.removeItem("dtb.syncts"); } catch {}
-  cloud.s = null; cloud.id = null;
+  try { localStorage.removeItem("dtb.approved"); localStorage.removeItem("dtb.sub"); } catch {}
+  cloud.s = null; cloud.id = null; cloud.ok = false; cloud.sub = null; cloud.expired = false;
 }
 function cloudBoot(then) {
   if (!cloud.s) return;
+  cloudAccess().then(() => { cloudWatch(() => then && then()); then && then(); });
   cloudPull().then(() => { cloud.state = "ok"; then && then(); return cloudPush(); }).catch(() => { cloud.state = "err"; });
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden" && cloud.s) cloudPush().catch(() => {}); });
 }
 function cloudErrText(e) {
-  if (e.msg === "PW") return "Falsches Kennwort für dieses Konto.";
+  if (e.msg === "NOACC") return "Неверный e-mail или пароль. Пароль можно восстановить кнопкой «Забыли пароль?». Если вы занимались раньше, до входа по e-mail, откройте «Регистрация» и введите те же фамилию, имя и пароль: старый прогресс найдётся, и e-mail привяжется к нему.";
+  if (e.msg === "PW") return "Falsches Kennwort für dieses Konto. Passwort vergessen? Klicken Sie unten auf „Kennwort zurücksetzen“.";
+  if (/INVALID_EMAIL/.test(e.msg || "")) return "Diese E-Mail-Adresse ist ungültig.";
+  if (/TOO_MANY_ATTEMPTS/.test(e.msg || "")) return "Zu viele Versuche. Bitte später noch einmal.";
   if (/WEAK_PASSWORD/.test(e.msg || "")) return "Das Kennwort ist zu kurz (mindestens 6 Zeichen).";
   if (/OPERATION_NOT_ALLOWED|CONFIGURATION_NOT_FOUND/.test(e.msg || "")) return "Anmeldung per E-Mail/Kennwort ist in Firebase noch nicht aktiviert. Die Daten bleiben vorerst nur auf diesem Gerät.";
   if (/PERMISSION_DENIED|Missing or insufficient/.test(e.msg || "")) return "Firestore-Regeln fehlen. Die Daten bleiben vorerst nur auf diesem Gerät.";
@@ -1932,6 +2289,7 @@ const NO_MODE = { f: 1, bw: 1, sp1: 1, sp2: 1, sp3: 1 };
 const vidOf = (sec, it) => sec === "bw" || sec === "sp1" ? "w-" + it.id : it.id || "w-F" + it.n;
 function bestOf(sec, it) {
   const ids = [vidOf(sec, it)];
+  if (sec === "sp2" || sec === "sp3") ids.push("w-" + it.id); // spoken answer checked by the AI (the chat rating keeps the plain id)
   let r = null;
   ids.forEach(id => { const x = resOf(id); if (x && x.max && (!r || x.best / x.max > r)) r = x.best / x.max; });
   return r;
@@ -2330,83 +2688,258 @@ function updateNav() {
 const LANG_CODES = [["001", "Deutsch"], ["002", "English"], ["003", "Français"], ["004", "Español"], ["005", "Italiano"], ["006", "Português"], ["007", "Magyar"],
   ["008", "Polski"], ["009", "Русский язык"], ["010", "Český jazyk"], ["011", "Türkçe"], ["012", "عربي"], ["013", "汉语"], ["000", "andere/other"]];
 // official German label plus its translation into the chosen interface language (none for German); Arabic is not on the printed form, so it is added here
-const L7_AR = { "männlich": "ذكر", "weiblich": "أنثى", "Testversion": "نسخة الاختبار", "Familienname": "اللقب", "Vorname": "الاسم الأول", "Geburtsdatum": "تاريخ الميلاد", "Geburtsort": "مكان الميلاد",
+const L7_AR = { "E-Mail *": "البريد الإلكتروني *", "Kennwort * (mindestens 6 Zeichen)": "كلمة المرور * (6 أحرف على الأقل)", "Kennwort (nur zum Wechseln des Kontos)": "كلمة المرور (لتغيير الحساب فقط)", "männlich": "ذكر", "weiblich": "أنثى", "Testversion": "نسخة الاختبار", "Familienname": "اللقب", "Vorname": "الاسم الأول", "Geburtsdatum": "تاريخ الميلاد", "Geburtsort": "مكان الميلاد",
   "Erstsprache": "اللغة الأولى", "Geschlecht": "الجنس", "Straße und Hausnummer": "الشارع ورقم المنزل", "Postleitzahl und Ort": "الرمز البريدي والمدينة", "Prüfungszentrum": "مركز الامتحان", "Prüfungsdatum": "تاريخ الامتحان" };
-const L7 = (de, en, fr, it, tr, ru) => { const t = { en, fr, it, tr, ru, ar: L7_AR[de] }[curLang()]; return t ? de + " · " + t : de; };
+// Ukrainian is not on the printed form either
+const L7_UK = { "Familienname": "Прізвище", "Vorname": "Ім'я", "männlich": "чоловіча", "weiblich": "жіноча", "Geburtsdatum": "Дата народження", "Geburtsort": "Місце народження",
+  "Erstsprache": "Рідна мова", "Geschlecht": "Стать", "Straße und Hausnummer": "Вулиця й будинок", "Postleitzahl und Ort": "Індекс і місто", "Prüfungszentrum": "Екзаменаційний центр", "Prüfungsdatum": "Дата іспиту" };
+const L7 = (de, en, fr, it, tr, ru) => { const t = { en, fr, it, tr, ru, ar: L7_AR[de], uk: L7_UK[de] }[curLang()]; return t ? de + " · " + t : de; };
+// sign-up / sign-in card (and the profile of a signed-in account). Required at sign-up: surname, first name, e-mail, phone, password, group.
+// The Antwortbogen fields (birth date, address, …) are optional and only used for the printed answer sheet.
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const phoneOk = v => /^\+?[\d\s().\/-]{6,24}$/.test(v) && v.replace(/\D/g, "").length >= 7;
+let regMode = "reg"; // "reg" (new account) | "login" (existing account)
 function viewProfile(first) {
   const c = cand();
   const dm = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.exec(c.geb || ""); // older entries were typed as TT.MM.JJJJ
   if (dm) c.geb = `${dm[3]}-${dm[2].padStart(2, "0")}-${dm[1].padStart(2, "0")}`;
-  const boxIn = (k, label, n, extra) => h("label", { class: "cv-row" }, h("input", { class: "boxin", name: k, value: c[k] || "", maxlength: n, autocomplete: "off", spellcheck: "false", style: `--n:${n}`, ...extra }), h("small", null, label));
-  const dateIn = (k, label) => h("label", { class: "cv-row" }, h("input", { class: "datein", type: "date", name: k, value: c[k] || "" }), h("small", null, label));
-  const lang = h("select", { class: "datein", name: "sprache" }, h("option", { value: "" }, "—"), LANG_CODES.map(([v, l]) => h("option", { value: v, selected: c.sprache === v }, `${v} - ${l}`)));
-  const sex = ["m", "w"].map(v => h("label", { class: "cv-sex" }, h("input", { type: "radio", name: "geschl", value: v, checked: c.geschl === v }),
-    v === "m" ? L7("männlich", "male", "masculin", "maschile", "erkek", "мужской") : L7("weiblich", "female", "féminin", "femminile", "kadın", "женский")));
-  const err = h("p", { class: "cv-err", hidden: true }, "Укажите фамилию и имя.");
-  const form = h("form", { class: "s30", autocomplete: "off" },
-    h("div", { class: "s30-top" }, h("span", { class: "s30-code" }, "1 0 1 3"), h("span", { class: "s30-bar", "aria-hidden": "true" })),
-    h("div", { class: "s30-title" }, "Deutsch-Test für den Beruf"),
-    h("div", { class: "s30-ver" }, h("span", { class: "boxes4" }), h("b", null, "-S10-"), h("span", { class: "boxes6" }), h("small", null, L7("Testversion", "Test Version", "Version d'examen", "Versione d'esame", "Sınav sürümü", "Тестовая версия"))),
-    h("div", { class: "s30-data" },
-      boxIn("fam", L7("Familienname", "Surname", "Nom", "Cognome", "Soyadı", "Фамилия"), 30, { required: true }),
-      boxIn("vor", L7("Vorname", "First Name", "Prénom", "Nome", "Adı", "Имя"), 30, { required: true }),
-      dateIn("geb", L7("Geburtsdatum", "Date of Birth", "Date de naissance", "Data di nascita", "Doğum tarihi", "Дата рождения")),
-      boxIn("gort", L7("Geburtsort", "Place of Birth", "Lieu de naissance", "Luogo di nascita", "Doğum yeri", "Место рождения"), 30),
-      h("label", { class: "cv-row" }, lang, h("small", null, L7("Erstsprache", "First Language", "Langue maternelle", "Madrelingua", "Anadili", "Родной язык"))),
-      h("div", { class: "cv-row" }, h("div", { class: "cv-sexes" }, sex), h("small", null, L7("Geschlecht", "Sex", "Sexe", "Sesso", "Cinsiyeti", "Пол"))),
-      boxIn("str", L7("Straße und Hausnummer", "Street and number", "Rue et numéro", "Via e numero civico", "Sokak ve numara", "Улица и дом"), 30),
-      boxIn("ort", L7("Postleitzahl und Ort", "Postcode and town", "Code postal et ville", "CAP e città", "Posta kodu ve şehir", "Индекс и город"), 30),
-      boxIn("zentrum", L7("Prüfungszentrum", "Examination Centre", "Centre d'examen", "Centro d'esame", "Sınav merkezi", "Экзаменационное учреждение"), 30),
-      dateIn("datum", L7("Prüfungsdatum", "Date of Examination", "Date d'examen", "Data dell'esame", "Sınav tarihi", "Дата экзамена"))),
-    h("label", { class: "cv-row" }, h("input", { class: "datein", type: "email", name: "email", value: c.email || "", autocomplete: "email", placeholder: "name@example.com", maxlength: 120 }), h("small", null, "E-mail")),
-    h("p", { class: "small muted", style: "margin:2px 0 8px" }, "E-mail нужен для верификации: тот же адрес отправьте преподавателю в WhatsApp. ИИ доступен после верификации и символического взноса на оплату API."),
-    h("label", { class: "cv-row" }, h("input", { class: "datein", type: "password", name: "pw", autocomplete: "new-password", placeholder: "••••••", minlength: 6 }), h("small", null, "Kennwort zum Speichern in der Cloud (optional, mindestens 6 Zeichen)")),
+  const signedIn = cloudOn();
+  const mode = signedIn ? "edit" : regMode;
+  const reg = mode === "reg";
+  const fixed = signedIn && c.done && !!c.role; // an existing account keeps its role and group
+  const field = (label, input, wide) => h("label", { class: "reg-field" + (wide ? " wide" : "") }, h("span", null, label), input);
+  const inp = (name, attrs) => h("input", { class: "reg-input", name, value: c[name] || "", ...attrs });
+  const err = h("p", { class: "reg-error", role: "alert", hidden: true });
+  const fail = t => { err.textContent = t; err.hidden = false; err.scrollIntoView({ block: "nearest" }); };
+  const seg = (items, cur, on) => h("div", { class: "reg-seg", role: "group" }, items.map(([v, l]) =>
+    h("button", { type: "button", class: cur === v ? "on" : "", "aria-pressed": cur === v, onclick: () => on(v) }, l)));
+
+  // who are you: a student picks a group; an organizer names a new group (approved by the main administrator)
+  let role = c.role || "student";
+  const grpSel = h("select", { class: "reg-input", name: "group", disabled: fixed }, h("option", { value: "" }, "— выберите группу —"),
+    c.group ? h("option", { value: c.group, selected: true }, c.groupName || c.group) : null);
+  const grpRow = field("Ваша группа *", grpSel, true);
+  const orgRow = field("Название вашей группы *", inp("gname", { value: c.groupName || "", maxlength: 60, disabled: fixed, placeholder: "Deutsch B2 Berlin" }), true);
+  const roleSeg = h("div", { class: "reg-who" });
+  const syncWho = () => {
+    roleSeg.replaceChildren(h("span", { class: "reg-label" }, "Кто вы? *"), seg([["student", "Я ученик"], ["org", "Я организатор группы"]], role, v => { if (!fixed) { role = v; syncWho(); } }));
+    grpRow.hidden = role === "org"; orgRow.hidden = role !== "org";
+  };
+  syncWho();
+  if (!fixed && mode !== "login") fetch("/api/groups").then(r => r.json()).then(j => {
+    const list = (j && j.groups) || [];
+    // the open group comes first for people without a teacher
+    const pub = list.filter(g => g.code === "PUBLIC"), rest = list.filter(g => g.code !== "PUBLIC");
+    pub.forEach(g => { if (g.code !== c.group) grpSel.append(h("option", { value: g.code }, "Общая группа: занимаюсь сам, без учителя")); });
+    if (rest.length) grpSel.append(h("option", { disabled: true }, "──────────"));
+    rest.forEach(g => { if (g.code !== c.group) grpSel.append(h("option", { value: g.code }, g.name)); });
+  }).catch(() => {});
+
+  const mail = c.email || (cloud.s && cloud.s.email && !/@dtb-trainer\.app$/.test(cloud.s.email) ? cloud.s.email : "");
+  const emailIn = inp("email", { type: "email", value: mail, autocomplete: "email", placeholder: "name@example.com", maxlength: 120, required: true, readonly: signedIn, dir: "ltr" });
+  const pwIn = h("input", { class: "reg-input", type: "password", name: "pw", autocomplete: reg ? "new-password" : "current-password", placeholder: "••••••", minlength: 6, dir: "ltr" });
+  const lang = h("select", { class: "reg-input", name: "sprache" }, h("option", { value: "" }, "—"), LANG_CODES.map(([v, l]) => h("option", { value: v, selected: c.sprache === v }, `${v} - ${l}`)));
+  const sex = h("select", { class: "reg-input", name: "geschl" }, h("option", { value: "" }, "—"),
+    h("option", { value: "m", selected: c.geschl === "m" }, L7("männlich", "male", "masculin", "maschile", "erkek", "мужской")),
+    h("option", { value: "w", selected: c.geschl === "w" }, L7("weiblich", "female", "féminin", "femminile", "kadın", "женский")));
+  const sheet = h("details", { class: "reg-more" }, h("summary", null, "Данные для бланка ответов (необязательно)"),
+    h("div", { class: "reg-grid" },
+      field(L7("Geburtsdatum", "Date of Birth", "Date de naissance", "Data di nascita", "Doğum tarihi", "Дата рождения"), inp("geb", { type: "date" })),
+      field(L7("Geburtsort", "Place of Birth", "Lieu de naissance", "Luogo di nascita", "Doğum yeri", "Место рождения"), inp("gort", { maxlength: 30 })),
+      field(L7("Erstsprache", "First Language", "Langue maternelle", "Madrelingua", "Anadili", "Родной язык"), lang),
+      field(L7("Geschlecht", "Sex", "Sexe", "Sesso", "Cinsiyeti", "Пол"), sex),
+      field(L7("Straße und Hausnummer", "Street and number", "Rue et numéro", "Via e numero civico", "Sokak ve numara", "Улица и дом"), inp("str", { maxlength: 30 })),
+      field(L7("Postleitzahl und Ort", "Postcode and town", "Code postal et ville", "CAP e città", "Posta kodu ve şehir", "Индекс и город"), inp("ort", { maxlength: 30 })),
+      field(L7("Prüfungszentrum", "Examination Centre", "Centre d'examen", "Centro d'esame", "Sınav merkezi", "Экзаменационное учреждение"), inp("zentrum", { maxlength: 30 })),
+      field(L7("Prüfungsdatum", "Date of Examination", "Date d'examen", "Data dell'esame", "Sınav tarihi", "Дата экзамена"), inp("datum", { type: "date" }))));
+
+  const person = h("div", { class: "reg-grid" },
+    field("Фамилия *", inp("fam", { maxlength: 30, autocomplete: "family-name", required: true })),
+    field("Имя *", inp("vor", { maxlength: 30, autocomplete: "given-name", required: true })),
+    field("E-mail *", emailIn),
+    field("Телефон (WhatsApp) *", inp("tel", { type: "tel", maxlength: 24, autocomplete: "tel", placeholder: "+49 151 2345678", dir: "ltr" })));
+  const form = h("form", { class: "reg-form", autocomplete: "on", novalidate: true },
+    mode === "login"
+      ? h("div", { class: "reg-grid" }, field("E-mail *", emailIn, true), field("Пароль *", pwIn, true))
+      : h("div", null, roleSeg, person, reg ? h("div", { class: "reg-grid" }, field("Пароль * (минимум 6 символов)", pwIn, true)) : null, grpRow, orgRow, sheet),
+    reg ? priceBox() : null,
+    reg ? h("p", { class: "reg-note" }, "После регистрации на e-mail придёт письмо с подтверждением. Доступ откроется после разрешения администратора: напишите ему в WhatsApp. Пожалуйста, только сообщение, не звоните.") : null,
     err,
-    h("div", { class: "s30-foot" }, h("b", null, "Antwortbogen S30"), h("span", null, "www.telc.net")));
+    h("button", { class: "reg-btn", type: "submit" }, mode === "login" ? "Войти" : reg ? "Зарегистрироваться" : "Сохранить"));
+
   form.onsubmit = async (e) => {
     e.preventDefault();
     const fd = new FormData(form), x = {};
     for (const [k, v] of fd.entries()) x[k] = String(v).trim();
     const pw = x.pw || ""; delete x.pw;
-    if (!x.fam || !x.vor) { err.textContent = "Укажите фамилию и имя."; err.hidden = false; return; }
-    if (pw && pw.length < 6) { err.textContent = "Das Kennwort ist zu kurz (mindestens 6 Zeichen)."; err.hidden = false; return; }
-    x.email = (x.email || "").toLowerCase();
-    // cloud accounts must carry a real e-mail: it is how the teacher recognises the student when verifying
-    if ((pw || cloudOn() || x.email) && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(x.email)) { err.textContent = "Укажите e-mail: он нужен для сохранения прогресса в облаке и для верификации."; err.hidden = false; return; }
-    store.set("cand", { ...x, done: true });
-    if (pw) {
-      err.hidden = true; const btn = document.querySelector(".btn.primary"); if (btn) btn.disabled = true;
-      try { await cloudConnect({ ...x }, pw); }
-      catch (ex) { if (btn) btn.disabled = false; err.textContent = cloudErrText(ex); err.hidden = false; if (ex.msg === "PW") { store.set("cand", { ...cand(), done: false }); return; } await new Promise(r => setTimeout(r, 2500)); }
+    x.email = String(emailIn.value || "").trim().toLowerCase();
+    if (mode !== "login" && (!x.fam || !x.vor)) return fail("Укажите фамилию и имя.");
+    if (!EMAIL_RE.test(x.email)) return fail("Укажите правильный e-mail: по нему проходят регистрация и вход.");
+    if (mode !== "login") {
+      if (!phoneOk(x.tel || "")) return fail("Укажите номер телефона с WhatsApp, например +49 151 2345678.");
+      if (!fixed && role === "org" && !x.gname) return fail("Укажите название группы.");
+      if (!fixed && role !== "org" && !x.group) return fail("Выберите свою группу.");
     }
+    if (!signedIn && pw.length < 6) return fail("Введите пароль (минимум 6 символов).");
+    const who = fixed || mode === "login" ? null : role === "org"
+      ? { role: "org", groupName: x.gname }
+      : { role: "student", group: x.group, groupName: (grpSel.selectedOptions[0] || {}).textContent || "" };
+    delete x.group; delete x.gname;
+    const filled = {}; Object.entries(x).forEach(([k, v]) => { if (v) filled[k] = v; });
+    const btn = form.querySelector(".reg-btn");
+    if (!signedIn) {
+      err.hidden = true; btn.disabled = true;
+      try { localStorage.removeItem("dtb.cand"); } catch {} // take the name saved in the cloud, if there is one
+      try { await cloudConnect({ ...x }, pw, { login: mode === "login" }); }
+      catch (ex) { btn.disabled = false; if (mode !== "login") store.set("cand", { ...c, ...x, done: false }); return fail(cloudErrText(ex)); }
+    }
+    const cc = cand();
+    let next = mode === "login" ? { ...cc, email: x.email } : { ...cc, ...filled };
+    if (who && !(cc.role && (cc.group || cc.role === "org"))) next = { ...next, ...who }; // an account from the cloud keeps its own group
+    if (next.role === "org" && !next.group && next.groupName) {
+      try { const g = await cloudGroupRequest(next.groupName, x.email); next.group = g.code; next.groupName = g.name; }
+      catch (ex) { btn.disabled = false; store.set("cand", { ...next, done: false }); return fail(ex.message || "Не удалось создать группу."); }
+    }
+    store.set("cand", { ...next, done: true });
     location.hash = first ? (location.hash && location.hash !== "#profile" ? location.hash : "#home") : "#home";
     render();
   };
-  const del = first ? null : h("button", { type: "button", class: "btn ghost", onclick: () => { cloudOff(cloudOn()); store.set("cand", { fam: "", vor: "" }); render(); } }, "Сменить участника");
-  return h("div", { class: "wrap narrow" },
-    first ? null : crumbs(h("a", { href: "#home" }, "Главная"), "Данные участника"),
-    h("p", { class: "lead", style: "margin:0" }, "Как на экзамене: заполните данные участника. Без пароля они и ваш прогресс хранятся только в этом браузере. С паролем прогресс сохраняется в облаке, и на другом устройстве достаточно ввести те же фамилию, имя, дату рождения и пароль."),
-    form,
-    h("div", { class: "row" }, h("button", { class: "btn primary", onclick: () => form.requestSubmit() }, first ? "Начать тренировку" : "Сохранить"), del));
+  const reset = h("button", { type: "button", class: "reg-link", onclick: async () => {
+    const m = String(emailIn.value || "").trim().toLowerCase();
+    if (!EMAIL_RE.test(m)) return fail("Сначала укажите e-mail.");
+    try { await cloudResetPw(m); err.replaceChildren(h("span", null, "Письмо для сброса пароля отправлено:"), " ", h("b", { dir: "ltr" }, m)); }
+    catch { err.textContent = "Не удалось отправить письмо. Проверьте e-mail."; }
+    err.hidden = false;
+  } }, "Забыли пароль?");
+  const out = signedIn ? h("button", { type: "button", class: "reg-link", onclick: () => { cloudOff(true); store.set("cand", { fam: "", vor: "" }); regMode = "login"; render(); } }, "Выйти / сменить аккаунт") : null;
+  return h("div", { class: "reg" },
+    h("div", { class: "reg-card" },
+      h("div", { class: "reg-top" }, h("span", { class: "reg-mark" }, "DTB"), h("span", { class: "reg-brand" }, h("b", null, "DTB B2 Beruf"), h("span", null, "Тренажёр к экзамену telc"))),
+      h("h1", null, mode === "login" ? "Вход" : reg ? "Регистрация" : "Данные участника"),
+      h("p", { class: "reg-sub" }, mode === "login" ? "Войдите с e-mail и паролем, которые вы указали при регистрации. Прогресс подтянется из облака." : reg ? "Создайте аккаунт: прогресс сохраняется в облаке и доступен на любом устройстве." : "Эти данные видит ваш преподаватель."),
+      signedIn ? null : seg([["reg", "Регистрация"], ["login", "Вход"]], mode, v => { regMode = v; render(); }),
+      form,
+      h("div", { class: "reg-links" }, mode === "edit" ? null : reset, out, first || signedIn ? null : h("a", { class: "reg-link", href: "#home" }, "Назад"))));
 }
-// header badge: who is signed in on this device
+// prices: the trainer alone, or the trainer with the AI that checks homework
+// payment under a price card: the PayPal.me link with the amount filled in, then the receipt to the administrator on
+// WhatsApp. The administrator checks the payment and opens access by hand; the month starts then.
+// the administrator's PayPal.me (the server may send another one as `pay`, PAYPAL_ME) and WhatsApp with a ready text
+const PAY_ME = "https://paypal.me/RustemDzhuraiev";
+const payMe = () => cloud.pay || PAY_ME;
+function waHref(text) {
+  const m = String(cloud.contact || "").match(/\+?\d[\d\s().\/-]{5,}\d/), digits = m ? m[0].replace(/\D/g, "") : "";
+  return digits ? "https://wa.me/" + digits + "?text=" + encodeURIComponent(text) : "";
+}
+function whoText() {
+  const c = cand(), mail = (cloud.s && cloud.s.email) || c.email || "";
+  return "\nName: " + [c.fam, c.vor].filter(Boolean).join(" ") + "\nE-Mail: " + mail + (c.groupName ? "\nGruppe: " + c.groupName : "");
+}
+function waBtn(text, label, cls) {
+  const href = waHref(text);
+  return href ? h("a", { class: "reg-btn wa " + (cls || ""), href, target: "_blank", rel: "noopener" }, label)
+    : h("p", { class: "reg-note" }, "Номер администратора пока не указан.");
+}
+// the first thing a new student sees: pay now, ask for a free trial, or say "I have paid, please activate"
+function accessChoice(expired) {
+  const opt = (n, title, note, ...body) => h("div", { class: "choice-card" },
+    h("div", { class: "choice-head" }, h("span", { class: "choice-num" }, String(n)), h("b", null, title)),
+    note ? h("p", { class: "reg-note" }, note) : null, ...body);
+  let n = 0;
+  return h("div", { class: "choice" },
+    h("div", { class: "price-head" }, "Как получить доступ"),
+    opt(++n, "Оплатить подписку", "Оплата через PayPal. Сумма уже подставлена.",
+      h("div", { class: "choice-pay" },
+        h("a", { class: "reg-btn pay-link", href: payMe() + "/5EUR", target: "_blank", rel: "noopener" }, h("span", null, "Тренажёр"), " · 5 €"),
+        h("a", { class: "reg-btn pay-link best", href: payMe() + "/10EUR", target: "_blank", rel: "noopener" }, h("span", null, "Тренажёр + ИИ"), " · 10 €"))),
+    expired ? null : opt(++n, "Попробовать бесплатно 3 дня", "Напишите администратору, и он включит пробный период.",
+      waBtn("Hallo! Ich möchte den DTB-B2-Beruf-Trainer 3 Tage kostenlos testen." + whoText(), "Запросить пробный период", "ghost")),
+    opt(++n, "Я уже оплатил(а)", "Отправьте скриншот оплаты. Администратор проверит его и откроет доступ, с этого дня начнётся месяц подписки.",
+      waBtn("Hallo! Ich habe per PayPal bezahlt. Bitte schalten Sie meinen Zugang frei, der Beleg ist im Anhang." + whoText(), "Активируйте мой доступ", "ghost")),
+    h("p", { class: "contact-warn" }, "📵 ", h("span", null, "Только сообщения, пожалуйста, не звоните.")));
+}
+function priceBox(pay) {
+  return h("div", { class: "price" },
+    h("div", { class: "price-head" }, "Стоимость подписки"),
+    h("div", { class: "price-grid" },
+      h("div", { class: "price-card" },
+        h("div", { class: "price-name" }, "Тренажёр"),
+        h("div", { class: "price-sum", dir: "ltr" }, h("b", null, "5 €"), h("span", null, " / ", h("span", null, "месяц"))),
+        h("p", null, "Все задания экзамена, проверка ответов, работа над ошибками и рейтинг группы. Без ИИ."),
+        null),
+      h("div", { class: "price-card best" },
+        h("span", { class: "price-tag" }, "Лучшая подготовка"),
+        h("div", { class: "price-name" }, "Тренажёр + ИИ"),
+        h("div", { class: "price-sum", dir: "ltr" }, h("b", null, "10 €"), h("span", null, " / ", h("span", null, "месяц"))),
+        h("p", null, "Всё из тарифа «Тренажёр» и ИИ, который проверяет домашние задания, письма и устные ответы и помогает лучше подготовиться к экзамену."),
+        null)));
+}
+// waiting room: the account exists, but the teacher has not admitted it yet
+function viewPending() {
+  const c = cand(), mail = (cloud.s && cloud.s.email) || c.email || "";
+  const sent = store.get("mailsent", "") === mail;
+  const msg = h("p", { class: "reg-note", hidden: true });
+  if (!cloud.checked) { cloudAccess().then(() => { cloud.checked = true; render(); }); return h("div", { class: "wrap narrow" }, h("p", { class: "lead" }, "Проверяем доступ…")); }
+  const org = c.role === "org";
+  return h("div", { class: "reg" },
+    h("div", { class: "reg-card wide" },
+      h("div", { class: "reg-top" }, h("span", { class: "reg-mark" }, "DTB"), h("span", { class: "reg-brand" }, h("b", null, "DTB B2 Beruf"), h("span", null, "Тренажёр к экзамену telc"))),
+      h("h1", null, cloud.expired ? (cloud.sub && cloud.sub.trial ? "Пробный период закончился" : "Подписка закончилась") : "Ожидает разрешения"),
+      cloud.expired ? h("p", { class: "reg-sub" }, "Доступ закрыт, ваш прогресс сохранён.") : null,
+      h("p", { class: "reg-sub" }, h("span", null, sent ? "Регистрация прошла. Мы отправили письмо с подтверждением на адрес:" : "Вы вошли как:"), " ", h("b", { dir: "ltr" }, mail)),
+      cloud.expired ? h("p", null, "Чтобы продолжить, оплатите 5 € в месяц (без ИИ) или 10 € в месяц (с ИИ) и напишите администратору в WhatsApp.") : null,
+      org ? h("p", null, h("span", null, "Ваша группа ждёт одобрения главного администратора:"), " ", h("b", null, c.groupName || ""), ". ", h("span", null, "После одобрения откроется тренажёр, а кабинет группы будет по адресу /admin (вход «Организатор группы» с вашим e-mail и паролем)."))
+        : accessChoice(cloud.expired),
+      !org && !cloud.expired && sent ? h("p", { class: "reg-note" }, "Подтвердите e-mail: откройте письмо и нажмите на ссылку.") : null,
+      !org && c.groupName ? h("p", { class: "reg-note" }, h("span", null, "Ваша группа:"), " ", h("b", null, c.groupName)) : null,
+      contactBlock(cloud.contact, c, mail),
+      org ? null : priceBox(),
+      msg,
+      h("div", { class: "reg-actions" },
+        h("button", { class: "reg-btn", onclick: async () => { msg.hidden = false; msg.textContent = "Проверяем…"; if (await cloudAccess()) render(); else msg.textContent = "Доступ ещё не подтверждён."; } }, "Проверить снова"),
+        h("a", { class: "reg-link", href: "#profile" }, "Сменить аккаунт"))));
+}
+// teacher's WhatsApp from VERIFY_CONTACT, shown in full; the button opens WhatsApp with a ready request (no call button: write, don't call)
+function contactBlock(contact, c, mail) {
+  contact = String(contact || "").trim();
+  if (!contact) return h("p", { class: "reg-note" }, "Номер администратора пока не указан.");
+  const m = contact.match(/\+?\d[\d\s().\/-]{5,}\d/), digits = m ? m[0].replace(/\D/g, "") : "";
+  c = c || {};
+  const text = "Hallo! Ich bitte um Zugang zum DTB-B2-Beruf-Trainer.\nName: " + [c.fam, c.vor].filter(Boolean).join(" ") + "\nE-Mail: " + (mail || "") + (c.groupName ? "\nGruppe: " + c.groupName : "") + "\nTarif: 5 € / 10 € (mit KI)";
+  return h("div", { class: "contact-box" },
+    h("div", { class: "contact-label" }, "WhatsApp администратора:"),
+    h("div", { class: "contact-num", dir: "ltr" }, contact),
+    h("div", { class: "contact-warn" }, "📵 ", h("span", null, "Только сообщения, пожалуйста, не звоните.")),
+    digits ? h("a", { class: "reg-btn wa", href: "https://wa.me/" + digits + "?text=" + encodeURIComponent(text), target: "_blank", rel: "noopener" }, "Написать в WhatsApp") : null);
+}
+// header badge: who is signed in on this device. Only the first name is shown so the header stays on one line; the full name is in the tooltip.
 function updateWho() {
   const top = document.querySelector(".top-in"); if (!top) return;
   let a = top.querySelector(".who");
   const c = cand();
-  if (!c.done) { if (a) a.remove(); return; }
-  if (!a) { a = h("a", { class: "who", href: "#profile", title: "Данные участника" }); top.insertBefore(a, top.querySelector(".langsw")); }
-  const kids = [h("span", { class: "who-ico", "aria-hidden": "true" }, "👤"), h("span", null, `${c.vor} ${c.fam}`)];
-  if (cloudOn()) kids.push(h("span", { class: "who-ico", title: "Cloud", "aria-hidden": "true" }, "☁"));
+  const menu = document.querySelector(".nav .more-menu");
+  const dropCab = () => { const x = document.querySelector(".more-cab"); if (x) x.remove(); };
+  if (!c.done) { if (a) a.remove(); dropCab(); return; }
+  if (!a) { a = h("a", { class: "who", href: "#profile" }); top.insertBefore(a, top.querySelector(".langsw")); }
+  const full = `${c.vor || ""} ${c.fam || ""}`.trim();
+  const short = c.vor || c.fam || String(c.email || "").split("@")[0];
+  a.title = [full, c.email].filter(Boolean).join(" · ") || "Данные участника";
+  a.setAttribute("aria-label", "Данные участника");
+  const kids = [h("span", { class: "who-ico", "aria-hidden": "true" }, "👤"), h("span", { class: "who-name" }, short)];
+  if (cloudOn()) kids.push(h("span", { class: "who-ico who-cloud", title: "Cloud", "aria-hidden": "true" }, "☁"));
   a.replaceChildren(...kids);
+  // the group cabinet link lives in the "More" menu
+  if (c.role === "org" && cloud.ok && menu) { if (!menu.querySelector(".more-cab")) menu.append(h("a", { class: "more-cab", href: "/admin" }, "👥 ", h("span", null, "Кабинет группы"))); }
+  else dropCab();
 }
 function render() {
   stopAll();
   const r = (location.hash || "#home").slice(1);
   const [sec, idx] = r.split(".");
   let v;
-  if (!cand().done && sec !== "profile") v = viewProfile(true);
-  else if (sec === "profile") v = viewProfile(false);
+  if ((!cand().done || !cloudOn()) && sec !== "profile") v = viewProfile(true);
+  else if (sec === "profile") v = viewProfile(!cloudOn());
+  else if (!cloud.ok) v = viewPending();
   else if (sec === "review") v = viewReview();
   else if (sec === "exam") v = viewExam();
   else if (sec === "voice") v = viewVoice();
@@ -2418,6 +2951,10 @@ function render() {
   app().replaceChildren(v);
   const top = ["home", "review", "exam", "voice", "learn", "progress", "leaderboard"].includes(sec) ? sec : "home";
   document.querySelectorAll(".nav a").forEach(a => a.classList.toggle("on", a.getAttribute("href") === "#" + (SEC[sec] ? "" : top)));
+  const more = document.querySelector(".nav .more");
+  if (more) { more.open = false; more.classList.toggle("on", !!more.querySelector(".more-menu a.on")); }
+  // before sign-in (and while waiting for access) the sections cannot be opened: the header shows only theme and language
+  document.body.classList.toggle("pre", !(cand().done && cloudOn() && cloud.ok));
   refreshAI(); updateNav(); updateWho();
 }
 let lastHash = location.hash;
@@ -2425,6 +2962,9 @@ window.addEventListener("hashchange", () => { render(); if (location.hash !== la
 try { localStorage.removeItem("dtb.mode"); } catch {}
 initTheme();
 initLang();
+// "More" menu in the header: closes on a click outside or on Escape
+document.addEventListener("click", (e) => { const m = document.querySelector(".nav .more[open]"); if (m && !m.contains(e.target)) m.open = false; });
+document.addEventListener("keydown", (e) => { if (e.key !== "Escape") return; const m = document.querySelector(".nav .more[open]"); if (m) { m.open = false; m.querySelector("summary").focus(); } });
 cloudBoot(() => render());
 audioReady.then(render);
 })();

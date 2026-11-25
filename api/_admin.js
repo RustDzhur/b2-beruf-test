@@ -74,13 +74,14 @@ function sessionSecret() {
   return crypto.createHash("sha256").update("dtb-admin|" + adminPassword()).digest("hex");
 }
 
-function signExp(exp) {
-  return crypto.createHmac("sha256", sessionSecret()).update("v1|" + exp).digest("base64url");
+// role: "super" (main teacher, ADMIN_PASSWORD) or a group code (teacher of that group only)
+function signExp(exp, role = "super") {
+  return crypto.createHmac("sha256", sessionSecret()).update("v1|" + exp + (role === "super" ? "" : "|" + role)).digest("base64url");
 }
 
-function createSession(now = Date.now()) {
+function createSession(now = Date.now(), role = "super") {
   const exp = now + SESSION_MS;
-  return exp + "." + signExp(exp);
+  return exp + (role === "super" ? "" : "~" + role) + "." + signExp(exp, role);
 }
 
 function parseCookies(header) {
@@ -95,22 +96,24 @@ function parseCookies(header) {
   return out;
 }
 
-function verifySession(cookieHeader, now = Date.now()) {
+// -> "super" | group code | null
+function sessionRole(cookieHeader, now = Date.now()) {
   const raw = parseCookies(cookieHeader)[COOKIE];
-  if (!raw) return false;
-  const dot = raw.indexOf(".");
-  if (dot < 0) return false;
-  const exp = Number(raw.slice(0, dot));
-  const sig = raw.slice(dot + 1);
-  if (!Number.isFinite(exp) || exp < now || !sig) return false;
-  const want = signExp(exp);
-  const a = Buffer.from(sig);
-  const b = Buffer.from(want);
-  return a.length === b.length && crypto.timingSafeEqual(a, b);
+  if (!raw) return null;
+  const dot = raw.lastIndexOf(".");
+  if (dot < 0) return null;
+  const head = raw.slice(0, dot), sig = raw.slice(dot + 1);
+  const t = head.indexOf("~");
+  const exp = Number(t < 0 ? head : head.slice(0, t));
+  const role = t < 0 ? "super" : head.slice(t + 1);
+  if (!Number.isFinite(exp) || exp < now || !sig || !(role === "super" || /^[A-Z0-9]{3,12}$/.test(role))) return null;
+  const a = Buffer.from(sig), b = Buffer.from(signExp(exp, role));
+  return a.length === b.length && crypto.timingSafeEqual(a, b) ? role : null;
 }
+function verifySession(cookieHeader, now = Date.now()) { return !!sessionRole(cookieHeader, now); }
 
-function sessionCookie(secure) {
-  return COOKIE + "=" + createSession() + "; Path=/; HttpOnly; SameSite=Strict; Max-Age=" + Math.floor(SESSION_MS / 1000) + (secure ? "; Secure" : "");
+function sessionCookie(secure, role = "super") {
+  return COOKIE + "=" + createSession(Date.now(), role) + "; Path=/; HttpOnly; SameSite=Strict; Max-Age=" + Math.floor(SESSION_MS / 1000) + (secure ? "; Secure" : "");
 }
 
 function clearCookie(secure) {
@@ -199,7 +202,7 @@ async function accessToken() {
   const b64 = o => Buffer.from(typeof o === "string" ? o : JSON.stringify(o)).toString("base64url");
   const unsigned = b64({ alg: "RS256", typ: "JWT" }) + "." + b64({
     iss: sa.client_email,
-    scope: "https://www.googleapis.com/auth/datastore",
+    scope: "https://www.googleapis.com/auth/datastore https://www.googleapis.com/auth/identitytoolkit https://www.googleapis.com/auth/cloud-platform",
     aud: "https://oauth2.googleapis.com/token",
     iat: now,
     exp: now + 3600,
@@ -277,10 +280,11 @@ function fixtureUsers() {
 
 async function loadUsers() {
   const fixtures = fixtureUsers();
-  if (fixtures) return { source: "fixtures", users: fixtures };
+  const G = require("./_groups.js");
+  if (fixtures) return { source: "fixtures", users: await G.applyMoves(fixtures.filter(u => !removedFixtures.has(u.uid))) };
   const sa = serviceAccount();
   if (!sa) throw adminError("no_service_account", 501, "Не настроен ключ Firebase.");
-  return { source: "firestore", users: await fetchFirestore(sa.project_id) };
+  return { source: "firestore", users: await G.applyMoves(await fetchFirestore(sa.project_id)) };
 }
 
 /* ------------------------------------------------------------------ metrics */
@@ -320,6 +324,7 @@ function cleanEmail(s) {
   const t = String(s || "").trim().toLowerCase().slice(0, 120);
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(t) ? t : "";
 }
+const cleanPhone = s => { const t = String(s || "").replace(/[^\d+\s()\/-]/g, "").trim().slice(0, 24); return t.replace(/\D/g, "").length >= 6 ? t : ""; };
 
 // earliest logged attempt per task: Map(vid -> {t, pct})
 function firstAttempts(log) {
@@ -500,7 +505,7 @@ function computeStudent(raw, now = Date.now()) {
   return {
     uid: String((raw && raw.uid) || ""),
     fam, vor, name: name || "Без имени", initials, hasName: !!(fam || vor),
-    email: cleanEmail(cand.email), verified: false,
+    email: cleanEmail(cand.email), phone: cleanPhone(cand.tel), verified: false, admitted: true, group: require("./_groups.js").groupOf(cand),
     days: days.length,
     tasks,
     attempts,
@@ -527,9 +532,17 @@ function computeStudent(raw, now = Date.now()) {
   };
 }
 
-function dashboard(rawUsers, now = Date.now(), verified = null) {
+function dashboard(rawUsers, now = Date.now(), verified = null, admitted = null, subs = null) {
   const students = (rawUsers || []).map(u => computeStudent(u, now));
   if (verified) students.forEach(s => { s.verified = verified.has(s.uid); });
+  if (admitted) students.forEach(s => { s.admitted = admitted.has(s.uid); });
+  if (subs) { // the paid month / trial (see _subs.js); no entry or until 0 = unlimited
+    const S = require("./_subs.js");
+    students.forEach(s => {
+      const t = subs.get(s.uid);
+      s.sub = t ? { plan: t.plan, until: t.until, trial: !!t.trial, trialUsed: !!t.trialUsed, days: S.daysLeft(t, now), expired: S.expired(t, now) } : null;
+    });
+  }
   const withData = students.filter(s => s.tasks > 0 || s.days > 0);
   const withScore = students.filter(s => s.scorePct != null);
   const d7 = dayKey(-6), d30 = dayKey(-29);
@@ -617,14 +630,125 @@ function dashboard(rawUsers, now = Date.now(), verified = null) {
   };
 }
 
-async function buildDashboard() {
-  const { source, users } = await loadUsers();
+// students of one group (role = group code), or everybody for the main teacher (role "super")
+const inRole = (raw, role) => role === "super" || require("./_groups.js").groupOf(raw && raw.data && raw.data.cand) === role;
+
+async function buildDashboard(role = "super", only = "") {
+  const { source, users: all } = await loadUsers();
+  const view = role === "super" && only ? require("./_groups.js").normCode(only) : role; // the main teacher may look at one group
+  const users = all.filter(u => inRole(u, view));
   let verified = null, verifyError = "";
   try { verified = await require("./_verify.js").listVerified(); } catch (e) { verifyError = e.message || "verify"; }
-  const out = dashboard(users, Date.now(), verified);
+  let admitted = null;
+  try { admitted = await require("./_admit.js").listAdmitted(); } catch (e) { verifyError = verifyError || e.message || "admit"; }
+  let subs = null;
+  try { subs = await require("./_subs.js").list(); } catch (e) { verifyError = verifyError || e.message || "subs"; }
+  const out = dashboard(users, Date.now(), verified, admitted, subs);
   out.verifyError = verifyError; // the cabinet warns instead of showing everybody as unverified by mistake
   out.source = source;
+  out.role = role;
+  const G = require("./_groups.js");
+  let groups = [];
+  try { groups = (await G.listGroups()).map(G.publicGroup); } catch {}
+  // number of students per group (for the main teacher's group list)
+  const per = {};
+  for (const u of all) { const g = G.groupOf(u.data && u.data.cand); per[g] = (per[g] || 0) + 1; }
+  groups.forEach(g => { g.students = per[g.code] || 0; });
+  out.groups = role === "super" ? groups : groups.filter(g => g.code === role);
+  out.view = view;
   return out;
+}
+
+// a group teacher may approve or delete only students of the own group
+async function assertRole(uids, role) {
+  if (role === "super") return;
+  const { users } = await loadUsers();
+  const mine = new Set(users.filter(u => inRole(u, role)).map(u => u.uid));
+  for (const u of uids) if (!mine.has(String(u))) throw adminError("forbidden", 403, "Этот ученик не из вашей группы.");
+}
+
+/* ------------------------------------------------------------- link e-mail */
+// Old accounts were made with a synthetic address (u…@dtb-trainer.app from name + birth date). After the student
+// signs in that old way, the server attaches the real e-mail with the service account, so the next sign-in works
+// by e-mail. (The browser cannot do it itself: Firebase blocks direct e-mail changes when e-mail enumeration
+// protection is on.) Only a synthetic address is ever replaced.
+const SYNTH_RE = /@dtb-trainer\.app$/;
+const authAdmin = { update: null }; // tests: replace with a fake
+// With a password (main administrator only) the account gets a new password and a confirmed e-mail at once,
+// so the person can sign in right away without waiting for any letter.
+async function linkEmail(uid, current, email, force, password) {
+  email = cleanEmail(email);
+  if (!email) throw adminError("bad_email", 400, "Некорректный e-mail.");
+  if (password != null && password !== "") {
+    password = String(password);
+    if (password.length < 6 || password.length > 128) throw adminError("bad_password", 400, "Пароль: от 6 до 128 символов.");
+  } else password = "";
+  current = String(current || "").toLowerCase();
+  if (current === email && !password) return { ok: true, linked: false };
+  if (!force && current && !SYNTH_RE.test(current)) throw adminError("has_email", 409, "У аккаунта уже есть e-mail.");
+  if (authAdmin.update) { await authAdmin.update(uid, email, password); return { ok: true, linked: true, password: !!password }; }
+  const sa = serviceAccount();
+  if (!sa) throw adminError("no_service_account", 501, "Не настроен ключ Firebase.");
+  const r = await fetch("https://identitytoolkit.googleapis.com/v1/projects/" + encodeURIComponent(sa.project_id) + "/accounts:update", {
+    method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + await accessToken() },
+    body: JSON.stringify(password ? { localId: uid, email, password, emailVerified: true } : { localId: uid, email, emailVerified: false }) });
+  if (!r.ok) {
+    const j = await r.json().catch(() => ({}));
+    const m = (j.error && j.error.message) || ("HTTP " + r.status);
+    if (/EMAIL_EXISTS/.test(m)) throw adminError("email_exists", 409, "Этот e-mail уже занят другим аккаунтом.");
+    if (/USER_NOT_FOUND/.test(m)) throw adminError("no_user", 404, "Аккаунт не найден в Firebase.");
+    if (/WEAK_PASSWORD/.test(m)) throw adminError("bad_password", 400, "Слишком простой пароль (минимум 6 символов).");
+    throw adminError("auth_failed", 502, "Firebase Auth: " + m);
+  }
+  return { ok: true, linked: true, password: !!password };
+}
+
+/* ------------------------------------------------------------ delete users */
+
+const removedFixtures = new Set(); // local preview only: "deleted" fixture users stay hidden until restart
+
+// Teacher removes strangers: returns a backup of every progress document first, then deletes
+// users/{uid}, verified/{uid} and the Firebase Auth account. Missing pieces are not an error.
+async function deleteUsers(uids) {
+  const UID = /^[A-Za-z0-9_-]{6,128}$/;
+  const list = [...new Set((Array.isArray(uids) ? uids : []).map(String))].filter(u => UID.test(u)).slice(0, 200);
+  if (!list.length) throw adminError("bad_uid", 400, "Не выбран ни один ученик.");
+  const fixtures = fixtureUsers();
+  if (fixtures) {
+    const backup = fixtures.filter(u => list.includes(u.uid));
+    list.forEach(u => removedFixtures.add(u));
+    lbCache = { at: 0, groups: null, groupOfUid: null };
+    return { deleted: list, failed: [], backup };
+  }
+  const sa = serviceAccount();
+  if (!sa) throw adminError("no_service_account", 501, "Не настроен ключ Firebase.");
+  const token = await accessToken();
+  const auth = { authorization: "Bearer " + token };
+  const docs = "https://firestore.googleapis.com/v1/projects/" + encodeURIComponent(sa.project_id) + "/databases/(default)/documents/";
+  const backup = [], deleted = [], failed = [];
+  for (const uid of list) {
+    try {
+      const r = await fetch(docs + "users/" + uid, { headers: auth });
+      if (r.ok) backup.push(parseRawDoc(await r.json()));
+      else if (r.status !== 404) throw new Error("Firestore: HTTP " + r.status);
+      for (const col of ["users", "verified", "admitted"]) {
+        const d = await fetch(docs + col + "/" + uid, { method: "DELETE", headers: auth });
+        if (!d.ok && d.status !== 404) throw new Error("Firestore " + col + ": HTTP " + d.status);
+      }
+      const a = await fetch("https://identitytoolkit.googleapis.com/v1/projects/" + encodeURIComponent(sa.project_id) + "/accounts:delete", {
+        method: "POST", headers: Object.assign({ "content-type": "application/json" }, auth), body: JSON.stringify({ localId: uid }) });
+      if (!a.ok) {
+        const j = await a.json().catch(() => ({}));
+        const m = (j.error && j.error.message) || ("HTTP " + a.status);
+        if (!/USER_NOT_FOUND/.test(m)) throw new Error("Auth: " + m);
+      }
+      deleted.push(uid);
+    } catch (e) {
+      failed.push({ uid, message: String(e.message || e) });
+    }
+  }
+  lbCache = { at: 0, groups: null, groupOfUid: null };
+  return { deleted, failed, backup };
 }
 
 /* ------------------------------------------------------------- leaderboard */
@@ -700,19 +824,32 @@ function leaderboardRows(users, period, now) {
   return rows.map((r, i) => Object.assign(r, { rank: i + 1, medal: i < 3 ? i + 1 : 0 }));
 }
 
-let lbCache = { at: 0, week: null, all: null };
+let lbCache = { at: 0, groups: null, groupOfUid: null };
+function resetLeaderboardCache() { lbCache = { at: 0, groups: null, groupOfUid: null }; }
 
+// the leaderboard a student sees: approved students of the student's own group only
 async function buildLeaderboard(period = "week", uid = "", now = Date.now()) {
   period = period === "all" ? "all" : "week";
-  if (!lbCache.week || now - lbCache.at > 60000) {
-    const { users } = await loadUsers();
-    lbCache = {
-      at: now,
-      week: leaderboardRows(users, "week", now),
-      all: leaderboardRows(users, "all", now),
-    };
+  if (!lbCache.groups || now - lbCache.at > 60000) {
+    const { users: everyone } = await loadUsers();
+    // everybody admitted to the trainer is in the leaderboard of the own group (old accounts automatically)
+    let ok = null;
+    try { ok = await require("./_admit.js").listAdmitted(); } catch {}
+    const G = require("./_groups.js");
+    const byGroup = new Map(), groupOfUid = new Map();
+    for (const u of everyone) {
+      const g = G.groupOf(u.data && u.data.cand);
+      groupOfUid.set(u.uid, g);
+      if (ok && !ok.has(u.uid)) continue;
+      if (!byGroup.has(g)) byGroup.set(g, []);
+      byGroup.get(g).push(u);
+    }
+    const groups = new Map();
+    for (const [g, users] of byGroup) groups.set(g, { week: leaderboardRows(users, "week", now), all: leaderboardRows(users, "all", now) });
+    lbCache = { at: now, groups, groupOfUid };
   }
-  const rows = lbCache[period] || [];
+  const g = lbCache.groupOfUid.get(uid);
+  const rows = (g && lbCache.groups.get(g) && lbCache.groups.get(g)[period]) || [];
   const pub = r => ({
     rank: r.rank, name: r.name, initials: r.initials, points: r.points,
     tests: r.tests, days: r.days, avg: r.avg, streak: r.streak, medal: r.medal,
@@ -760,17 +897,62 @@ function bodyOf(body) {
   return {};
 }
 
-function login(password) {
-  if (!adminPassword()) {
-    throw adminError("no_password", 503, "ADMIN_PASSWORD не задан на сервере.");
+// main teacher: {password} = ADMIN_PASSWORD -> "super".
+// group organizer: {email, password} of the trainer account -> code of the approved group this account owns.
+const orgAuth = {
+  async uid(email, password) {
+    const key = process.env.FIREBASE_WEB_API_KEY || "AIzaSyA5_PmCPlHg-9P1OD9LQFHXXF4Svj6Vajo"; // public web key (same as in the page)
+    let r, j;
+    try {
+      r = await fetch("https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" + encodeURIComponent(key), {
+        method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email, password, returnSecureToken: false }) });
+      j = await r.json().catch(() => ({}));
+    } catch { throw adminError("google_unreachable", 502, "Нет связи с Google."); }
+    return r.ok && j.localId ? j.localId : null;
+  },
+  // e-mail + password -> {uid, verified} (verified = the e-mail was confirmed through Firebase's letter)
+  async account(email, password) {
+    const key = process.env.FIREBASE_WEB_API_KEY || "AIzaSyA5_PmCPlHg-9P1OD9LQFHXXF4Svj6Vajo";
+    try {
+      const r = await fetch("https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" + encodeURIComponent(key), {
+        method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email, password, returnSecureToken: true }) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok || !j.idToken) return null;
+      const l = await fetch("https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=" + encodeURIComponent(key), {
+        method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ idToken: j.idToken }) });
+      const u = ((await l.json().catch(() => ({}))).users || [])[0] || {};
+      return { uid: j.localId, verified: u.emailVerified === true };
+    } catch { throw adminError("google_unreachable", 502, "Нет связи с Google."); }
+  },
+};
+async function login(body) {
+  body = body && typeof body === "object" ? body : { password: body };
+  const password = String(body.password || "");
+  const email = String(body.email || "").trim().toLowerCase();
+  if (!email) {
+    if (!adminPassword()) throw adminError("no_password", 503, "ADMIN_PASSWORD не задан на сервере.");
+    if (!passwordMatches(password)) throw adminError("bad_password", 401, "Неверный пароль.");
+    return "super";
   }
-  if (!passwordMatches(password)) {
-    throw adminError("bad_password", 401, "Неверный пароль.");
+  // the site owner (ADMIN_EMAILS) may sign in as the main administrator with the trainer account
+  if (require("./_verify.js").adminEmails().includes(email)) {
+    const acc = await orgAuth.account(email, password);
+    if (!acc) throw adminError("bad_password", 401, "Неверный e-mail или пароль.");
+    if (!acc.verified) throw adminError("email_unverified", 403, "Сначала подтвердите e-mail по ссылке из письма Firebase.");
+    return "super";
   }
-  return true;
+  const uid = await orgAuth.uid(email, password);
+  if (!uid) throw adminError("bad_password", 401, "Неверный e-mail или пароль.");
+  const g = await require("./_groups.js").ownedBy(uid);
+  if (!g) throw adminError("not_organizer", 403, "Этот аккаунт не организатор группы.");
+  if (g.status !== "ok") throw adminError("group_pending", 403, "Группа «" + g.name + "» ещё ждёт одобрения главного администратора.");
+  return g.code;
 }
 
 module.exports = {
+  resetLeaderboardCache,
+  linkEmail,
+  authAdmin,
   COOKIE,
   SESSION_MS,
   ACHIEVEMENTS,
@@ -791,6 +973,7 @@ module.exports = {
   isSecure,
   bodyOf,
   login,
+  orgAuth,
   serviceAccount,
   accessToken,
   fetchFirestore,
@@ -800,6 +983,9 @@ module.exports = {
   dashboard,
   buildDashboard,
   buildLeaderboard,
+  deleteUsers,
+  assertRole,
+  sessionRole,
   leaderboardStats,
   leaderboardRows,
   partOf,

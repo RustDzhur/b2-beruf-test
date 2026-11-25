@@ -65,9 +65,33 @@ npm start
 
 Сессия — HttpOnly-cookie на 8 часов; пароль в браузере не хранится. В кабинете показываются только имя, прогресс и активность. Дата рождения, адрес и остальные поля анкеты не читаются.
 
-Интерфейс кабинета переключается между RU / EN / DE / FR / TR / AR / IT (немецкий по умолчанию, как на основном сайте) и поддерживает тёмную/светлую тему. Тема и язык запоминаются в браузере.
+Интерфейс кабинета переключается между RU / EN / DE / FR / TR / AR / IT / UK (немецкий по умолчанию, как на основном сайте) и поддерживает тёмную/светлую тему. Тема и язык запоминаются в браузере.
 
 Проверка: `npm test` (встроенный `node:test`, без зависимостей). Демо-данные не используются; тестовый набор лежит в `tests/` и на Vercel не выкладывается.
+
+## Регистрация по e-mail и доступ по разрешению
+
+- Ученик регистрируется по **e-mail и паролю** (имя и фамилия необязательны, нужны для рейтинга). Firebase сам отправляет письмо с подтверждением адреса, SMTP не нужен. Есть кнопка «Kennwort zurücksetzen».
+- Старые аккаунты (имя + дата рождения + пароль) продолжают открываться: при первом входе к ним привязывается настоящий e-mail.
+- Два разных доступа. **Допуск к тренажёру**: аккаунты, созданные до перехода на e-mail (до `ADMIT_BEFORE`, по умолчанию 2026-11-21 17:30 UTC), допущены автоматически; новые ждут кнопки **«Допустить»** в `/admin` (Firestore `admitted`). **ИИ** (платный) открывается отдельно кнопкой **«Открыть ИИ»** (Firestore `verified`) и никому не включается автоматически.
+- Тренажёр новому ученику открывается только после «Допустить». До этого ученик видит экран «Ожидает разрешения» с контактом из переменной `VERIFY_CONTACT` (Vercel → Environment Variables, например `WhatsApp +49 …`). Проверка: `GET /api/access`.
+- `ADMIN_EMAILS` (через запятую): e-mail владельца сайта. С подтверждённым адресом такой аккаунт всегда допущен, ИИ открыт, и в `/admin` можно войти этим e-mail и паролем от тренажёра как главный администратор. Пароль `ADMIN_PASSWORD` остаётся запасным входом.
+- Если старый ученик (аккаунт без e-mail) не может войти: в `/admin` откройте его профиль → «Привязать e-mail для входа», затем на сайте «Забыли пароль?».
+- Рейтинг показывает всех допущенных учеников (старые аккаунты сразу, новые после «Допустить»).
+- Текст письма: Firebase Console → Authentication → Templates → Email address verification. Пример: «Здравствуйте! Вы зарегистрировались в тренажёре DTB B2 Beruf. Подтвердите e-mail по ссылке: %LINK%. Доступ к тренажёру открывается только участникам группы: свяжитесь с преподавателем по WhatsApp или по телефону и попросите разрешение на подключение.»
+
+### Удаление посторонних
+
+В `/admin` отметьте учеников галочками и нажмите «Удалить выбранных». Удаляются прогресс (`users/{uid}`), разрешение (`verified/{uid}`) и аккаунт Firebase Auth; резервная копия скачивается JSON-файлом. Для удаления аккаунтов service account нужна роль Firebase Authentication Admin (у ключа `firebase-adminsdk` она есть).
+
+## Группы
+
+- При регистрации ученик выбирает «Я ученик» и свою группу из списка одобренных групп, или «Я организатор группы» и пишет название новой группы.
+- Заявка организатора попадает в `/admin` главного администратора (карточка «Группы»): «Одобрить», «Переименовать», «Отклонить/Удалить». После одобрения организатор допускается в тренажёр, группа появляется в списке при регистрации.
+- Организатор входит в `/admin` → «Организатор группы» тем же e-mail и паролем, что в тренажёре, и видит только своих учеников: допуск, ИИ, удаление.
+- Главный администратор (пароль `ADMIN_PASSWORD`) видит все группы и может открыть одну группу через выбор над таблицей.
+- Рейтинг у каждого ученика только по его группе. Ученики без группы (зарегистрированные раньше) относятся к «Основной группе» (`MAIN`).
+- Firestore: `groups/{code}` = {name, owner, email, status, at}.
 
 ## Режимы теста
 
@@ -144,3 +168,21 @@ git push -u origin main
 
 - Ответы заданий Lesen и Hören проверяются по заложенным ключам; при сомнении сверяйтесь с материалами курса.
 - Кабинет `/admin` и рейтинг работают на Vercel (нужны serverless-функции `api/admin/*` и `api/leaderboard`). На GitHub Pages без функций они не откроются; прогресс и тема работают и без сервера.
+
+## Subscriptions and trials
+
+- «Допустить» in /admin starts one paid month on the trainer plan (5 €), «Открыть ИИ» one month on the AI plan (10 €).
+  In a student's profile: «+1 месяц · 5 €», «+1 месяц с ИИ · 10 €», «Пробный 2/3 дня» (once per account), «Бессрочно».
+- When the term ends the server closes the trainer and the AI by itself (Firestore `subs/{uid}`). Students without a
+  `subs` document (everybody admitted before this feature) keep unlimited access.
+- Letters: Vercel Cron calls `/api/cron/subs` once a day (08:00 UTC) and sends a reminder 3 days before the end of a
+  paid month and a notice when a month or a trial has ended. Set in **one** Vercel project only:
+  `CRON_SECRET` (any long random string), `RESEND_API_KEY` (resend.com), `MAIL_FROM` (e.g. `DTB Trainer <abo@your-domain>`,
+  the domain verified in Resend). Without them access still closes on time, only the letters are not sent.
+
+## PayPal
+
+The waiting screen and the "subscription ended" screen show a PayPal.me button under each plan with the amount filled
+in (5 € / 10 €) and a WhatsApp button with a ready message to send the receipt. The administrator checks the payment
+and opens access by hand («Допустить» / «Открыть ИИ» / «+1 месяц»), which starts the month. The site does not check
+payments itself. Optional Vercel setting: `PAYPAL_ME` (paypal.me name; default `RustemDzhuraiev`).

@@ -28,7 +28,7 @@ function writeSheet(t, ta) {
 }
 function writeTask(t) {
   const drafts = store.get("drafts", {});
-  const ta = h("textarea", { class: "letter", id: "ta-" + t.id, spellcheck: "false", placeholder: t.kind === "forum" ? "Liebe Kolleginnen und Kollegen,\n…" : t.kind === "praesentation" ? "Guten Tag, ich möchte Ihnen heute … vorstellen.\n…" : "Sehr geehrte Frau …,\n…" });
+  const ta = h("textarea", { class: "letter" + (t.speak ? " spoken" : ""), id: "ta-" + t.id, spellcheck: "false", lang: "de", placeholder: t.speak ? "Нажмите «Говорить» и отвечайте по-немецки или введите ответ здесь…" : t.kind === "forum" ? "Liebe Kolleginnen und Kollegen,\n…" : t.kind === "praesentation" ? "Guten Tag, ich möchte Ihnen heute … vorstellen.\n…" : "Sehr geehrte Frau …,\n…" });
   ta.value = drafts[t.id] || "";
   const counter = h("span", { class: "small mono" });
   const upd = () => { const n = words(ta.value); counter.textContent = `${n} слов` + (n < t.target[0] ? ` · цель ${t.target[0]}–${t.target[1]}` : n > t.target[1] + 40 ? " · многовато" : " ✓"); const d = store.get("drafts", {}); d[t.id] = ta.value; store.set("drafts", d); };
@@ -41,15 +41,26 @@ function writeTask(t) {
   const insert = (s) => { const c = s.replace(/…/g, "").replace(/\s+/g, " ").trim(); const p = ta.selectionStart ?? ta.value.length; ta.value = ta.value.slice(0, p) + c + " " + ta.value.slice(ta.selectionEnd ?? p); ta.focus(); ta.selectionStart = ta.selectionEnd = p + c.length + 1; upd(); };
   const rm = h("div", { class: "stack" }, h("div", { class: "eyebrow" }, "Redemittel · нажмите, чтобы вставить"), REDEMITTEL[t.kind].map((g, i) => h("details", { class: "rm", open: i < 2 }, h("summary", null, g.h), h("ul", null, g.items.map(s => h("li", { onclick: () => insert(s) }, s))))));
   const fb = h("div", { class: "stack" });
+  // Sprechen: a microphone fills the field, and a free rule-based check works without the AI
+  const dict = t.speak ? dictation(ta) : null;
+  const freeBtn = t.speak ? h("button", { class: "btn", onclick: () => {
+    dict.stop();
+    const text = ta.value.trim();
+    if (words(text) < 15) { fb.replaceChildren(h("div", { class: "note" }, "Скажите хотя бы 15 слов, тогда проверка будет полезной.")); return; }
+    fb.replaceChildren(spReport(spCheck(text, { points: t.points, rede: REDEMITTEL[t.kind], model: t.modelText, target: t.target, seconds: dict.seconds(), conn: t.conn })));
+    fb.scrollIntoView({ behavior: "smooth", block: "start" });
+  } }, "Проверить бесплатно") : null;
   const prev = store.get("feedback", {})[t.id];
   if (prev && prev.data) fb.append(renderFeedback(prev.data, prev.text, t.kind));
   let ctl = null;
   const stopBtn = h("button", { class: "btn", hidden: true, onclick: () => ctl && ctl.abort() }, "Остановить");
-  const checkBtn = aiButton("Проверить письмо", async () => {
+  const checkBtn = aiButton(t.speak ? "Проверить с ИИ" : "Проверить письмо", async () => {
+    if (dict) dict.stop();
     const text = ta.value.trim();
-    if (words(text) < 40) { fb.replaceChildren(h("div", { class: "note" }, "Напишите хотя бы 40 слов, тогда проверка будет полезной.")); return; }
+    if (t.speak && words(text) < 25) { fb.replaceChildren(h("div", { class: "note" }, "Скажите хотя бы 25 слов, тогда проверка ИИ будет полезной.")); return; }
+    if (!t.speak && words(text) < 40) { fb.replaceChildren(h("div", { class: "note" }, "Напишите хотя бы 40 слов, тогда проверка будет полезной.")); return; }
     checkBtn.disabled = true; stopBtn.hidden = false; ctl = new AbortController();
-    fb.replaceChildren(thinking("ИИ проверяет письмо по критериям экзамена… обычно 30–90 секунд"));
+    fb.replaceChildren(thinking(t.speak ? "ИИ проверяет ответ по критериям экзамена… обычно 30–90 секунд" : "ИИ проверяет письмо по критериям экзамена… обычно 30–90 секунд"));
     try {
       const d = await askJSON(feedbackPrompt(t, text), { signal: ctl.signal });
       if (!d || !d.inhalt || !d.sprache) throw { code: "invalid_json" };
@@ -74,19 +85,20 @@ function writeTask(t) {
   return h("div", { class: "stack" },
     h("div", { class: "card stack" }, h("div", { class: "spread" }, h("h2", null, t.title), h("div", { class: "row" }, tb, tl)), t.taskEl),
     h("div", { class: "two" },
-      h("div", { class: "stack" }, writeSheet(t, ta), h("div", { class: "spread" }, counter, h("div", { class: "row" }, checkBtn, stopBtn, modelBtn, genBtn, skip)),
-        noAiNote("Проверка письма через ИИ недоступна в этом просмотре. Сравните текст с образцом и пройдитесь по Redemittel."), models, genBox),
+      h("div", { class: "stack" }, dict ? dict.el : null, writeSheet(t, ta), h("div", { class: "spread" }, counter, h("div", { class: "row" }, freeBtn, checkBtn, stopBtn, modelBtn, genBtn, skip)),
+        t.speak ? h("p", { class: "small muted", style: "margin:0" }, "Бесплатная проверка работает у всех и без ИИ. Проверка ИИ (грамматика, уровень B2, исправленный вариант) входит в тариф «Тренажёр + ИИ», 10 € в месяц.") : null,
+        noAiNote(t.speak ? "Проверка ответа через ИИ недоступна в этом просмотре. Используйте бесплатную проверку и сравните ответ с образцом." : "Проверка письма через ИИ недоступна в этом просмотре. Сравните текст с образцом и пройдитесь по Redemittel."), models, genBox),
       h("div", { class: "card sticky" }, rm)),
     fb);
 }
 function feedbackPrompt(t, text) {
   const mx = WMAX[t.kind];
-  const task = t.kind === "praesentation" ? PRAES_TASK : t.kind === "beschwerde"
+  const task = t.kind === "praesentation" ? (t.speak ? PRAES_TASK_SPOKEN + "\n\n" + t.context : PRAES_TASK) : t.kind === "smalltalk" ? SMALLTALK_TASK + "\n\n" + t.context : t.kind === "loesung" ? LOESUNG_TASK + "\n\n" + t.context : t.kind === "beschwerde"
     ? `Aufgabe 21 (DTB B2 Beruf): Antwort auf eine Kundenbeschwerde im Auftrag der Vorgesetzten. Bewertet wird vor allem, ob ALLE Aufträge aus der Notiz der Vorgesetzten umgesetzt sind, ob nichts Unpassendes versprochen wird (z. B. kein Rabatt, wenn er nicht erwähnt ist), ob das Register formell und höflich ist und ob die Textsorte stimmt (Anrede, Bezug, Entschuldigung, Erklärung, Lösung, Schluss, Gruß).\n\n${t.context}`
     : `Aufgabe 58 (DTB B2 Beruf): Forumsbeitrag im Intranet zu folgender Situation. Erwartet werden: kurze Einleitung zum Thema, Vorteile, Nachteile, eigene begründete Meinung, passender Schluss; einheitliches Register (du/ihr oder Sie, nicht gemischt); ca. 150 Wörter.\n\n${t.context}`;
   return `Du bist ein erfahrener, strenger, aber ermutigender Prüfer für telc Deutsch B2 Beruf (DTB). Bewerte den Text eines Lernenden.
 
-${task}
+${task}${t.speak ? "\n\n" + SPOKEN_NOTE : ""}
 
 Text des Lernenden:
 """
@@ -107,7 +119,7 @@ Antworte NUR mit JSON in genau diesem Format:
 
 Regeln:
 - Alle Kommentare, Erklärungen, das Fazit und die Tipps auf ${aiLang() === "de" ? "Deutsch (einfach und klar, ohne Übersetzungen in andere Sprachen)" : LANG_NAME[aiLang()] + " (Sprache der Benutzeroberfläche)"}.
-- "leitpunkte": ${t.kind === "beschwerde" ? "jeder einzelne Auftrag aus der Notiz der Vorgesetzten als eigener Punkt (auf Deutsch kurz benannt)" : t.kind === "praesentation" ? "Einleitung mit Gliederung, jeder Stichpunkt des Themas, eigene Meinung, Schluss" : "Einleitung, Vorteile, Nachteile, eigene Meinung, Schluss"}; "status" ist "ja", "teilweise" oder "nein".
+- "leitpunkte": ${t.kind === "beschwerde" ? "jeder einzelne Auftrag aus der Notiz der Vorgesetzten als eigener Punkt (auf Deutsch kurz benannt)" : t.kind === "smalltalk" ? "jeder Aspekt des Themas, Gegenfragen an den Partner, eigene Erfahrungen" : t.kind === "loesung" ? "jeder Stichpunkt der Aufgabe als eigener Punkt, dann Einigung / gemeinsame Lösung" : t.kind === "praesentation" ? "Einleitung mit Gliederung, jeder Stichpunkt des Themas, eigene Meinung, Schluss" : "Einleitung, Vorteile, Nachteile, eigene Meinung, Schluss"}; "status" ist "ja", "teilweise" oder "nein".
 - "original" muss wörtlich und exakt im Text des Lernenden vorkommen (1–6 Wörter), "korrektur" ist die korrigierte Form desselben Ausschnitts.
 - "typ" ist eines von: Grammatik, Wortschatz, Rechtschreibung, Zeichensetzung, Stil.
 - Alle echten Fehler auflisten (höchstens 30), keine Geschmacksfragen.
@@ -248,6 +260,12 @@ const SP_REDE = {
 REDEMITTEL.praesentation = SP_REDE.sp1;
 WMAX.praesentation = { inhalt: 6, sprache: 6 };
 const PRAES_TASK = `Sprechen Teil 1 (DTB B2 Beruf): Präsentation zu einem Thema, ca. 2 Minuten (etwa 180–250 Wörter), danach 2 Minuten Fragen. Der Text wurde hier schriftlich vorbereitet. Erwartet werden: Einleitung mit Gliederung, Hauptteil mit allen Stichpunkten und konkreten Beispielen, eigene Meinung, Schluss (Zusammenfassung und Dank), einheitlicher, gut sprechbarer Stil (keine zu langen Schachtelsätze). Bewertet werden Inhalt und Sprache.`;
+const PRAES_TASK_SPOKEN = `Sprechen Teil 1A (DTB B2 Beruf): Präsentation zu einem Thema, ca. 2 Minuten frei gesprochen (etwa 180–250 Wörter). Erwartet werden: Einleitung mit Gliederung, Hauptteil mit allen Stichpunkten und konkreten Beispielen, eigene Meinung und Erfahrung, Schluss (Zusammenfassung und Dank). Bewertet werden Inhalt und Sprache.`;
+const SMALLTALK_TASK = `Sprechen Teil 2 (DTB B2 Beruf): Smalltalk mit einer Kollegin oder einem Kollegen, ca. 3 Minuten, lockerer Ton (du). Der Lernende spricht hier seinen eigenen Teil des Gesprächs als zusammenhängenden Beitrag: auf die Aspekte des Themas eingehen, von eigenen Erfahrungen erzählen, Gegenfragen stellen, das Gespräch freundlich am Laufen halten.`;
+const LOESUNG_TASK = `Sprechen Teil 3 (DTB B2 Beruf): gemeinsam mit einer Kollegin eine Lösung für ein Problem am Arbeitsplatz finden, ca. 4 Minuten, du-Form. Der Lernende spricht hier seinen eigenen Teil: zu jedem Stichpunkt einen konkreten Vorschlag mit Begründung, Reaktion auf mögliche Einwände (zustimmen, nachfragen, höflich widersprechen), kurzfristige und langfristige Maßnahmen, am Ende ein Vorschlag zur Einigung.`;
+const SPOKEN_NOTE = `Wichtig: Der Text wurde frei gesprochen und vom Browser automatisch in Text umgewandelt (Spracherkennung). Ignoriere fehlende oder falsche Zeichensetzung, Groß- und Kleinschreibung und offensichtliche Erkennungsfehler (ähnlich klingende Wörter) und liste sie nicht als Fehler auf (keine Fehler vom Typ Rechtschreibung oder Zeichensetzung). Bewerte die gesprochene Sprache: Aufgabenerfüllung, Grammatik, Wortschatz, Satzbau, Redemittel, Kohärenz. "verbesserter_text" ist eine korrigierte, gut sprechbare Fassung auf B2-Niveau mit Satzzeichen.`;
+REDEMITTEL.smalltalk = SP_REDE.sp2; REDEMITTEL.loesung = SP_REDE.sp3;
+WMAX.smalltalk = { inhalt: 4, sprache: 4 }; WMAX.loesung = { inhalt: 5, sprache: 5 };
 
 const PRAXIS = { sp1: "Teil 1", sp2: "Teil 2", sp3: "Teil 3" };
 // model dialogue / monologue with audio (neural recording when available) and a readable transcript
@@ -262,7 +280,8 @@ function modelBlock(segs, title, hint) {
 function chatPartner(cfg) {
   const turns = [];
   const chat = h("div", { class: "chat" });
-  const box = h("textarea", { class: "in", id: "sp-in-" + cfg.id, rows: 3, placeholder: "Schreiben Sie Ihre Antwort auf Deutsch…" });
+  const box = h("textarea", { class: "in", id: "sp-in-" + cfg.id, rows: 3, lang: "de", placeholder: "Sagen oder schreiben Sie Ihre Antwort auf Deutsch…" });
+  const mic = dictation(box, { compact: true });
   const fb = h("div", { class: "stack" });
   const autoSpeak = h("input", { type: "checkbox", id: "sp-voice-" + cfg.id, checked: store.get("spVoice", true) });
   autoSpeak.onchange = () => store.set("spVoice", autoSpeak.checked);
@@ -279,7 +298,7 @@ function chatPartner(cfg) {
     sendBtn.disabled = false;
   }
   const startBtn = aiButton(cfg.startLabel, () => { first = cfg.rules() + "\n" + cfg.start; startBtn.hidden = true; partner(); });
-  const sendBtn = h("button", { class: "btn primary", onclick: () => { const v = box.value.trim(); if (!v || !first) return; bubble("me", v); turns.push({ role: "user", content: v }); box.value = ""; partner(); } }, "Отправить");
+  const sendBtn = h("button", { class: "btn primary", onclick: () => { mic.stop(); const v = box.value.trim(); if (!v || !first) return; bubble("me", v); turns.push({ role: "user", content: v }); box.value = ""; partner(); } }, "Отправить");
   box.addEventListener("keydown", (e) => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) sendBtn.click(); });
   const rateBtn = aiButton("Оценить мой разговор", async () => {
     const mine = turns.filter(t => t.role === "user").map(t => t.content);
@@ -299,10 +318,9 @@ function chatPartner(cfg) {
   }, "");
   const el = h("div", { class: "card stack" }, h("div", { class: "spread" }, h("h3", null, cfg.title), h("label", { class: "row small", for: "sp-voice-" + cfg.id }, autoSpeak, "озвучивать ответы")),
     noAiNote("Разговор с ИИ здесь недоступен. Потренируйтесь вслух по пунктам и Redemittel и сравните с образцом."),
-    startBtn, chat, h("div", { class: "stack", "data-ai": "", hidden: !SAMPLE }, box, h("div", { class: "row" }, sendBtn, rateBtn, h("span", { class: "small muted" }, "Ctrl+Enter — отправить"))), fb);
+    startBtn, chat, h("div", { class: "stack", "data-ai": "", hidden: !SAMPLE }, mic.el, box, h("div", { class: "row" }, sendBtn, rateBtn, h("span", { class: "small muted" }, "Ctrl+Enter — отправить"))), fb);
   return el;
 }
-const rmCard = (key) => h("div", { class: "card sticky stack" }, h("div", { class: "eyebrow" }, "Redemittel"), SP_REDE[key].map((g, i) => h("details", { class: "rm", open: i < 2 }, h("summary", null, g.h), h("ul", null, g.items.map(s => h("li", null, s))))));
 const RULES_COMMON = "Antworte immer nur auf Deutsch, in 2–4 kurzen Sätzen, natürlich gesprochen auf B2-Niveau. Keine Korrekturen, keine Erklärungen, keine Aufzählungen, nur das Gespräch.";
 
 // strip in the style of the "Aufgabenblätter" of the oral exam (pair exam, about 16 minutes, no preparation time)
@@ -316,41 +334,51 @@ const spHead = (k) => h("div", { class: "sp-head" }, h("span", { class: "sp-ico"
     SP_HEAD[k].map(([t, d, m]) => h("div", { class: "sp-p" }, h("b", null, t), " " + T(d), m ? h("span", null, ` (${T(m)})`) : null))));
 function rSprechen3(it) {
   const m = modelBlock(it.model, "Образец диалога", "A — это вы, B — ваш партнёр. Это один из возможных вариантов: берите структуру и фразы, но говорите своими словами.");
+  // first the learner speaks their own part (free check or AI check), then can train the dialogue with the AI partner
+  const speak = writeTask({
+    id: "w-" + it.id, kind: "loesung", speak: true, title: "Teil 3 · " + T("Ситуация") + " " + it.n, minutes: 4, target: [100, 220], conn: 4,
+    taskEl: h("div", { class: "stack" }, h("p", { class: "qt", style: "margin:0" }, it.text), h("div", { class: "eyebrow" }, T("Эти пункты помогут вам")), h("ul", { style: "margin:0;padding-left:20px" }, it.points.map(p => h("li", null, p))),
+      h("p", { class: "small muted", style: "margin:0" }, "Скажите свою часть разговора: предложение по каждому пункту, причину, ответ на возможное возражение и в конце предложение договориться. Ниже можно потренировать диалог с ИИ-партнёром."),
+      h("div", { class: "row" }, m.btn)),
+    context: `Situation: ${it.text}\nStichpunkte: ${it.points.join("; ")}`,
+    points: it.points, modelText: spModel(it.model, "A"),
+  });
   const chat = chatPartner({
     id: it.id, title: "Разговор с партнёром (ИИ)", partnerName: "Партнёр (ИИ)", startLabel: "Начать разговор", max: 10,
     rules: () => `Wir üben die mündliche Prüfung telc DTB B2 Beruf, Teil 3 ("Gemeinsam eine Lösung finden"). Du bist meine Gesprächspartnerin, eine freundliche Kollegin. Situation: ${it.text}\nStichpunkte: ${it.points.join("; ")}\nRegeln: ${RULES_COMMON} Mach eigene konkrete Vorschläge, reagiere auf meine Ideen (zustimmen, nachfragen oder höflich widersprechen) und bringe das Gespräch Schritt für Schritt zu einer gemeinsamen Lösung, sodass alle Stichpunkte besprochen werden. Wenn wir uns einigen, bestätige das kurz.`,
     start: "Beginne du das Gespräch: Begrüße mich kurz, beschreibe das Problem in 2 Sätzen und frage mich, was wir tun sollen.",
     rateIntro: `Bewerte meine Beiträge in einem Übungsgespräch für telc DTB B2 Beruf, Sprechen Teil 3 (gemeinsam Lösungen finden, 10 Punkte). Situation: ${it.text}. Stichpunkte: ${it.points.join("; ")}. Kriterien: alle Stichpunkte behandelt, eigene Vorschläge, auf die Partnerin eingehen, Einigung erzielen, Sprache.`,
   });
-  return h("div", { class: "stack" }, spHead("sp3"), h("div", { class: "two" },
-    h("div", { class: "stack" },
-      h("div", { class: "card stack" }, h("div", { class: "eyebrow" }, T("Ситуация") + " " + it.n), h("p", { class: "qt", style: "margin:0" }, it.text), h("div", { class: "eyebrow" }, T("Эти пункты помогут вам")), h("ul", { style: "margin:0;padding-left:20px" }, it.points.map(p => h("li", null, p))),
-        h("div", { class: "row" }, m.btn)), m.box, chat),
-    rmCard("sp3")));
+  return h("div", { class: "stack" }, spHead("sp3"), speak, m.box, chat);
 }
 
 function rSprechen2(it) {
   const m = modelBlock(it.model, "Образец разговора", "A — это вы, B — собеседник. Берите фразы и структуру, а ответы делайте про себя.");
+  const speak = writeTask({
+    id: "w-" + it.id, kind: "smalltalk", speak: true, title: "Teil 2 · " + it.title, minutes: 3, target: [80, 180], conn: 3,
+    taskEl: h("div", { class: "stack" }, h("p", { class: "qt", style: "margin:0" }, it.situation), h("ul", { style: "margin:0;padding-left:20px" }, it.points.map(p => h("li", null, p))),
+      h("p", { class: "small muted", style: "margin:0" }, "Скажите свою часть разговора: ответьте на каждый пункт, расскажите о своём опыте и задайте собеседнику 1–2 встречных вопроса. Ниже можно поговорить с ИИ-собеседником."),
+      h("div", { class: "row" }, m.btn)),
+    context: `Thema: ${it.title}\nSituation: ${it.situation}\nAspekte: ${it.points.join("; ")}`,
+    points: it.points, modelText: spModel(it.model, "A"),
+  });
   const chat = chatPartner({
     id: it.id, title: "Разговор с собеседником (ИИ)", partnerName: "Собеседник (ИИ)", startLabel: "Начать разговор", max: 8,
     rules: () => `Wir üben die mündliche Prüfung telc DTB B2 Beruf, Teil 2 (Smalltalk, ca. 3 Minuten, entspannte Alltagsunterhaltung unter Kollegen). Du bist mein Gesprächspartner / meine Gesprächspartnerin. Thema: ${it.title}. Situation: ${it.situation}\nMögliche Aspekte: ${it.points.join("; ")}\nRegeln: ${RULES_COMMON} Stelle immer wieder eine kurze Frage zu meiner Antwort, erzähle auch selbst etwas Kurzes über dich, bleib freundlich und locker.`,
     start: "Beginne du das Gespräch mit einem natürlichen Einstieg zum Thema.",
     rateIntro: `Bewerte meine Beiträge in einem Smalltalk-Übungsgespräch für telc DTB B2 Beruf, Sprechen Teil 2 (8 Punkte). Thema: ${it.title}. Kriterien: auf den Partner eingehen, Gespräch am Laufen halten, Fragen stellen, eigene Erfahrungen erzählen, Wortschatz und Grammatik.`,
   });
-  return h("div", { class: "stack" }, spHead("sp2"), h("div", { class: "two" },
-    h("div", { class: "stack" },
-      h("div", { class: "card stack" }, h("div", { class: "eyebrow" }, T("Тема") + " " + it.n + " · " + it.title), h("p", { class: "qt", style: "margin:0" }, it.situation), h("ul", { style: "margin:0;padding-left:20px" }, it.points.map(p => h("li", null, p))),
-        h("div", { class: "row" }, m.btn)), m.box, chat),
-    rmCard("sp2")));
+  return h("div", { class: "stack" }, spHead("sp2"), speak, m.box, chat);
 }
 
 function rSprechen1(it, mode, ctx) {
   const m = modelBlock(it.model, "Образец презентации", "Пример структуры: приветствие и план, основная часть с примерами, мнение, заключение. Ваш текст должен быть про вас.");
   const write = writeTask({
-    id: "w-" + it.id, kind: "praesentation", title: "Teil 1 · " + it.title, minutes: 6, target: [150, 260],
-    taskEl: h("div", { class: "stack" }, h("p", { style: "margin:0" }, "Подготовьте выступление на ~2 минуты (150–260 слов) по теме и этим пунктам. Потом прочитайте его вслух, на экзамене вы говорите свободно. ИИ проверит текст, затем задаст вопросы, как экзаменатор."),
+    id: "w-" + it.id, kind: "praesentation", speak: true, title: "Teil 1 · " + it.title, minutes: 2, target: [150, 260], conn: 5,
+    taskEl: h("div", { class: "stack" }, h("p", { style: "margin:0" }, "Расскажите о теме примерно 2 минуты (150–260 слов) по этим пунктам. Нажмите «Говорить» и говорите свободно, как на экзамене: речь превратится в текст. Потом проверьте ответ бесплатно или с ИИ, а ИИ-экзаменатор задаст вопросы."),
       h("ul", { style: "margin:0;padding-left:20px" }, it.points.map(p => h("li", null, p)))),
     context: `Thema: ${it.title}\nStichpunkte: ${it.points.join("; ")}`,
+    points: it.points, modelText: spModel(it.model),
     models: [it.model.map(s => s.t).join("\n\n")], modelNote: "Один из возможных вариантов. Ниже можно ещё послушать его.", onDone: ctx && ctx.onWriteDone,
   });
   const ta = () => (document.getElementById("ta-w-" + it.id) || {}).value || "";

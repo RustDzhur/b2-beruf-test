@@ -7,7 +7,10 @@ const load = (file, names) => {
   vm.runInContext(fs.readFileSync(file, "utf8").split("function admTr")[0] + ";this.out = {" + names + "};", ctx);
   return ctx.out;
 };
-const LANGS = ["en", "de", "fr", "tr", "ar", "it"];
+const LANGS = ["en", "de", "fr", "tr", "ar", "it", "uk"];
+const N = LANGS.length;
+// Ukrainian is written in Cyrillic too, so a Ukrainian string only counts as Russian when it has letters Ukrainian does not use (ы э ъ ё)
+const RU_LEFT = (t, i) => (LANGS[i] === "uk" ? /[ЫыЭэЪъЁё]/ : /[А-Яа-яЁё]/).test(t);
 
 // every Russian sentence the mistake-repetition feature puts on screen must exist in all six interface languages
 const STUDENT_KEYS = [
@@ -26,9 +29,9 @@ test("student interface: repetition texts are translated into every language", (
   for (const k of STUDENT_KEYS) {
     const row = I18N[k];
     assert.ok(row, "missing key: " + k);
-    assert.equal(row.length, 6, k);
-    row.forEach((t, i) => assert.ok(t && t.trim() && !/[А-Яа-яЁё]/.test(t), `${LANGS[i]} untranslated: ${k}`));
-    for (const i of [2, 3, 4, 5]) assert.notEqual(row[i], row[0], `${LANGS[i]} falls back to English: ${k}`);
+    assert.equal(row.length, N, k);
+    row.forEach((t, i) => assert.ok(t && t.trim() && !RU_LEFT(t, i), `${LANGS[i]} untranslated: ${k}`));
+    for (const i of [2, 3, 4, 5, 6]) assert.notEqual(row[i], row[0], `${LANGS[i]} falls back to English: ${k}`);
   }
 });
 
@@ -36,22 +39,22 @@ test("student interface: 'from <date>' rule translates and nests today/tomorrow"
   const { I18N_RULES } = load("src/i18n.js", "I18N_RULES");
   const rule = I18N_RULES.find(([rx]) => rx === "^Можно с (.+)$");
   assert.ok(rule, "rule missing");
-  assert.equal(rule[1].length, 6);
+  assert.equal(rule[1].length, N);
   rule[1].forEach(t => assert.ok(t.includes("{~1}")));
 });
 
 test("teacher cabinet: new labels are translated into every language", () => {
   const { ADM_I18N, ADM_RULES } = load("src/admin_i18n.js", "ADM_I18N, ADM_RULES");
   for (const k of ["Общий рейтинг", "Тот же рейтинг, что видят ученики: очки за всё время", "с первой попытки", "Средний успех (с первой попытки)", "Общий рейтинг: —"]) {
-    assert.ok(ADM_I18N[k] && ADM_I18N[k].length === 6, "missing key: " + k);
-    ADM_I18N[k].forEach(t => assert.ok(t && !/[А-Яа-яЁё]/.test(t), k));
+    assert.ok(ADM_I18N[k] && ADM_I18N[k].length === N, "missing key: " + k);
+    ADM_I18N[k].forEach((t, i) => assert.ok(t && !RU_LEFT(t, i), k));
   }
   const samples = ["12 попыток · 1 дн. · 80% с первой попытки", "Общий рейтинг: #2 · 433 очков",
     "Сейчас (с учётом пересдач): 98% · лучший: 98% · успешных заданий: 3 из 3 · ошибок к повтору: 0"];
   for (const s of samples) {
     const r = ADM_RULES.find(([rx]) => rx.test(s));
     assert.ok(r, "no rule for: " + s);
-    assert.equal(r[1].length, 6);
+    assert.equal(r[1].length, N);
   }
 });
 
@@ -65,9 +68,9 @@ test("teacher cabinet: counted phrases and tooltips lose no Russian in any langu
   const src = fs.readFileSync("src/admin_i18n.js", "utf8").split("function admLangNode")[0] + ";this.admTr = admTr; this.setL = (l) => { ADM_LANG = l; };";
   const ctx = vm.createContext({ localStorage: { getItem: () => null } });
   vm.runInContext(src, ctx);
-  for (const l of ["en", "de", "fr", "tr", "ar", "it"]) {
+  for (const l of LANGS) {
     ctx.setL(l);
-    for (const s of samples) assert.ok(!/[А-Яа-яЁё]/.test(ctx.admTr(s)), `${l}: ${s} -> ${ctx.admTr(s)}`);
+    for (const s of samples) assert.ok(!RU_LEFT(ctx.admTr(s), LANGS.indexOf(l)) && ctx.admTr(s) !== s, `${l}: ${s} -> ${ctx.admTr(s)}`);
   }
 });
 
@@ -78,23 +81,23 @@ test("student interface: verification texts are translated, with and without the
   const fn = new Function(util.match(/const notVerifiedText = [^\n]+/)[0] + "; return notVerifiedText;")();
   const exact = fn("");
   assert.ok(I18N[exact], "no exact translation for the text without a number");
-  assert.equal(I18N[exact].length, 6);
-  I18N[exact].forEach((t, i) => assert.ok(t && !/[А-Яа-яЁё]/.test(t), LANGS[i]));
+  assert.equal(I18N[exact].length, N);
+  I18N[exact].forEach((t, i) => assert.ok(t && !RU_LEFT(t, i), LANGS[i]));
   const withNumber = fn("+49 000 0000000");
   const rule = I18N_RULES.find(r => new RegExp(r[0]).test(withNumber));
   assert.ok(rule, "no rule for the text with a number");
-  rule[1].forEach((t, i) => assert.ok(t.includes("{1}") && !/[А-Яа-яЁё]/.test(t), LANGS[i]));
+  rule[1].forEach((t, i) => assert.ok(t.includes("{1}") && !RU_LEFT(t, i), LANGS[i]));
   for (const k of ["E-mail нужен для верификации: тот же адрес отправьте преподавателю в WhatsApp. ИИ доступен после верификации и символического взноса на оплату API.", "Укажите e-mail: он нужен для сохранения прогресса в облаке и для верификации."]) {
-    assert.ok(I18N[k] && I18N[k].length === 6, k);
-    I18N[k].forEach((t, i) => assert.ok(t && !/[А-Яа-яЁё]/.test(t), LANGS[i] + ": " + k));
+    assert.ok(I18N[k] && I18N[k].length === N, k);
+    I18N[k].forEach((t, i) => assert.ok(t && !RU_LEFT(t, i), LANGS[i] + ": " + k));
   }
 });
 
 test("teacher cabinet: verification labels are translated into every language", () => {
   const { ADM_I18N } = load("src/admin_i18n.js", "ADM_I18N");
   for (const k of ["Доступ к ИИ", "Верифицирован", "Не верифицирован", "Не верифицированные", "Подтвердить", "Отозвать", "Не удалось сохранить.", "Не удалось загрузить статусы верификации"]) {
-    assert.ok(ADM_I18N[k] && ADM_I18N[k].length === 6, "missing: " + k);
-    ADM_I18N[k].forEach((t, i) => assert.ok(t && !/[А-Яа-яЁё]/.test(t), LANGS[i] + ": " + k));
+    assert.ok(ADM_I18N[k] && ADM_I18N[k].length === N, "missing: " + k);
+    ADM_I18N[k].forEach((t, i) => assert.ok(t && !RU_LEFT(t, i), LANGS[i] + ": " + k));
   }
 });
 
@@ -106,7 +109,7 @@ test('Redemittel (DB.RM) are translated into every interface language', () => {
   for (const k of ['forum', 'beschwerde']) for (const g of sb.DB.RM[k]) { keys.push(g.h + ' · ' + g.hr); for (const x of g.items) keys.push(x.ru); }
   for (const key of keys) {
     const row = sb.I18N[key];
-    assert.ok(row && row.length === 6, 'no translation: ' + key);
-    assert.ok(row.every(t => t && !/[а-яё]/i.test(t.replace(/Redemittel/g, '')) || key === row[0]), 'Russian left in: ' + key);
+    assert.ok(row && row.length === N, 'no translation: ' + key);
+    row.forEach((t, i) => assert.ok(t && !RU_LEFT(t.replace(/Redemittel/g, ''), i), LANGS[i] + ' untranslated: ' + key));
   }
 });

@@ -9,10 +9,14 @@ const admin = require("./_admin.js");
 const WEB_KEY = process.env.FIREBASE_WEB_API_KEY || "AIzaSyA5_PmCPlHg-9P1OD9LQFHXXF4Svj6Vajo"; // public by design (same key as in the page)
 const UID_RE = /^[A-Za-z0-9_-]{6,128}$/;
 const TOKEN_TTL = 5 * 60 * 1000, VERIFIED_TTL = 60 * 1000;
-const tokenCache = new Map(), verifiedCache = new Map();
+const tokenCache = new Map(), verifiedCache = new Map(), created = new Map(), emails = new Map(), mailOk = new Map();
+// ADMIN_EMAILS (comma separated): the site owner's own accounts. With a confirmed e-mail they are always admitted,
+// get the AI and may sign in to /admin as the main administrator (see _admin.js login).
+const adminEmails = () => String(process.env.ADMIN_EMAILS || "").toLowerCase().split(/[\s,;]+/).filter(Boolean);
+const isOwner = uid => { const e = emails.get(uid); return !!e && mailOk.get(uid) === true && adminEmails().includes(e); };
 const mem = new Set(); // used only with ADMIN_FIXTURES (no Firestore), so the cabinet can be tried locally
 
-const contact = () => String(process.env.VERIFY_CONTACT || "").slice(0, 60);
+const contact = () => String(process.env.VERIFY_CONTACT || "").slice(0, 120);
 const open = () => process.env.AI_OPEN === "1"; // escape hatch for local work: everybody may use the AI
 const useMem = () => { try { return !admin.serviceAccount() && !!admin.fixtureUsers(); } catch { return false; } };
 const fail = (status, code, message) => Object.assign(new Error(message), { status, code });
@@ -41,6 +45,9 @@ async function lookupUid(idToken) {
   if (!uid) return null;
   if (tokenCache.size > 2000) tokenCache.clear();
   tokenCache.set(key, { uid, exp: Date.now() + TOKEN_TTL });
+  emails.set(uid, String(j.users[0].email || "").toLowerCase()); // the sign-in address (old accounts: u…@dtb-trainer.app)
+  mailOk.set(uid, j.users[0].emailVerified === true);
+  created.set(uid, Number(j.users[0].createdAt || 0)); // account creation time: old accounts are admitted automatically
   return uid;
 }
 
@@ -97,7 +104,10 @@ async function listVerified() {
 }
 
 // hooks so tests can run without Google
-const impl = { lookupUid, isVerified };
+// sub(uid): the subscription term (see _subs.js); a Firestore hiccup must not lock everybody out, so it counts as "no term"
+const impl = { lookupUid, isVerified, isAdmitted: (uid, createdAt) => require("./_admit.js").isAdmitted(uid, createdAt),
+  sub: async uid => { try { return await require("./_subs.js").get(uid); } catch { return null; } } };
+const isExpired = sub => require("./_subs.js").expired(sub);
 
 // Authorization header -> {ok:true, uid} or {ok:false, status, code}
 async function check(authHeader) {
@@ -107,11 +117,43 @@ async function check(authHeader) {
   try {
     const uid = await impl.lookupUid(m[1]);
     if (!uid) return { ok: false, status: 403, code: "not_verified" };
+    if (isOwner(uid)) return { ok: true, uid };
     if (!(await impl.isVerified(uid))) return { ok: false, status: 403, code: "not_verified" };
+    if (isExpired(await impl.sub(uid))) return { ok: false, status: 403, code: "expired" }; // the paid month or the trial is over
     return { ok: true, uid };
   } catch (e) {
     return { ok: false, status: e.status || 503, code: e.code || "verify_unavailable" };
   }
 }
 
-module.exports = { check, setVerified, listVerified, isVerified, contact, UID_RE, _hooks: impl };
+// GET /api/access -> {verified: admitted to the trainer, ai: may use the paid AI, contact}
+// "verified" keeps its old name for the page; it now means admission (see _admit.js), not the AI.
+// PayPal.me link for the payment buttons (PAYPAL_ME, e.g. "YourName"); payments are checked by hand by the administrator
+const payLink = () => {
+  const n = String(process.env.PAYPAL_ME || "RustemDzhuraiev").replace(/^.*paypal\.me\//i, "").replace(/[^A-Za-z0-9_.-]/g, "").slice(0, 60);
+  return n ? "https://paypal.me/" + n : "";
+};
+async function access(authHeader) {
+  const [code, o] = await accessCheck(authHeader);
+  return [code, Object.assign(o, { pay: payLink() })];
+}
+async function accessCheck(authHeader) {
+  if (open()) return [200, { verified: true, ai: true, contact: contact() }];
+  const m = /^Bearer\s+(\S{20,4096})$/.exec(String(authHeader || ""));
+  if (!m) return [200, { verified: false, ai: false, contact: contact() }];
+  try {
+    const uid = await impl.lookupUid(m[1]);
+    if (!uid) return [200, { verified: false, ai: false, contact: contact() }];
+    if (isOwner(uid)) return [200, { verified: true, ai: true, owner: true, contact: contact() }];
+    const admitted = await impl.isAdmitted(uid, created.get(uid));
+    const sub = admitted ? await impl.sub(uid) : null;
+    const term = sub && sub.until > 0 ? { until: sub.until, trial: !!sub.trial, plan: sub.plan } : null;
+    if (isExpired(sub)) return [200, { verified: false, ai: false, expired: true, sub: term, contact: contact() }]; // closes by itself
+    const ai = admitted ? await impl.isVerified(uid) : false;
+    return [200, { verified: admitted, ai, sub: term, contact: contact() }];
+  } catch (e) {
+    return [e.status || 503, { code: e.code || "verify_unavailable", verified: null, contact: contact() }];
+  }
+}
+
+module.exports = { emails, mailOk, adminEmails, isOwner, check, access, setVerified, listVerified, isVerified, contact, UID_RE, _hooks: impl };
